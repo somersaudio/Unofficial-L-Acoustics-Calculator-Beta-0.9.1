@@ -169,15 +169,28 @@ function allocateToOutputs(
  * Merge additional enclosures into existing output allocations.
  * Used when multiple enclosure types are allocated to the same amp.
  * IMPORTANT: Only uses empty outputs - never mixes different enclosure types on the same output.
+ * IMPORTANT: Respects load percentage limit - won't add if amp is at capacity.
  */
 function mergeIntoOutputs(
   existingOutputs: OutputAllocation[],
   enclosure: Enclosure,
   count: number,
-  limits: { perOutput: number; perAmplifier: number; minImpedanceOverride?: number }
+  limits: { perOutput: number; perAmplifier: number; minImpedanceOverride?: number },
+  currentLoadPercent: number
 ): { outputs: OutputAllocation[]; allocated: number } {
   let remaining = count;
   const outputs = existingOutputs.map((o) => ({ ...o, enclosures: [...o.enclosures] }));
+
+  // Calculate how much load each enclosure of this type adds
+  const loadPerEnclosure = 100 / limits.perAmplifier;
+
+  // Track current load as we allocate
+  let currentLoad = currentLoadPercent;
+
+  // Don't allocate if amp is already at or over capacity
+  if (currentLoad >= 100) {
+    return { outputs, allocated: 0 };
+  }
 
   if (enclosure.parallelAllowed) {
     // Only add to EMPTY outputs - never mix enclosure types on the same output
@@ -185,31 +198,63 @@ function mergeIntoOutputs(
       // Skip outputs that already have enclosures
       if (outputs[i].totalEnclosures > 0) continue;
 
-      const toAllocate = Math.min(remaining, limits.perOutput);
-      outputs[i].enclosures.push({ enclosure, count: toAllocate });
-      outputs[i].totalEnclosures = toAllocate;
-      outputs[i].impedanceOhms = calculateParallelImpedance(
-        enclosure.nominal_impedance_ohms,
-        toAllocate
-      );
-      // Set impedance override if manufacturer allows lower impedance
-      if (limits.minImpedanceOverride !== undefined) {
-        outputs[i].minImpedanceOverride = limits.minImpedanceOverride;
+      // Check if adding more would exceed 100% load
+      if (currentLoad >= 100) break;
+
+      // Calculate how many we can add without exceeding 100%
+      const loadRemaining = 100 - currentLoad;
+      const maxByLoad = Math.floor(loadRemaining / loadPerEnclosure);
+      const toAllocate = Math.min(remaining, limits.perOutput, Math.max(1, maxByLoad));
+
+      if (toAllocate <= 0) break;
+
+      // Check if this would push us over 100%
+      const newLoad = currentLoad + (toAllocate * loadPerEnclosure);
+      if (newLoad > 100 && currentLoad > 0) {
+        // Try allocating fewer
+        const safeCount = Math.floor((100 - currentLoad) / loadPerEnclosure);
+        if (safeCount <= 0) break;
+        // Use safeCount instead
+        outputs[i].enclosures.push({ enclosure, count: safeCount });
+        outputs[i].totalEnclosures = safeCount;
+        outputs[i].impedanceOhms = calculateParallelImpedance(
+          enclosure.nominal_impedance_ohms,
+          safeCount
+        );
+        if (limits.minImpedanceOverride !== undefined) {
+          outputs[i].minImpedanceOverride = limits.minImpedanceOverride;
+        }
+        remaining -= safeCount;
+        currentLoad += safeCount * loadPerEnclosure;
+      } else {
+        outputs[i].enclosures.push({ enclosure, count: toAllocate });
+        outputs[i].totalEnclosures = toAllocate;
+        outputs[i].impedanceOhms = calculateParallelImpedance(
+          enclosure.nominal_impedance_ohms,
+          toAllocate
+        );
+        if (limits.minImpedanceOverride !== undefined) {
+          outputs[i].minImpedanceOverride = limits.minImpedanceOverride;
+        }
+        remaining -= toAllocate;
+        currentLoad += toAllocate * loadPerEnclosure;
       }
-      remaining -= toAllocate;
     }
   } else {
     // No parallel - only add to empty outputs, 1 per output
     for (let i = 0; i < outputs.length && remaining > 0; i++) {
+      // Check if adding one more would exceed 100% load
+      if (currentLoad + loadPerEnclosure > 100) break;
+
       if (outputs[i].totalEnclosures === 0) {
         outputs[i].enclosures.push({ enclosure, count: 1 });
         outputs[i].totalEnclosures = 1;
         outputs[i].impedanceOhms = enclosure.nominal_impedance_ohms;
-        // Set impedance override if manufacturer allows lower impedance
         if (limits.minImpedanceOverride !== undefined) {
           outputs[i].minImpedanceOverride = limits.minImpedanceOverride;
         }
         remaining--;
+        currentLoad += loadPerEnclosure;
       }
     }
   }
@@ -399,6 +444,28 @@ function calculateTotalOutputsNeeded(
   return totalOutputs;
 }
 
+/**
+ * Calculate the total load percentage for a set of requests on a given amp config.
+ * This determines how many amps are needed based on combined per_amplifier limits.
+ */
+function calculateTotalLoadPercent(
+  requests: EnclosureRequest[],
+  ampConfigKey: string,
+  allAmpConfigs: AmpConfig[]
+): number {
+  let totalLoadPercent = 0;
+
+  for (const request of requests) {
+    const candidates = getCompatibleConfigs(request.enclosure, allAmpConfigs);
+    const candidate = candidates.find((c) => c.ampConfigKey === ampConfigKey);
+    if (!candidate) return Infinity; // Not compatible
+
+    totalLoadPercent += (request.quantity / candidate.perAmplifier) * 100;
+  }
+
+  return totalLoadPercent;
+}
+
 /** Solve for multiple enclosure types - tries to share amps between compatible types */
 function solveMultipleEnclosureTypes(
   requests: EnclosureRequest[],
@@ -423,7 +490,14 @@ function solveMultipleEnclosureTypes(
 
   for (const ampConfig of commonConfigs) {
     const outputsNeeded = calculateTotalOutputsNeeded(requests, ampConfig, allAmpConfigs);
-    const ampsNeeded = Math.ceil(outputsNeeded / ampConfig.outputs);
+    const totalLoadPercent = calculateTotalLoadPercent(requests, ampConfig.key, allAmpConfigs);
+
+    // Amps needed is the MAX of:
+    // 1. Outputs needed / outputs per amp (physical output constraint)
+    // 2. Total load / 100 (per_amplifier capacity constraint)
+    const ampsByOutputs = Math.ceil(outputsNeeded / ampConfig.outputs);
+    const ampsByLoad = Math.ceil(totalLoadPercent / 100);
+    const ampsNeeded = Math.max(ampsByOutputs, ampsByLoad);
 
     if (
       !bestSharedSolution ||
@@ -437,20 +511,78 @@ function solveMultipleEnclosureTypes(
 
   // Calculate what independent solving would give us
   let independentAmpsNeeded = 0;
+  let independentMaxPowerRank = 0;
+  let independentSumPowerRank = 0;
   for (const request of requests) {
     const best = findBestAmpConfig(request.enclosure, request.quantity, allAmpConfigs);
     if (best) {
-      independentAmpsNeeded += Math.ceil(request.quantity / best.enclosuresPerAmp);
+      const ampsForThis = Math.ceil(request.quantity / best.enclosuresPerAmp);
+      independentAmpsNeeded += ampsForThis;
+      independentMaxPowerRank = Math.max(independentMaxPowerRank, best.ampConfig.powerRank);
+      independentSumPowerRank += best.ampConfig.powerRank * ampsForThis;
     }
   }
 
-  // Use shared solution if it's better or equal (prefer consolidation)
-  if (bestSharedSolution && bestSharedSolution.ampsNeeded <= independentAmpsNeeded) {
-    return buildSharedSolution(requests, bestSharedSolution.ampConfig, allAmpConfigs);
+  // Compare shared vs independent solutions
+  // Prefer shared only if it uses FEWER amps, or same amps with lower power
+  if (bestSharedSolution) {
+    const sharedSumPowerRank = bestSharedSolution.ampConfig.powerRank * bestSharedSolution.ampsNeeded;
+
+    // Shared is better if:
+    // 1. Fewer amps, OR
+    // 2. Same amps AND lower max power rank, OR
+    // 3. Same amps AND same max power rank AND lower total power rank
+    const sharedIsBetter =
+      bestSharedSolution.ampsNeeded < independentAmpsNeeded ||
+      (bestSharedSolution.ampsNeeded === independentAmpsNeeded &&
+        bestSharedSolution.ampConfig.powerRank < independentMaxPowerRank) ||
+      (bestSharedSolution.ampsNeeded === independentAmpsNeeded &&
+        bestSharedSolution.ampConfig.powerRank === independentMaxPowerRank &&
+        sharedSumPowerRank < independentSumPowerRank);
+
+    if (sharedIsBetter) {
+      return buildSharedSolution(requests, bestSharedSolution.ampConfig, allAmpConfigs);
+    }
   }
 
   // Fall back to independent solving
   return solveIndependently(requests, allAmpConfigs);
+}
+
+/**
+ * Calculate load percentage for an amp instance with mixed enclosure types.
+ * Load is the sum of each enclosure type's contribution: (count / perAmplifier) for each type.
+ */
+function calculateMixedLoadPercent(
+  outputs: OutputAllocation[],
+  ampConfigKey: string,
+  allAmpConfigs: AmpConfig[]
+): number {
+  // Count enclosures by type
+  const enclosureCounts = new Map<string, { count: number; enclosure: Enclosure }>();
+
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      const key = entry.enclosure.enclosure;
+      const existing = enclosureCounts.get(key);
+      if (existing) {
+        existing.count += entry.count;
+      } else {
+        enclosureCounts.set(key, { count: entry.count, enclosure: entry.enclosure });
+      }
+    }
+  }
+
+  // Sum up load contributions from each enclosure type
+  let totalLoadPercent = 0;
+  for (const { count, enclosure } of enclosureCounts.values()) {
+    const limits = enclosure.max_enclosures[ampConfigKey];
+    if (limits) {
+      totalLoadPercent += (count / limits.per_amplifier) * 100;
+    }
+  }
+
+  return Math.round(totalLoadPercent);
 }
 
 /** Build a solution using a shared amp config for all enclosure types */
@@ -461,6 +593,7 @@ function buildSharedSolution(
 ): SolverSolution {
   const ampInstances: AmpInstance[] = [];
   let totalAllocated = 0;
+  const configsUsed = new Set<string>([ampConfig.key]);
 
   // Process each request, filling amps and creating new ones as needed
   for (const request of requests) {
@@ -476,42 +609,63 @@ function buildSharedSolution(
     for (const ampInstance of ampInstances) {
       if (remaining <= 0) break;
 
+      // Only try to fill amps of the shared type (not overflow amps)
+      if (ampInstance.ampConfig.key !== ampConfig.key) continue;
+
+      // Calculate current load to check if amp has capacity
+      const currentLoad = calculateMixedLoadPercent(ampInstance.outputs, ampConfig.key, allAmpConfigs);
+      if (currentLoad >= 100) continue; // Amp is full
+
       const { outputs, allocated } = mergeIntoOutputs(
         ampInstance.outputs,
         enclosure,
         remaining,
-        { perOutput: candidate.perOutput, perAmplifier: candidate.perAmplifier, minImpedanceOverride: candidate.minImpedanceOverride }
+        { perOutput: candidate.perOutput, perAmplifier: candidate.perAmplifier, minImpedanceOverride: candidate.minImpedanceOverride },
+        currentLoad  // Pass current load percentage, not enclosure count
       );
 
       if (allocated > 0) {
         ampInstance.outputs = outputs;
         ampInstance.totalEnclosures += allocated;
-        // Recalculate load percent based on outputs used
-        const usedOutputs = ampInstance.outputs.filter((o) => o.totalEnclosures > 0).length;
-        ampInstance.loadPercent = Math.round((usedOutputs / ampConfig.outputs) * 100);
+        // Recalculate load percent based on all enclosure types on this amp
+        ampInstance.loadPercent = calculateMixedLoadPercent(ampInstance.outputs, ampConfig.key, allAmpConfigs);
         remaining -= allocated;
       }
     }
 
     // Create new amps for remaining
+    // For overflow, check if there's a more efficient amp for just this enclosure type
     while (remaining > 0) {
-      const toAllocate = Math.min(remaining, candidate.perAmplifier);
-      const outputs = allocateToOutputs(enclosure, toAllocate, ampConfig, {
-        perOutput: candidate.perOutput,
-        perAmplifier: candidate.perAmplifier,
-        minImpedanceOverride: candidate.minImpedanceOverride,
+      // Find the best amp for just the remaining enclosures of this type
+      const overflowBest = findBestAmpConfig(enclosure, remaining, allAmpConfigs);
+
+      // Use the more efficient amp if it's better (lower power rank and same or fewer amps)
+      const useOverflowAmp = overflowBest &&
+        overflowBest.ampConfig.powerRank < ampConfig.powerRank;
+
+      const chosenConfig = useOverflowAmp ? overflowBest!.ampConfig : ampConfig;
+      const chosenCandidate = useOverflowAmp ? overflowBest! : candidate;
+
+      if (useOverflowAmp) {
+        configsUsed.add(chosenConfig.key);
+      }
+
+      const toAllocate = Math.min(remaining, chosenCandidate.perAmplifier);
+      const outputs = allocateToOutputs(enclosure, toAllocate, chosenConfig, {
+        perOutput: chosenCandidate.perOutput,
+        perAmplifier: chosenCandidate.perAmplifier,
+        minImpedanceOverride: chosenCandidate.minImpedanceOverride,
       });
 
-      const ampIndex = ampInstances.filter((i) => i.ampConfig.key === ampConfig.key).length;
+      const ampIndex = ampInstances.filter((i) => i.ampConfig.key === chosenConfig.key).length;
 
       ampInstances.push({
-        id: generateAmpId(ampConfig.key, ampIndex),
-        ampConfig,
+        id: generateAmpId(chosenConfig.key, ampIndex),
+        ampConfig: chosenConfig,
         outputs,
         totalEnclosures: toAllocate,
-        loadPercent: Math.round(
-          (outputs.filter((o) => o.totalEnclosures > 0).length / ampConfig.outputs) * 100
-        ),
+        // Load percent based on this enclosure type's contribution
+        loadPercent: calculateMixedLoadPercent(outputs, chosenConfig.key, allAmpConfigs),
       });
 
       remaining -= toAllocate;
@@ -520,14 +674,18 @@ function buildSharedSolution(
     totalAllocated += quantity;
   }
 
+  // Collect all amp configs used
+  const ampConfigsUsed = allAmpConfigs.filter((c) => configsUsed.has(c.key));
+  const maxPowerRank = Math.max(...ampConfigsUsed.map((c) => c.powerRank));
+
   return {
     success: true,
     ampInstances,
     summary: {
       totalAmplifiers: ampInstances.length,
       totalEnclosuresAllocated: totalAllocated,
-      ampConfigsUsed: [ampConfig],
-      maxPowerRank: ampConfig.powerRank,
+      ampConfigsUsed,
+      maxPowerRank,
     },
   };
 }

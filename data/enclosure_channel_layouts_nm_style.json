@@ -1,0 +1,508 @@
+{
+  "spec": {
+    "name": "Network Manager-style channel layout per enclosure",
+    "version": "1.0.0",
+    "source_files": [
+      "Enclosures.json",
+      "LA01205_1201.pdf"
+    ],
+    "intent": "Display labeling metadata; allocator behavior stays unchanged unless you enforce channel_count."
+  },
+  "conventions": {
+    "passive_fullrange_single_channel": [
+      "LFHF"
+    ],
+    "sub_single_channel": [
+      "LF"
+    ],
+    "two_channel_active": [
+      "LF",
+      "HF"
+    ],
+    "four_channel_active": [
+      "LF",
+      "LF",
+      "MF",
+      "HF"
+    ],
+    "sixteen_channel_active_example": "LC\u00d74 + LF\u00d78 + HF\u00d74"
+  },
+  "enclosure_channel_map": [
+    {
+      "enclosure": "5XT",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "A10 Wide/Focus",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "A10i Wide/Focus",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "A15 Wide/Focus",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "A15i Wide/Focus",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "K1",
+      "channel_count": 4,
+      "channel_layout_nm": "LF\u00d72 + MF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "LF"
+        },
+        {
+          "channel_number": 3,
+          "range": "MF"
+        },
+        {
+          "channel_number": 4,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "K1-SB",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "K2",
+      "channel_count": 4,
+      "channel_layout_nm": "LF\u00d72 + MF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "LF"
+        },
+        {
+          "channel_number": 3,
+          "range": "MF"
+        },
+        {
+          "channel_number": 4,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "K3",
+      "channel_count": 2,
+      "channel_layout_nm": "LF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "K3i",
+      "channel_count": 2,
+      "channel_layout_nm": "LF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "Kara II",
+      "channel_count": 2,
+      "channel_layout_nm": "LF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "Kara IIi",
+      "channel_count": 2,
+      "channel_layout_nm": "LF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "Kiva II",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "KS21",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "KS21i",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "KS28",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "L2 / L2D",
+      "channel_count": 16,
+      "channel_layout_nm": "LC\u00d74 + LF\u00d78 + HF\u00d74",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LC"
+        },
+        {
+          "channel_number": 2,
+          "range": "LC"
+        },
+        {
+          "channel_number": 3,
+          "range": "LC"
+        },
+        {
+          "channel_number": 4,
+          "range": "LC"
+        },
+        {
+          "channel_number": 5,
+          "range": "LF"
+        },
+        {
+          "channel_number": 6,
+          "range": "LF"
+        },
+        {
+          "channel_number": 7,
+          "range": "LF"
+        },
+        {
+          "channel_number": 8,
+          "range": "LF"
+        },
+        {
+          "channel_number": 9,
+          "range": "LF"
+        },
+        {
+          "channel_number": 10,
+          "range": "LF"
+        },
+        {
+          "channel_number": 11,
+          "range": "LF"
+        },
+        {
+          "channel_number": 12,
+          "range": "LF"
+        },
+        {
+          "channel_number": 13,
+          "range": "HF"
+        },
+        {
+          "channel_number": 14,
+          "range": "HF"
+        },
+        {
+          "channel_number": 15,
+          "range": "HF"
+        },
+        {
+          "channel_number": 16,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "SB10i",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "SB15m",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "SB18 / SB18 IIi",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "SB6i",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "Soka",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "Syva",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "Syva Low",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "Syva Sub",
+      "channel_count": 1,
+      "channel_layout_nm": "LF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        }
+      ],
+      "channel_type": "sub_single_channel"
+    },
+    {
+      "enclosure": "X12",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "X15 HiQ",
+      "channel_count": 2,
+      "channel_layout_nm": "LF + HF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LF"
+        },
+        {
+          "channel_number": 2,
+          "range": "HF"
+        }
+      ],
+      "channel_type": "active_multi_channel"
+    },
+    {
+      "enclosure": "X4i",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "X6i",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "X8",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    },
+    {
+      "enclosure": "X8i",
+      "channel_count": 1,
+      "channel_layout_nm": "LFHF",
+      "channels": [
+        {
+          "channel_number": 1,
+          "range": "LFHF"
+        }
+      ],
+      "channel_type": "passive_single_channel"
+    }
+  ]
+}

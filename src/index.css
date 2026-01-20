@@ -1,7 +1,18 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Custom styles for L-Acoustic Amp Calc */
 :root {
   --color-primary: #1e40af;
   --color-primary-dark: #1e3a8a;
+}
+
+/* Smooth transitions for dark mode */
+html {
+  transition: background-color 0.2s ease-in-out;
+}
+
+html.dark {
+  color-scheme: dark;
 }

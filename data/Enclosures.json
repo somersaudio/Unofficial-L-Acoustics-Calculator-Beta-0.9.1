@@ -25,7 +25,7 @@
       "parallelAllowed": true
     },
     {
-      "enclosure": "A10(i) Wide/Focus",
+      "enclosure": "A10 Wide/Focus",
       "max_enclosures": {
         "LA12X": {
           "per_output": 3,
@@ -52,7 +52,61 @@
       "parallelAllowed": true
     },
     {
-      "enclosure": "A15(i) Wide/Focus",
+      "enclosure": "A10i Wide/Focus",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "A15 Wide/Focus",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 10
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "A15i Wide/Focus",
       "max_enclosures": {
         "LA12X": {
           "per_output": 3,
@@ -124,7 +178,7 @@
       "parallelAllowed": true
     },
     {
-      "enclosure": "K3(i)",
+      "enclosure": "K3",
       "max_enclosures": {
         "LA12X": {
           "per_output": 3,
@@ -143,7 +197,53 @@
       "parallelAllowed": true
     },
     {
-      "enclosure": "KS21(i)",
+      "enclosure": "K3i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 6
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "KS21",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "KS21i",
       "max_enclosures": {
         "LA12X": {
           "per_output": 2,
@@ -189,7 +289,30 @@
       "parallelAllowed": false
     },
     {
-      "enclosure": "Kara II(i)",
+      "enclosure": "Kara II",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 6
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Kara IIi",
       "max_enclosures": {
         "LA12X": {
           "per_output": 3,

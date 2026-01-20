@@ -10,16 +10,16 @@ interface SolverResultsProps {
 }
 
 function getImpedanceColor(impedance: number): string {
-  if (impedance === Infinity) return "text-gray-400";
-  if (impedance < HARD_FLOOR_IMPEDANCE) return "text-red-600 font-bold";
-  if (impedance < MIN_IMPEDANCE_OHMS) return "text-red-500";
-  return "text-green-600";
+  if (impedance === Infinity) return "text-gray-400 dark:text-gray-500";
+  if (impedance < HARD_FLOOR_IMPEDANCE) return "text-red-600 dark:text-red-400 font-bold";
+  if (impedance < MIN_IMPEDANCE_OHMS) return "text-red-500 dark:text-red-400";
+  return "text-green-600 dark:text-green-400";
 }
 
 function getLoadColor(loadPercent: number): string {
-  if (loadPercent > 100) return "text-red-600";
-  if (loadPercent > 80) return "text-amber-600";
-  return "text-green-600";
+  if (loadPercent > 100) return "text-red-600 dark:text-red-400";
+  if (loadPercent > 80) return "text-amber-600 dark:text-amber-400";
+  return "text-green-600 dark:text-green-400";
 }
 
 function OutputCard({ output, ampOutputCount }: { output: OutputAllocation; ampOutputCount: number }) {
@@ -33,24 +33,24 @@ function OutputCard({ output, ampOutputCount }: { output: OutputAllocation; ampO
     <div
       className={`rounded border p-2 text-xs ${
         hasImpedanceError
-          ? "border-red-300 bg-red-50"
+          ? "border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/30"
           : hasLoad
-          ? "border-blue-200 bg-blue-50"
-          : "border-gray-200 bg-gray-50"
+          ? "border-blue-200 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30"
+          : "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700"
       }`}
     >
-      <div className="mb-1 font-medium text-gray-700">{outputLabel}</div>
+      <div className="mb-1 font-medium text-gray-700 dark:text-gray-300">{outputLabel}</div>
       {hasLoad ? (
         <>
           <div className="space-y-1">
             {output.enclosures.map((entry, i) => (
-              <div key={i} className="text-gray-900">
+              <div key={i} className="text-gray-900 dark:text-gray-100">
                 {entry.count}x {entry.enclosure.enclosure}
               </div>
             ))}
           </div>
           <div
-            className={`mt-2 border-t ${hasImpedanceError ? "border-red-200" : "border-blue-200"} pt-1 ${getImpedanceColor(
+            className={`mt-2 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-700" : "border-blue-200 dark:border-blue-700"} pt-1 ${getImpedanceColor(
               output.impedanceOhms
             )}`}
           >
@@ -58,12 +58,12 @@ function OutputCard({ output, ampOutputCount }: { output: OutputAllocation; ampO
               ? "No load"
               : `${output.impedanceOhms}Ω`}
             {hasImpedanceError && (
-              <span className="ml-1 text-red-600">ERROR</span>
+              <span className="ml-1 text-red-600 dark:text-red-400">ERROR</span>
             )}
           </div>
         </>
       ) : (
-        <div className="text-gray-400 italic">Empty</div>
+        <div className="text-gray-400 dark:text-gray-500 italic">Empty</div>
       )}
     </div>
   );
@@ -77,29 +77,29 @@ function AmpCard({ instance }: { instance: AmpInstance }) {
 
   return (
     <div className={`rounded-lg border shadow-sm ${
-      hasAnyImpedanceError ? "border-red-300 bg-red-50" : "border-gray-300 bg-white"
+      hasAnyImpedanceError ? "border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20" : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800"
     }`}>
       {/* Amp Header */}
       <div className={`border-b px-4 py-3 ${
-        hasAnyImpedanceError ? "border-red-200 bg-red-100" : "border-gray-200 bg-gray-100"
+        hasAnyImpedanceError ? "border-red-200 bg-red-100 dark:border-red-700 dark:bg-red-900/30" : "border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-700"
       }`}>
         <div className="flex items-center justify-between">
           <div>
-            <span className="font-bold text-gray-900">
+            <span className="font-bold text-gray-900 dark:text-gray-100">
               {instance.ampConfig.model}
             </span>
             {instance.ampConfig.mode && (
-              <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+              <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                 {instance.ampConfig.mode}
               </span>
             )}
-            <span className="ml-2 text-sm text-gray-500">#{instance.id.split("-").pop()}</span>
+            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">#{instance.id.split("-").pop()}</span>
           </div>
           <div className="text-right">
             <div className={`text-sm font-medium ${getLoadColor(instance.loadPercent)}`}>
               {instance.loadPercent}% load
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {instance.totalEnclosures} enclosure{instance.totalEnclosures !== 1 ? "s" : ""}
             </div>
           </div>
@@ -129,7 +129,7 @@ function AmpCard({ instance }: { instance: AmpInstance }) {
 export default function SolverResults({ solution, requests }: SolverResultsProps) {
   if (!solution) {
     return (
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center text-gray-500">
+      <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600 dark:text-gray-400">
         <p>Add enclosures to see amplifier recommendations.</p>
       </div>
     );
@@ -137,9 +137,9 @@ export default function SolverResults({ solution, requests }: SolverResultsProps
 
   if (!solution.success) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6">
-        <h3 className="mb-2 font-bold text-red-800">Cannot Calculate</h3>
-        <p className="text-red-700">{solution.errorMessage}</p>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-700 dark:bg-red-900/30">
+        <h3 className="mb-2 font-bold text-red-800 dark:text-red-400">Cannot Calculate</h3>
+        <p className="text-red-700 dark:text-red-300">{solution.errorMessage}</p>
       </div>
     );
   }
@@ -155,18 +155,18 @@ export default function SolverResults({ solution, requests }: SolverResultsProps
     <div className="space-y-6">
       {/* Impedance Error Banner */}
       {hasErrors && (
-        <div className="rounded-lg border border-red-300 bg-red-100 p-4">
+        <div className="rounded-lg border border-red-300 bg-red-100 p-4 dark:border-red-700 dark:bg-red-900/30">
           <div className="flex items-start gap-3">
-            <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <div>
-              <h4 className="font-bold text-red-800">Impedance Error</h4>
-              <p className="text-sm text-red-700">
+              <h4 className="font-bold text-red-800 dark:text-red-400">Impedance Error</h4>
+              <p className="text-sm text-red-700 dark:text-red-300">
                 {impedanceErrors.length} output{impedanceErrors.length !== 1 ? "s have" : " has"} impedance
                 below the minimum {MIN_IMPEDANCE_OHMS}Ω threshold. This configuration is not safe.
               </p>
-              <ul className="mt-2 text-xs text-red-600">
+              <ul className="mt-2 text-xs text-red-600 dark:text-red-400">
                 {impedanceErrors.map((err, i) => (
                   <li key={i}>
                     {err.ampId} Output {err.outputIndex + 1}: {err.impedanceOhms}Ω
@@ -181,30 +181,30 @@ export default function SolverResults({ solution, requests }: SolverResultsProps
       {/* Summary Card */}
       <div className={`rounded-lg border p-4 ${
         hasErrors
-          ? "border-amber-200 bg-amber-50"
-          : "border-green-200 bg-green-50"
+          ? "border-amber-200 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/20"
+          : "border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20"
       }`}>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className={`mb-3 font-bold ${hasErrors ? "text-amber-800" : "text-green-800"}`}>
+            <h3 className={`mb-3 font-bold ${hasErrors ? "text-amber-800 dark:text-amber-400" : "text-green-800 dark:text-green-400"}`}>
               {hasErrors ? "Configuration (with errors)" : "Recommended Configuration"}
             </h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <div className={hasErrors ? "text-amber-600" : "text-green-600"}>Total Amplifiers</div>
-                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900" : "text-green-900"}`}>
+                <div className={hasErrors ? "text-amber-600 dark:text-amber-400" : "text-green-600 dark:text-green-400"}>Total Amplifiers</div>
+                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-300" : "text-green-900 dark:text-green-300"}`}>
                   {solution.summary.totalAmplifiers}
                 </div>
               </div>
               <div>
-                <div className={hasErrors ? "text-amber-600" : "text-green-600"}>Enclosures Allocated</div>
-                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900" : "text-green-900"}`}>
+                <div className={hasErrors ? "text-amber-600 dark:text-amber-400" : "text-green-600 dark:text-green-400"}>Enclosures Allocated</div>
+                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-300" : "text-green-900 dark:text-green-300"}`}>
                   {solution.summary.totalEnclosuresAllocated}
                 </div>
               </div>
             </div>
             <div className={`mt-3 border-t pt-3 text-sm ${
-              hasErrors ? "border-amber-200 text-amber-700" : "border-green-200 text-green-700"
+              hasErrors ? "border-amber-200 text-amber-700 dark:border-amber-700 dark:text-amber-300" : "border-green-200 text-green-700 dark:border-green-700 dark:text-green-300"
             }`}>
               <span className="font-medium">Amp Types: </span>
               {solution.summary.ampConfigsUsed.map((c, i) => (
@@ -220,7 +220,7 @@ export default function SolverResults({ solution, requests }: SolverResultsProps
           {/* Export Button */}
           <button
             onClick={handleExportPDF}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -232,7 +232,7 @@ export default function SolverResults({ solution, requests }: SolverResultsProps
 
       {/* Individual Amp Cards */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Amplifier Allocation Detail
         </h3>
         {solution.ampInstances.map((instance) => (
