@@ -1,0 +1,27 @@
+{
+  "load_percent_calculator": {
+    "definition": "load_percent = (count_on_amp / per_amplifier_limit) * 100",
+    "functions": {
+      "getPerAmplifierLimit": {
+        "inputs": ["enclosuresJson", "enclosureName", "ampConfigKey"],
+        "steps": [
+          "entry = find enclosuresJson[] where entry.enclosure == enclosureName",
+          "limits = entry.max_enclosures[ampConfigKey]",
+          "return limits.per_amplifier"
+        ]
+      },
+      "computeLoadPercent": {
+        "inputs": ["count_on_amp", "per_amplifier"],
+        "steps": [
+          "return round((count_on_amp / per_amplifier) * 100, 4)"
+        ]
+      },
+      "computePerEnclosurePercent": {
+        "inputs": ["per_amplifier"],
+        "steps": [
+          "return round(100 / per_amplifier, 4)"
+        ]
+      }
+    }
+  }
+}

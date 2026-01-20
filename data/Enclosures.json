@@ -1,0 +1,632 @@
+{
+  "schema": "enclosures.v2",
+  "enclosures": [
+    {
+      "enclosure": "5XT",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 6,
+          "per_amplifier": 24
+        },
+        "LA7.16i": {
+          "per_output": 3,
+          "per_amplifier": 48
+        },
+        "LA4X": {
+          "per_output": 4,
+          "per_amplifier": 16
+        },
+        "LA2Xi_SE": {
+          "per_output": 4,
+          "per_amplifier": 16
+        }
+      },
+      "nominal_impedance_ohms": 16,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "A10(i) Wide/Focus",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "A15(i) Wide/Focus",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 10
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "K1",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 2,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "K1-SB",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 4,
+      "parallelAllowed": false
+    },
+    {
+      "enclosure": "K2",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 3
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 1
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "impedance_sections_ohms": {
+        "HF": 16
+      },
+      "impedance_notes": "PDF specifies K2 HF section is 16Ω; other section(s) not specified in that rule, so nominal is defaulted to 8Ω per the document's 'all others are 8Ω' statement.",
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "K3(i)",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 6
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "KS21(i)",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "KS28",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_PBTL": {
+          "per_output": 1,
+          "per_amplifier": 1
+        }
+      },
+      "nominal_impedance_ohms": 4,
+      "parallelAllowed": false
+    },
+    {
+      "enclosure": "Kara II(i)",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 6
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Kiva II",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 6,
+          "per_amplifier": 24
+        },
+        "LA7.16i": {
+          "per_output": 2,
+          "per_amplifier": 32
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 16,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "L2 / L2D",
+      "max_enclosures": {
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 1
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": false,
+      "parallel_notes": "User constraint: L2/L2D cannot be placed in parallel."
+    },
+    {
+      "enclosure": "SB10i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 2,
+          "per_amplifier": 32
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "SB15m",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 9
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "SB18 / SB18 IIi",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 6
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "SB6i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 4,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Soka",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Syva",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 10
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Syva Low",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 2,
+          "per_amplifier": 6,
+          "min_impedance_override": 2
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_PBTL": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "notes": [
+        "LA12X can drive up to two Syva Low per output, but no more than six per controller at high level."
+      ],
+      "nominal_impedance_ohms": 4,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Syva Sub",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X12",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 14
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X15 HiQ",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 6
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 8
+        },
+        "LA4X": {
+          "per_output": 1,
+          "per_amplifier": 2
+        },
+        "LA2Xi_SE": {
+          "per_output": 1,
+          "per_amplifier": 2
+        },
+        "LA2Xi_PBTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X4i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 6,
+          "per_amplifier": 24
+        },
+        "LA7.16i": {
+          "per_output": 4,
+          "per_amplifier": 64
+        },
+        "LA4X": {
+          "per_output": 4,
+          "per_amplifier": 16
+        },
+        "LA2Xi_SE": {
+          "per_output": 4,
+          "per_amplifier": 16
+        },
+        "LA2Xi_PBTL": {
+          "per_output": 4,
+          "per_amplifier": 16
+        }
+      },
+      "nominal_impedance_ohms": 16,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X6i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X8",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "X8i",
+      "max_enclosures": {
+        "LA12X": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
+        "LA7.16i": {
+          "per_output": 1,
+          "per_amplifier": 16
+        },
+        "LA4X": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_SE": {
+          "per_output": 2,
+          "per_amplifier": 8
+        },
+        "LA2Xi_BTL": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    }
+  ]
+}

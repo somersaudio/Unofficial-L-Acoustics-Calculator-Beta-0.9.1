@@ -1,0 +1,317 @@
+{
+  "spec": {
+    "name": "L-Acoustics Amp Minimizer + Spread-First Allocator + Impedance Guardrails",
+    "version": "1.0.0",
+    "references": {
+      "amplifiers_file": "Amplifiers.v1.json",
+      "enclosures_file": "Enclosures.json",
+      "impedance_and_cable_helpers_file": "impedance_and_cable_validation_pseudocode.json",
+      "amplification_reference_pdf": "LA01205_1201.pdf"
+    }
+  },
+  "data_contracts": {
+    "amplifiers_json": {
+      "root": "amplifiers",
+      "fields": {
+        "model_key": "amplifier",
+        "outputs": "outputs",
+        "powerRank": "powerRank",
+        "operatingModes": "operatingModes"
+      }
+    },
+    "enclosures_json": {
+      "root": "enclosures",
+      "fields": {
+        "enclosure_key": "enclosure",
+        "nominal_ohms": "nominal_impedance_ohms",
+        "parallel_allowed": "parallelAllowed",
+        "max_enclosures": "max_enclosures",
+        "limits": {
+          "per_output": "per_output",
+          "per_amplifier": "per_amplifier"
+        }
+      }
+    }
+  },
+  "objective": {
+    "primary": "minimize_physical_amplifier_count",
+    "secondary": "minimize_power_required",
+    "power_required_definition": [
+      "minimize max(powerRank) used in solution",
+      "then minimize sum(powerRank * quantity)",
+      "then minimize distinct amplifier models"
+    ],
+    "tertiary_tiebreakers": [
+      "minimize_overprovisioned_enclosures"
+    ]
+  },
+  "normalization": {
+    "amp_config_key_to_model_mode": [
+      {
+        "key": "LA2Xi_SE",
+        "model": "LA2Xi",
+        "mode": "SE"
+      },
+      {
+        "key": "LA2Xi_BTL",
+        "model": "LA2Xi",
+        "mode": "BTL"
+      },
+      {
+        "key": "LA2Xi_PBTL",
+        "model": "LA2Xi",
+        "mode": "PBTL"
+      },
+      {
+        "key": "LA4X",
+        "model": "LA4X",
+        "mode": null
+      },
+      {
+        "key": "LA12X",
+        "model": "LA12X",
+        "mode": null
+      },
+      {
+        "key": "LA7.16i",
+        "model": "LA7.16i",
+        "mode": null
+      }
+    ]
+  },
+  "guardrails": {
+    "min_allowed_impedance_ohms": 2.7,
+    "tolerance_ohms": 0.15,
+    "hard_block_below_ohms": 2.55,
+    "enforce_parallelAllowed": true,
+    "notes": [
+      "Hard-block any output whose computed impedance falls below (2.7 - tolerance).",
+      "Also verify enclosure max counts per output and per amplifier from Enclosures.json.",
+      "Impedance computed for identical enclosures in parallel: total = nominal_ohms / parallel_count."
+    ]
+  },
+  "recommendations": {
+    "supported_loads_by_amp": {
+      "LA12X": {
+        "supported": [
+          8.0,
+          4.0,
+          2.7
+        ],
+        "warn_if": [
+          16.0
+        ]
+      },
+      "LA7.16i": {
+        "supported": [
+          16.0,
+          8.0,
+          4.0
+        ],
+        "warn_if": [
+          2.7
+        ]
+      },
+      "LA4X": {
+        "supported": [
+          16.0,
+          8.0,
+          4.0
+        ],
+        "warn_if": [
+          2.7
+        ]
+      },
+      "LA2Xi": {
+        "SE": {
+          "supported": [
+            8.0
+          ],
+          "warn_if": [
+            16.0,
+            4.0,
+            2.7
+          ]
+        },
+        "BTL": {
+          "supported": [
+            4.0
+          ],
+          "warn_if": [
+            16.0,
+            8.0,
+            2.7
+          ]
+        },
+        "PBTL": {
+          "supported": [
+            4.0
+          ],
+          "warn_if": [
+            16.0,
+            8.0,
+            2.7
+          ]
+        }
+      }
+    },
+    "severity_policy": {
+      "warn_unrecommended_impedance": {
+        "severity": "warning",
+        "allow": true,
+        "message_template": "{ampModel}{ampModeSuffix}: {totalOhms}\u03a9 load is not recommended per LA01205 tables (allowed with caution)."
+      },
+      "block_below_min_impedance": {
+        "severity": "error",
+        "allow": false,
+        "message_template": "{ampModel}{ampModeSuffix}: {totalOhms}\u03a9 load is below the minimum allowed (~2.7\u03a9). Reduce parallel count or add another amp/output."
+      },
+      "block_parallel_not_allowed": {
+        "severity": "error",
+        "allow": false,
+        "message_template": "{enclosure}: parallel wiring on one output is not allowed."
+      },
+      "block_exceeds_limits": {
+        "severity": "error",
+        "allow": false,
+        "message_template": "{enclosure} on {ampConfigKey}: exceeds per_output or per_amplifier limits."
+      }
+    }
+  },
+  "solver": {
+    "type": "dynamic_programming_unbounded_min_items_cover",
+    "plan_metrics": [
+      "ampCount",
+      "maxPowerRank",
+      "sumPowerRank",
+      "distinctModels",
+      "overProvision"
+    ],
+    "better_plan_comparator_order": [
+      "lower ampCount wins",
+      "if tie: lower maxPowerRank wins",
+      "if tie: lower sumPowerRank wins",
+      "if tie: lower distinctModels wins",
+      "if tie: lower overProvision wins"
+    ],
+    "feasibility_constraints": [
+      "assigned_to_amp <= per_amplifier",
+      "assigned_to_amp <= outputs_total * per_output"
+    ],
+    "steps": [
+      "INPUT: enclosureName, requiredCount",
+      "LOOKUP: enclosureEntry in Enclosures.json.enclosures where enclosure == enclosureName",
+      "BUILD OPTIONS: for each ampConfigKey in enclosureEntry.max_enclosures:",
+      "  normalize ampConfigKey -> model/mode",
+      "  outputs_total, powerRank from Amplifiers.v1.json.amplifiers[model]",
+      "  per_output, per_amplifier from enclosureEntry.max_enclosures[ampConfigKey]",
+      "  capacityPerAmp = min(per_amplifier, outputs_total * per_output)",
+      "  option = { ampConfigKey, model, mode, outputs_total, powerRank, per_output, per_amplifier, capacityPerAmp }",
+      "FILTER options where capacityPerAmp is missing or 0",
+      "RUN DP to reach >= requiredCount capacity with minimal amp count using comparator order",
+      "OUTPUT: chosen amps (model/mode/qty) + per-amp assigned counts (for allocator)"
+    ]
+  },
+  "allocator": {
+    "policy": "spread_first_then_parallel",
+    "policy_definition": [
+      "Place 1 enclosure per output first (use available outputs first).",
+      "Only after all outputs have 1 enclosure, begin adding additional enclosures in parallel to outputs.",
+      "Never exceed per_output for that enclosure+ampConfigKey.",
+      "Never exceed per_amplifier on that amp instance.",
+      "For any output with parallel_count>1, compute impedance and apply guardrails + recommendation warnings."
+    ],
+    "runtime_state_schema": {
+      "plan": {
+        "enclosure": "string",
+        "requested_count": "integer",
+        "solution_amps": [
+          {
+            "model": "string",
+            "mode": "string|null",
+            "powerRank": "integer",
+            "quantity": "integer"
+          }
+        ],
+        "amp_instances": [
+          {
+            "instance_id": "string",
+            "model": "string",
+            "mode": "string|null",
+            "ampConfigKey": "string",
+            "outputs_total": "integer",
+            "per_output_limit": "integer",
+            "per_amplifier_limit": "integer",
+            "assigned_count": "integer",
+            "outputs": [
+              {
+                "output_index": "integer",
+                "enclosure": "string|null",
+                "parallel_count": "integer",
+                "is_full": "boolean",
+                "impedance": {
+                  "nominal_ohms": "number|null",
+                  "total_ohms": "number|null"
+                },
+                "status": "recommended|warning|blocked",
+                "messages": [
+                  "string"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "allocation_steps": [
+      "INPUT: enclosureName, requiredCount, chosenAmpPlan[] (from solver)",
+      "LOOKUP enclosureEntry; get nominal_ohms and parallelAllowed",
+      "FOR each amp instance in chosenAmpPlan, initialize outputs_total outputs with parallel_count=0",
+      "ASSIGN counts per amp instance (e.g., fill earlier amps to capacityPerAmp before moving to next)",
+      "FOR each amp instance:",
+      "  remainingForThisAmp = assigned_count",
+      "  // Pass 1: spread-first (one per output)",
+      "  for out in outputs 1..outputs_total while remainingForThisAmp>0:",
+      "    place 1 enclosure if output empty",
+      "  // Pass 2: parallel fill",
+      "  while remainingForThisAmp>0:",
+      "    for out in outputs 1..outputs_total:",
+      "      if output.parallel_count < per_output_limit:",
+      "        add 1 in parallel",
+      "      if remainingForThisAmp==0: break",
+      "  AFTER each change to an output, run evaluate_output_rules() (below) to set status/messages"
+    ]
+  },
+  "functions": {
+    "compute_parallel_impedance_identical": {
+      "signature": "computeParallelImpedance(nominal_ohms, parallel_count, decimals=2)",
+      "pseudocode": [
+        "if parallel_count <= 0: error",
+        "return round(nominal_ohms / parallel_count, decimals)"
+      ]
+    },
+    "evaluate_output_rules": {
+      "signature": "evaluateOutputRules(enclosureEntry, ampModel, ampMode, ampConfigKey, parallel_count, totalCountOnAmp, per_output_limit, per_amplifier_limit)",
+      "pseudocode": [
+        "// 1) Parallel allowed",
+        "if guardrails.enforce_parallelAllowed and parallel_count > 1 and enclosureEntry.parallelAllowed == false:",
+        "  return { status:'blocked', messages:[severity_policy.block_parallel_not_allowed.message_template] }",
+        "",
+        "// 2) Enclosure max limits",
+        "if parallel_count > per_output_limit or totalCountOnAmp > per_amplifier_limit:",
+        "  return { status:'blocked', messages:[severity_policy.block_exceeds_limits.message_template] }",
+        "",
+        "// 3) Impedance floor",
+        "totalOhms = computeParallelImpedance(enclosureEntry.nominal_impedance_ohms, parallel_count, 2)",
+        "if totalOhms < (guardrails.min_allowed_impedance_ohms - guardrails.tolerance_ohms):",
+        "  return { status:'blocked', totalOhms:totalOhms, messages:[severity_policy.block_below_min_impedance.message_template] }",
+        "",
+        "// 4) Recommendation/warning based on supported load table",
+        "loads = recommendations.supported_loads_by_amp[ampModel] (or [ampModel][ampMode] for LA2Xi)",
+        "if totalOhms in loads.supported: return { status:'recommended', totalOhms:totalOhms, messages:[] }",
+        "if totalOhms in loads.warn_if: return { status:'warning', totalOhms:totalOhms, messages:[severity_policy.warn_unrecommended_impedance.message_template] }",
+        "return { status:'warning', totalOhms:totalOhms, messages:['Unknown impedance bucket for this amp; allowed with caution.'] }"
+      ]
+    }
+  }
+}

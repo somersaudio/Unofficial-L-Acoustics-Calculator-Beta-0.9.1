@@ -1,0 +1,263 @@
+{
+  "schema": "amplifiers.v1",
+  "amplifiers": [
+    {
+      "amplifier": "LA2Xi",
+      "outputs": 4,
+      "powerRank": 1,
+      "operatingModes": [
+        {
+          "mode": "SE",
+          "description": "Stereo mode (2 channels)"
+        },
+        {
+          "mode": "BTL",
+          "description": "Bridge-Tied Load mode"
+        },
+        {
+          "mode": "PBTL",
+          "description": "Parallel Bridge-Tied Load mode"
+        }
+      ],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": "2\u00d71260W",
+          "8_ohm": null,
+          "4_ohm": null,
+          "2_7_ohm": "1\u00d72550W (bridge)"
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA01205_1201.pdf",
+          "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
+          "version": "1.0.0"
+        },
+        "connector_family": "terminal_block",
+        "total_amp_channels": {
+          "SE": 2,
+          "BTL": 1,
+          "PBTL": 1
+        },
+        "pinout_templates": [],
+        "modes": {
+          "SE": {
+            "connector": "terminal_block",
+            "channels_presented_to_speaker": 2,
+            "terminals": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            },
+            "common_adapter_to_speakON": {
+              "speakON_pins": {
+                "1+": "CH1 +",
+                "1-": "CH1 -"
+              },
+              "note": "PDF shows a custom cable adapting terminal block to speakON 1+/1-."
+            }
+          },
+          "BTL": {
+            "connector": "terminal_block",
+            "channels_presented_to_speaker": 1,
+            "terminals_used": {
+              "1+": "bridged +",
+              "1-": "bridged -"
+            },
+            "common_adapter_to_speakON": {
+              "speakON_pins": {
+                "1+": "bridged +",
+                "1-": "bridged -"
+              },
+              "note": "PDF shows a custom cable adapting BTL to speakON 1+/1-."
+            }
+          },
+          "PBTL": {
+            "connector": "terminal_block",
+            "channels_presented_to_speaker": 1,
+            "terminals_available": {
+              "1+": "pair1 +",
+              "1-": "pair1 -",
+              "2+": "pair2 +",
+              "2-": "pair2 -",
+              "3+": "pair3 +",
+              "3-": "pair3 -",
+              "4+": "pair4 +",
+              "4-": "pair4 -"
+            },
+            "common_adapter_to_speakON": {
+              "speakON_pins": {
+                "1+": "combined +",
+                "1-": "combined -"
+              },
+              "note": "PDF shows a custom cable adapting PBTL to speakON 1+/1-."
+            }
+          }
+        }
+      }
+    },
+    {
+      "amplifier": "LA4X",
+      "outputs": 4,
+      "powerRank": 2,
+      "operatingModes": [],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": "4\u00d7190W",
+          "8_ohm": "4\u00d7360W / 4\u00d71000W (see PDF)",
+          "4_ohm": "4\u00d7640W",
+          "2_7_ohm": null
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA01205_1201.pdf",
+          "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
+          "version": "1.0.0"
+        },
+        "connector_family": "speakON",
+        "total_amp_channels": 4,
+        "pinout_templates": [
+          {
+            "output_type": "speakON_one_channel_template",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -"
+            }
+          },
+          {
+            "output_type": "speakON_two_channel_template",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            }
+          }
+        ],
+        "modes": null
+      }
+    },
+    {
+      "amplifier": "LA12X",
+      "outputs": 4,
+      "powerRank": 3,
+      "operatingModes": [],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": null,
+          "8_ohm": "4\u00d71400W",
+          "4_ohm": "4\u00d72600W",
+          "2_7_ohm": "4\u00d73300W"
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA01205_1201.pdf",
+          "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
+          "version": "1.0.0"
+        },
+        "connector_family": "speakON",
+        "total_amp_channels": 4,
+        "pinout_templates": [
+          {
+            "output_type": "speakON_one_channel_template",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -"
+            }
+          },
+          {
+            "output_type": "speakON_two_channel_template",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            }
+          }
+        ],
+        "modes": null
+      }
+    },
+    {
+      "amplifier": "LA7.16i",
+      "outputs": 16,
+      "powerRank": 4,
+      "operatingModes": [],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": "16\u00d7580W",
+          "8_ohm": "16\u00d7920W",
+          "4_ohm": "16\u00d71000W",
+          "2_7_ohm": null
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA01205_1201.pdf",
+          "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
+          "version": "1.0.0"
+        },
+        "connector_family": "terminal_block",
+        "total_amp_channels": 16,
+        "pinout_templates": [
+          {
+            "output_type": "terminal_block_for_2_channel_enclosures",
+            "channels_available": 2,
+            "terminals": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            }
+          },
+          {
+            "output_type": "terminal_block_for_4_channel_enclosures",
+            "channels_available": 4,
+            "terminals": {
+              "1+": "LF1 +",
+              "1-": "LF1 -",
+              "2+": "LF2 +",
+              "2-": "LF2 -",
+              "3+": "MF +",
+              "3-": "MF -",
+              "4+": "HF +",
+              "4-": "HF -"
+            }
+          },
+          {
+            "output_type": "sc32_for_16_channel_enclosures",
+            "connector_family_override": "SC32",
+            "channels_on_connector": 16,
+            "pins_pairs": {
+              "1": "CH1",
+              "2": "CH2",
+              "3": "CH3",
+              "4": "CH4",
+              "5": "CH5",
+              "6": "CH6",
+              "7": "CH7",
+              "8": "CH8",
+              "9": "CH9",
+              "10": "CH10",
+              "11": "CH11",
+              "12": "CH12",
+              "13": "CH13",
+              "14": "CH14",
+              "15": "CH15",
+              "16": "CH16"
+            },
+            "note": "PDF lists terminal pairs 1+/1- through 16+/16- for SC32 BE custom patch."
+          }
+        ],
+        "modes": null
+      }
+    }
+  ]
+}

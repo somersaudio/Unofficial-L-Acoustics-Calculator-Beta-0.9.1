@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Custom styles for L-Acoustic Amp Calc */
+:root {
+  --color-primary: #1e40af;
+  --color-primary-dark: #1e3a8a;
+}

@@ -1,0 +1,150 @@
+{
+  "title": "Impedance + Cable Length Validation Pseudocode",
+  "version": "1.0.0",
+  "notes": [
+    "Language-agnostic pseudocode packaged as JSON for easy embedding in an app or prompt.",
+    "Impedance bucket mapping is conservative: map computed total ohms to the next lower (harder) bucket among 8, 4, 2.7."
+  ],
+  "data_you_have": {
+    "cableTable": "array of rows like: { gauge_mm2: number, maxLenByBucket: { 8.0: { m: number|null }, 4.0: { m: number|null }, 2.7: { m: number|null } } }",
+    "supportedBuckets": [
+      8.0,
+      4.0,
+      2.7
+    ]
+  },
+  "helpers": [
+    {
+      "name": "roundOhms",
+      "signature": "roundOhms(x)",
+      "pseudocode": [
+        "return round(x * 10) / 10  // 1 decimal, like PDF examples"
+      ]
+    },
+    {
+      "name": "roundMeters",
+      "signature": "roundMeters(x)",
+      "pseudocode": [
+        "return round(x * 10) / 10  // optional"
+      ]
+    },
+    {
+      "name": "nearestConservativeBucket",
+      "signature": "nearestConservativeBucket(totalOhms)",
+      "pseudocode": [
+        "// 'conservative_next_lower_impedance' policy:",
+        "// buckets are [8,4,2.7] meaning: 8 is easiest, 2.7 is hardest",
+        "if totalOhms >= 8.0: return 8.0",
+        "if totalOhms >= 4.0: return 4.0",
+        "return 2.7"
+      ]
+    },
+    {
+      "name": "getCableRowForGauge",
+      "signature": "getCableRowForGauge(gauge_mm2)",
+      "pseudocode": [
+        "for row in cableTable:",
+        "  if row.gauge_mm2 == gauge_mm2:",
+        "    return row",
+        "return null"
+      ]
+    }
+  ],
+  "impedance_calcs": [
+    {
+      "name": "parallelGroupImpedance",
+      "signature": "parallelGroupImpedance(nominalOhms, parallelCount)",
+      "pseudocode": [
+        "// basic parallel of identical impedances",
+        "// total = nominal / count",
+        "if parallelCount <= 0: error",
+        "return nominalOhms / parallelCount"
+      ]
+    },
+    {
+      "name": "combineParallelImpedances",
+      "signature": "combineParallelImpedances(impedances[])",
+      "pseudocode": [
+        "// combine any set of impedances in parallel:",
+        "// 1 / Zt = sum(1 / Zi)",
+        "// NOTE: if you're ONLY allowing identical speakers in parallel, you can skip this",
+        "sumRecip = 0",
+        "for z in impedances:",
+        "  if z <= 0: error",
+        "  sumRecip += 1 / z",
+        "if sumRecip == 0: error",
+        "return 1 / sumRecip"
+      ]
+    }
+  ],
+  "per_output_aggregate_load": [
+    {
+      "name": "computeOutputAggregate",
+      "signature": "computeOutputAggregate(output.connected_loads)",
+      "pseudocode": [
+        "// connected_loads is an array of groups:",
+        "// group = { nominal_ohms, parallel_count, ... }",
+        "groupImpedances = []",
+        "",
+        "for group in output.connected_loads:",
+        "  zGroup = parallelGroupImpedance(group.nominal_ohms, group.parallel_count)",
+        "  group.computed_total_ohms = zGroup",
+        "  group.computed_total_ohms_rounded = roundOhms(zGroup)",
+        "  group.load_bucket_ohms = nearestConservativeBucket(group.computed_total_ohms)",
+        "  groupImpedances.append(zGroup)",
+        "",
+        "// If all groups are on the SAME output in parallel, combine them in parallel:",
+        "zTotal = combineParallelImpedances(groupImpedances)",
+        "",
+        "output.aggregate.total_impedance_ohms = zTotal",
+        "output.aggregate.total_impedance_ohms_rounded = roundOhms(zTotal)",
+        "output.aggregate.load_bucket_ohms = nearestConservativeBucket(zTotal)",
+        "",
+        "return output"
+      ]
+    }
+  ],
+  "cable_length_validation": [
+    {
+      "name": "validateCableForOutput",
+      "signature": "validateCableForOutput(output, cableTable)",
+      "pseudocode": [
+        "// Requires output.aggregate.load_bucket_ohms already computed",
+        "bucket = output.aggregate.load_bucket_ohms",
+        "gauge = output.cable_run.gauge_mm2",
+        "length = output.cable_run.length_m",
+        "",
+        "row = getCableRowForGauge(gauge)",
+        "if row == null:",
+        "  output.cable_run.within_recommendation = false",
+        "  output.cable_run.max_allowed_length_m_for_bucket = null",
+        "  output.cable_run.error = 'Unknown cable gauge'",
+        "  return output",
+        "",
+        "maxLen = row.maxLenByBucket[bucket].m  // may be null if 'not recommended'",
+        "output.cable_run.max_allowed_length_m_for_bucket = maxLen",
+        "",
+        "if maxLen == null:",
+        "  output.cable_run.within_recommendation = false",
+        "  output.cable_run.error = 'No recommended max length for this load at this gauge'",
+        "  return output",
+        "",
+        "output.cable_run.within_recommendation = (length <= maxLen)",
+        "if output.cable_run.within_recommendation == false:",
+        "  output.cable_run.warning = 'Cable run exceeds recommended max for ' + bucket + '\u03a9 load with ' + gauge + 'mm\u00b2'",
+        "return output"
+      ]
+    }
+  ],
+  "end_to_end": [
+    {
+      "name": "updateOutputLoadAndCable",
+      "signature": "updateOutputLoadAndCable(output, cableTable)",
+      "pseudocode": [
+        "output = computeOutputAggregate(output.connected_loads)",
+        "output = validateCableForOutput(output, cableTable)",
+        "return output"
+      ]
+    }
+  ]
+}
