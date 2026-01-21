@@ -47,6 +47,7 @@ export interface Enclosure {
   max_enclosures: Record<AmpConfigKey, EnclosureLimits>;
   nominal_impedance_ohms: number; // 4, 8, or 16
   parallelAllowed: boolean;
+  preferredPerOutput: number; // Preferred count per output when spreading (default: 1)
   impedance_sections_ohms?: Record<string, number>; // Optional, e.g., { "HF": 16 }
   impedance_notes?: string;
   parallel_notes?: string;

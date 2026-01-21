@@ -440,12 +440,22 @@ export async function loadDataFromFiles(
   // Build normalized amp configs
   const ampConfigs = buildAmpConfigs(amplifiers.amplifiers);
 
+  // Apply defaults to enclosures
+  const normalizedEnclosures: EnclosuresData = {
+    ...enclosures,
+    enclosures: enclosures.enclosures.map((enc) => ({
+      ...enc,
+      // Default preferredPerOutput to 1 (spread when possible)
+      preferredPerOutput: enc.preferredPerOutput ?? 1,
+    })),
+  };
+
   return {
     success: true,
     errors,
     data: {
       amplifiers,
-      enclosures,
+      enclosures: normalizedEnclosures,
       loadTables,
       ampConfigs,
     },

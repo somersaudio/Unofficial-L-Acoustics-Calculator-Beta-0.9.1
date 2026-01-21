@@ -13,8 +13,177 @@ import {
 } from "../types";
 
 // =============================================================================
+// Constants
+// =============================================================================
+
+// Maximum number of different enclosure types allowed per amplifier
+const MAX_ENCLOSURE_TYPES_PER_AMP = 3;
+
+// =============================================================================
 // Helper Functions
 // =============================================================================
+
+/** Count the number of unique enclosure types on an amp's outputs */
+function countEnclosureTypesOnAmp(outputs: OutputAllocation[]): number {
+  const types = new Set<string>();
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      types.add(entry.enclosure.enclosure);
+    }
+  }
+  return types.size;
+}
+
+/** Check if an enclosure type is already on the amp */
+function isEnclosureTypeOnAmp(outputs: OutputAllocation[], enclosureName: string): boolean {
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      if (entry.enclosure.enclosure === enclosureName) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Get all unique enclosure types from outputs */
+function getEnclosureTypesFromOutputs(outputs: OutputAllocation[]): Enclosure[] {
+  const seen = new Set<string>();
+  const enclosures: Enclosure[] = [];
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      if (!seen.has(entry.enclosure.enclosure)) {
+        seen.add(entry.enclosure.enclosure);
+        enclosures.push(entry.enclosure);
+      }
+    }
+  }
+  return enclosures;
+}
+
+/** Count total used outputs (outputs with enclosures) */
+function countUsedOutputs(outputs: OutputAllocation[]): number {
+  return outputs.filter(o => o.totalEnclosures > 0).length;
+}
+
+/**
+ * Find a higher-output amp config that can accommodate all existing enclosures plus a new one.
+ * Returns the upgrade candidate or null if no suitable upgrade exists.
+ */
+function findUpgradeCandidate(
+  currentAmpInstance: AmpInstance,
+  newEnclosure: Enclosure,
+  newEnclosureCount: number,
+  allAmpConfigs: AmpConfig[]
+): { ampConfig: AmpConfig; candidate: SolverCandidate } | null {
+  const existingEnclosures = getEnclosureTypesFromOutputs(currentAmpInstance.outputs);
+  const usedOutputs = countUsedOutputs(currentAmpInstance.outputs);
+
+  // We need at least 1 more output than currently used
+  const minOutputsNeeded = usedOutputs + 1;
+
+  // Get compatible amp configs for the new enclosure, sorted by powerRank
+  const newEnclosureCandidates = getCompatibleConfigs(newEnclosure, allAmpConfigs);
+
+  for (const candidate of newEnclosureCandidates) {
+    const ampConfig = candidate.ampConfig;
+
+    // Skip if same or fewer outputs than current amp
+    if (ampConfig.outputs <= currentAmpInstance.ampConfig.outputs) continue;
+
+    // Skip if not enough outputs
+    if (ampConfig.outputs < minOutputsNeeded) continue;
+
+    // Check if this amp config is compatible with ALL existing enclosure types
+    let allCompatible = true;
+    for (const existingEnc of existingEnclosures) {
+      const limits = existingEnc.max_enclosures[ampConfig.key];
+      if (!limits) {
+        allCompatible = false;
+        break;
+      }
+    }
+
+    if (!allCompatible) continue;
+
+    // Check load capacity - would total load be <= 100%?
+    let totalLoad = 0;
+
+    // Load from existing enclosures
+    for (const output of currentAmpInstance.outputs) {
+      for (const entry of output.enclosures) {
+        const limits = entry.enclosure.max_enclosures[ampConfig.key];
+        if (limits) {
+          totalLoad += (entry.count / limits.per_amplifier) * 100;
+        }
+      }
+    }
+
+    // Load from new enclosures
+    const newLimits = newEnclosure.max_enclosures[ampConfig.key];
+    if (newLimits) {
+      totalLoad += (newEnclosureCount / newLimits.per_amplifier) * 100;
+    }
+
+    if (totalLoad > 100) continue;
+
+    console.log(`[findUpgradeCandidate] Found upgrade: ${currentAmpInstance.ampConfig.key} -> ${ampConfig.key} (${usedOutputs} used outputs -> ${ampConfig.outputs} total outputs, load would be ${Math.round(totalLoad)}%)`);
+    return { ampConfig, candidate };
+  }
+
+  return null;
+}
+
+/**
+ * Upgrade an amp instance to a new amp config with more outputs.
+ * Preserves existing enclosures on their outputs and adds empty outputs for new enclosures.
+ */
+function upgradeAmpInstance(
+  ampInstance: AmpInstance,
+  newAmpConfig: AmpConfig,
+  allAmpConfigs: AmpConfig[],
+  ampInstances: AmpInstance[]
+): void {
+  const oldConfig = ampInstance.ampConfig;
+  const oldOutputs = ampInstance.outputs;
+
+  console.log(`[upgradeAmpInstance] Upgrading ${ampInstance.id} from ${oldConfig.key} to ${newAmpConfig.key}`);
+
+  // Create new outputs array with the new amp's output count
+  const newOutputs: OutputAllocation[] = [];
+
+  // Copy existing used outputs
+  for (let i = 0; i < oldOutputs.length; i++) {
+    if (oldOutputs[i].totalEnclosures > 0) {
+      newOutputs.push({ ...oldOutputs[i], outputIndex: newOutputs.length });
+    }
+  }
+
+  // Add empty outputs up to new amp's output count
+  while (newOutputs.length < newAmpConfig.outputs) {
+    newOutputs.push({
+      outputIndex: newOutputs.length,
+      enclosures: [],
+      totalEnclosures: 0,
+      impedanceOhms: Infinity,
+    });
+  }
+
+  // Update the amp instance
+  ampInstance.ampConfig = newAmpConfig;
+  ampInstance.outputs = newOutputs;
+
+  // Generate new ID based on the new config
+  const newIndex = ampInstances.filter(
+    (i) => i !== ampInstance && i.ampConfig.key === newAmpConfig.key
+  ).length;
+  ampInstance.id = generateAmpId(newAmpConfig.key, newIndex);
+
+  // Recalculate load percent
+  ampInstance.loadPercent = calculateMixedLoadPercent(newOutputs, newAmpConfig.key, allAmpConfigs);
+
+  console.log(`[upgradeAmpInstance] Upgraded to ${ampInstance.id}, ${countUsedOutputs(newOutputs)} used outputs, ${newOutputs.length - countUsedOutputs(newOutputs)} empty outputs, load=${ampInstance.loadPercent}%`);
+}
 
 /** Calculate impedance when enclosures are wired in parallel */
 function calculateParallelImpedance(
@@ -70,28 +239,37 @@ function findBestAmpConfig(
   quantity: number,
   allAmpConfigs: AmpConfig[]
 ): SolverCandidate | null {
+  // Candidates are already sorted by powerRank (lowest first)
   const candidates = getCompatibleConfigs(enclosure, allAmpConfigs);
 
-  // Find the lowest power amp that can handle the quantity with minimum amp count
-  let bestCandidate: SolverCandidate | null = null;
-  let bestAmpCount = Infinity;
+  if (candidates.length === 0) return null;
 
+  console.log(`[findBestAmpConfig] ${enclosure.enclosure} x${quantity}, candidates:`,
+    candidates.map(c => `${c.ampConfigKey}(rank=${c.ampConfig.powerRank}, perAmp=${c.enclosuresPerAmp})`));
+
+  // Find the minimum amp count needed across all candidates
+  let minAmpCount = Infinity;
   for (const candidate of candidates) {
     const ampCount = Math.ceil(quantity / candidate.enclosuresPerAmp);
-
-    // Prefer fewer amps, then lower power
-    if (ampCount < bestAmpCount) {
-      bestAmpCount = ampCount;
-      bestCandidate = candidate;
-    } else if (ampCount === bestAmpCount && bestCandidate) {
-      // Same amp count, prefer lower power
-      if (candidate.ampConfig.powerRank < bestCandidate.ampConfig.powerRank) {
-        bestCandidate = candidate;
-      }
+    console.log(`[findBestAmpConfig] ${candidate.ampConfigKey}: ceil(${quantity}/${candidate.enclosuresPerAmp}) = ${ampCount} amps`);
+    if (ampCount < minAmpCount) {
+      minAmpCount = ampCount;
     }
   }
 
-  return bestCandidate;
+  console.log(`[findBestAmpConfig] minAmpCount = ${minAmpCount}`);
+
+  // Among candidates that achieve the minimum amp count, pick the one with lowest powerRank
+  // Since candidates are sorted by powerRank (lowest first), the first one with minAmpCount wins
+  for (const candidate of candidates) {
+    const ampCount = Math.ceil(quantity / candidate.enclosuresPerAmp);
+    if (ampCount === minAmpCount) {
+      console.log(`[findBestAmpConfig] Selected: ${candidate.ampConfigKey} (first with minAmpCount)`);
+      return candidate;
+    }
+  }
+
+  return candidates[0]; // Fallback (shouldn't reach here)
 }
 
 // =============================================================================
@@ -99,9 +277,47 @@ function findBestAmpConfig(
 // =============================================================================
 
 /**
+ * Calculate the minimum number of enclosures needed per output to achieve acceptable impedance.
+ * The amp reference tables indicate what impedance ranges are supported.
+ * Typically, impedances at exactly 16Ω aren't recommended (like 1x 16Ω enclosure).
+ *
+ * Returns the minimum count needed, or the perOutput limit if even max doesn't work.
+ */
+function getMinimumPerOutputForImpedance(
+  enclosure: Enclosure,
+  limits: { perOutput: number; minImpedanceOverride?: number }
+): number {
+  // Maximum recommended impedance - at or above this is "not recommended"
+  // Most L-Acoustics amps support down to 2.7Ω and UP TO (but not including) 16Ω per output
+  // So 8Ω is fine, but 16Ω (like a single 5XT) is not recommended
+  const MAX_RECOMMENDED_IMPEDANCE = 16;
+
+  const minAllowedImpedance = limits.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
+
+  // Find minimum count where impedance is within acceptable range
+  for (let count = 1; count <= limits.perOutput; count++) {
+    const impedance = calculateParallelImpedance(enclosure.nominal_impedance_ohms, count);
+    // Check if impedance is in valid range: not too low (below amp minimum) and below max recommended
+    // Note: strictly less than MAX_RECOMMENDED_IMPEDANCE, so 16Ω is NOT acceptable
+    if (impedance >= minAllowedImpedance && impedance < MAX_RECOMMENDED_IMPEDANCE) {
+      return count;
+    }
+  }
+
+  // If no count gives acceptable impedance, use preferredPerOutput or 1
+  return enclosure.preferredPerOutput;
+}
+
+/**
  * Allocate enclosures to outputs on a single amp.
- * - If parallelAllowed: fill each output to max before moving to next
- * - If not parallelAllowed: spread 1 per output
+ *
+ * Distribution strategy:
+ * 1. If parallelAllowed AND spreading is valid (impedance-wise):
+ *    - First, spread enclosures across outputs (preferredPerOutput each, typically 1)
+ *    - Then, if more enclosures remain, pack additional into existing outputs up to perOutput
+ * 2. If parallelAllowed but spreading isn't valid (impedance too high):
+ *    - Stack enclosures until impedance is acceptable, then spread at that count
+ * 3. If not parallelAllowed: spread 1 per output (existing behavior)
  */
 function allocateToOutputs(
   enclosure: Enclosure,
@@ -123,9 +339,71 @@ function allocateToOutputs(
   }
 
   if (enclosure.parallelAllowed) {
-    // Fill each output to max before moving to next
+    // Calculate minimum per output for valid impedance
+    const minPerOutputForImpedance = getMinimumPerOutputForImpedance(enclosure, limits);
+
+    // Effective minimum per output - use the higher of impedance requirement and preferredPerOutput
+    // But preferredPerOutput of 1 means "spread as much as possible when valid"
+    // So if impedance requires 2, use 2. If impedance allows 1 and preferred is 1, use 1.
+    const effectiveMinPerOutput = Math.max(minPerOutputForImpedance, enclosure.preferredPerOutput);
+
+    // Phase 1: Spread enclosures across outputs (effectiveMinPerOutput each)
     let outputIdx = 0;
-    while (remaining > 0 && outputIdx < ampConfig.outputs) {
+    while (remaining >= effectiveMinPerOutput && outputIdx < ampConfig.outputs) {
+      const initialAllocation = Math.min(effectiveMinPerOutput, limits.perOutput);
+      outputs[outputIdx].enclosures.push({
+        enclosure,
+        count: initialAllocation,
+      });
+      outputs[outputIdx].totalEnclosures = initialAllocation;
+      outputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+        enclosure.nominal_impedance_ohms,
+        initialAllocation
+      );
+      if (limits.minImpedanceOverride !== undefined) {
+        outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
+      }
+      remaining -= initialAllocation;
+      outputIdx++;
+    }
+
+    // Phase 2: Pack additional enclosures into existing outputs (round-robin style to balance load)
+    // Continue adding to outputs that have room until we've allocated everything
+    while (remaining > 0) {
+      let allocated = false;
+      for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
+        if (outputs[i].totalEnclosures > 0 && outputs[i].totalEnclosures < limits.perOutput) {
+          // Add one more to this output
+          const currentCount = outputs[i].totalEnclosures;
+          const newCount = currentCount + 1;
+
+          // Update the enclosure entry
+          outputs[i].enclosures[0].count = newCount;
+          outputs[i].totalEnclosures = newCount;
+          outputs[i].impedanceOhms = calculateParallelImpedance(
+            enclosure.nominal_impedance_ohms,
+            newCount
+          );
+          remaining--;
+          allocated = true;
+        }
+      }
+
+      // If we couldn't allocate any more (all outputs full or at max), break
+      // This shouldn't happen if count <= perAmplifier, but safety check
+      if (!allocated) break;
+    }
+
+    // Phase 3: If there are still remaining enclosures and empty outputs,
+    // allocate to them (for cases where effectiveMinPerOutput > remaining initially)
+    outputIdx = 0;
+    while (remaining > 0) {
+      // Find next empty output
+      while (outputIdx < ampConfig.outputs && outputs[outputIdx].totalEnclosures > 0) {
+        outputIdx++;
+      }
+      if (outputIdx >= ampConfig.outputs) break;
+
       const toAllocate = Math.min(remaining, limits.perOutput);
       outputs[outputIdx].enclosures.push({
         enclosure,
@@ -136,7 +414,6 @@ function allocateToOutputs(
         enclosure.nominal_impedance_ohms,
         toAllocate
       );
-      // Set impedance override if manufacturer allows lower impedance
       if (limits.minImpedanceOverride !== undefined) {
         outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
       }
@@ -165,11 +442,13 @@ function allocateToOutputs(
   return outputs;
 }
 
+
 /**
  * Merge additional enclosures into existing output allocations.
  * Used when multiple enclosure types are allocated to the same amp.
  * IMPORTANT: Only uses empty outputs - never mixes different enclosure types on the same output.
  * IMPORTANT: Respects load percentage limit - won't add if amp is at capacity.
+ * NOTE: Enclosure type limit (max 3 types) is checked by the caller before calling this function.
  */
 function mergeIntoOutputs(
   existingOutputs: OutputAllocation[],
@@ -346,9 +625,10 @@ function solveSingleEnclosureType(
 ): SolverSolution {
   const { enclosure, quantity } = request;
 
-  const bestCandidate = findBestAmpConfig(enclosure, quantity, allAmpConfigs);
+  // Initial check for compatibility
+  const initialCandidate = findBestAmpConfig(enclosure, quantity, allAmpConfigs);
 
-  if (!bestCandidate) {
+  if (!initialCandidate) {
     return {
       success: false,
       errorMessage: `No compatible amplifier found for ${enclosure.enclosure}`,
@@ -363,10 +643,17 @@ function solveSingleEnclosureType(
   }
 
   const ampInstances: AmpInstance[] = [];
+  const configsUsed = new Set<string>();
   let remaining = quantity;
-  let ampIndex = 0;
+  let maxPowerRank = 0;
 
+  // Re-evaluate best amp for each iteration based on remaining quantity
+  // This ensures we pick the most efficient amp for overflow (e.g., LA4X for 1 K2 instead of LA12X)
   while (remaining > 0) {
+    // Find the best amp for the remaining quantity
+    const bestCandidate = findBestAmpConfig(enclosure, remaining, allAmpConfigs);
+    if (!bestCandidate) break; // Shouldn't happen if initialCandidate was found
+
     const toAllocate = Math.min(remaining, bestCandidate.enclosuresPerAmp);
     const outputs = allocateToOutputs(
       enclosure,
@@ -374,6 +661,9 @@ function solveSingleEnclosureType(
       bestCandidate.ampConfig,
       { perOutput: bestCandidate.perOutput, perAmplifier: bestCandidate.perAmplifier, minImpedanceOverride: bestCandidate.minImpedanceOverride }
     );
+
+    // Count how many of this amp type we've already created
+    const ampIndex = ampInstances.filter((i) => i.ampConfig.key === bestCandidate.ampConfigKey).length;
 
     const ampInstance: AmpInstance = {
       id: generateAmpId(bestCandidate.ampConfigKey, ampIndex),
@@ -384,9 +674,13 @@ function solveSingleEnclosureType(
     };
 
     ampInstances.push(ampInstance);
+    configsUsed.add(bestCandidate.ampConfigKey);
+    maxPowerRank = Math.max(maxPowerRank, bestCandidate.ampConfig.powerRank);
     remaining -= toAllocate;
-    ampIndex++;
   }
+
+  // Collect all amp configs used
+  const ampConfigsUsed = allAmpConfigs.filter((c) => configsUsed.has(c.key));
 
   return {
     success: true,
@@ -394,8 +688,8 @@ function solveSingleEnclosureType(
     summary: {
       totalAmplifiers: ampInstances.length,
       totalEnclosuresAllocated: quantity,
-      ampConfigsUsed: [bestCandidate.ampConfig],
-      maxPowerRank: bestCandidate.ampConfig.powerRank,
+      ampConfigsUsed,
+      maxPowerRank,
     },
   };
 }
@@ -595,26 +889,54 @@ function buildSharedSolution(
   let totalAllocated = 0;
   const configsUsed = new Set<string>([ampConfig.key]);
 
+  console.log(`[buildSharedSolution] Starting with shared amp: ${ampConfig.key}`);
+
   // Process each request, filling amps and creating new ones as needed
   for (const request of requests) {
     const { enclosure, quantity } = request;
     let remaining = quantity;
 
+    console.log(`[buildSharedSolution] Processing ${enclosure.enclosure} x${quantity}`);
+
     // Get the limits for this enclosure on the chosen amp
     const candidates = getCompatibleConfigs(enclosure, allAmpConfigs);
     const candidate = candidates.find((c) => c.ampConfigKey === ampConfig.key);
+
+    console.log(`[buildSharedSolution] Candidate for shared amp:`, candidate ? `${candidate.ampConfigKey} (perAmp=${candidate.perAmplifier})` : 'NONE');
+
     if (!candidate) continue;
 
     // Try to fill existing amps first (only empty outputs)
     for (const ampInstance of ampInstances) {
       if (remaining <= 0) break;
 
+      console.log(`[buildSharedSolution] Checking existing amp ${ampInstance.id} (type=${ampInstance.ampConfig.key})`);
+
       // Only try to fill amps of the shared type (not overflow amps)
-      if (ampInstance.ampConfig.key !== ampConfig.key) continue;
+      if (ampInstance.ampConfig.key !== ampConfig.key) {
+        console.log(`[buildSharedSolution] Skipping - not shared type`);
+        continue;
+      }
+
+      // Check enclosure type limit - skip if adding this type would exceed max
+      const currentTypeCount = countEnclosureTypesOnAmp(ampInstance.outputs);
+      const typeAlreadyOnAmp = isEnclosureTypeOnAmp(ampInstance.outputs, enclosure.enclosure);
+      if (!typeAlreadyOnAmp && currentTypeCount >= MAX_ENCLOSURE_TYPES_PER_AMP) {
+        console.log(`[buildSharedSolution] Skipping - already has ${currentTypeCount} enclosure types (max ${MAX_ENCLOSURE_TYPES_PER_AMP})`);
+        continue;
+      }
 
       // Calculate current load to check if amp has capacity
       const currentLoad = calculateMixedLoadPercent(ampInstance.outputs, ampConfig.key, allAmpConfigs);
-      if (currentLoad >= 100) continue; // Amp is full
+      console.log(`[buildSharedSolution] Current load: ${currentLoad}%`);
+      if (currentLoad >= 100) {
+        console.log(`[buildSharedSolution] Skipping - amp is full`);
+        continue; // Amp is full
+      }
+
+      // Count empty outputs
+      const emptyOutputs = ampInstance.outputs.filter(o => o.totalEnclosures === 0).length;
+      console.log(`[buildSharedSolution] Empty outputs: ${emptyOutputs}`);
 
       const { outputs, allocated } = mergeIntoOutputs(
         ampInstance.outputs,
@@ -624,31 +946,142 @@ function buildSharedSolution(
         currentLoad  // Pass current load percentage, not enclosure count
       );
 
+      console.log(`[buildSharedSolution] Merge result: allocated=${allocated}`);
+
       if (allocated > 0) {
         ampInstance.outputs = outputs;
         ampInstance.totalEnclosures += allocated;
         // Recalculate load percent based on all enclosure types on this amp
         ampInstance.loadPercent = calculateMixedLoadPercent(ampInstance.outputs, ampConfig.key, allAmpConfigs);
         remaining -= allocated;
+        console.log(`[buildSharedSolution] After merge: remaining=${remaining}, newLoad=${ampInstance.loadPercent}%`);
       }
     }
 
     // Create new amps for remaining
-    // For overflow, check if there's a more efficient amp for just this enclosure type
+    // Check if we can fit on existing amps of OTHER types first, then pick the most efficient new amp
     while (remaining > 0) {
-      // Find the best amp for just the remaining enclosures of this type
-      const overflowBest = findBestAmpConfig(enclosure, remaining, allAmpConfigs);
+      // First, try to fit on existing amps of any compatible type (not just shared type)
+      let fittedOnExisting = false;
+      for (const ampInstance of ampInstances) {
+        if (remaining <= 0) break;
 
-      // Use the more efficient amp if it's better (lower power rank and same or fewer amps)
-      const useOverflowAmp = overflowBest &&
-        overflowBest.ampConfig.powerRank < ampConfig.powerRank;
+        // Check if this amp type is compatible with this enclosure
+        const compatCandidate = candidates.find((c) => c.ampConfigKey === ampInstance.ampConfig.key);
+        if (!compatCandidate) continue;
 
-      const chosenConfig = useOverflowAmp ? overflowBest!.ampConfig : ampConfig;
-      const chosenCandidate = useOverflowAmp ? overflowBest! : candidate;
+        // Check enclosure type limit
+        const currentTypeCount = countEnclosureTypesOnAmp(ampInstance.outputs);
+        const typeAlreadyOnAmp = isEnclosureTypeOnAmp(ampInstance.outputs, enclosure.enclosure);
+        if (!typeAlreadyOnAmp && currentTypeCount >= MAX_ENCLOSURE_TYPES_PER_AMP) {
+          continue;
+        }
 
-      if (useOverflowAmp) {
-        configsUsed.add(chosenConfig.key);
+        // Check if amp has capacity
+        const currentLoad = calculateMixedLoadPercent(ampInstance.outputs, ampInstance.ampConfig.key, allAmpConfigs);
+        if (currentLoad >= 100) continue;
+
+        // Check for empty outputs
+        const emptyOutputs = ampInstance.outputs.filter(o => o.totalEnclosures === 0).length;
+        if (emptyOutputs === 0) continue;
+
+        const { outputs, allocated } = mergeIntoOutputs(
+          ampInstance.outputs,
+          enclosure,
+          remaining,
+          { perOutput: compatCandidate.perOutput, perAmplifier: compatCandidate.perAmplifier, minImpedanceOverride: compatCandidate.minImpedanceOverride },
+          currentLoad
+        );
+
+        if (allocated > 0) {
+          console.log(`[buildSharedSolution] Fitted ${allocated}x ${enclosure.enclosure} on existing ${ampInstance.id}`);
+          ampInstance.outputs = outputs;
+          ampInstance.totalEnclosures += allocated;
+          ampInstance.loadPercent = calculateMixedLoadPercent(ampInstance.outputs, ampInstance.ampConfig.key, allAmpConfigs);
+          remaining -= allocated;
+          fittedOnExisting = true;
+        }
       }
+
+      if (fittedOnExisting || remaining <= 0) continue;
+
+      // Try to upgrade an existing amp to a higher-output model instead of creating a new amp
+      let upgradedExisting = false;
+      for (const ampInstance of ampInstances) {
+        if (remaining <= 0) break;
+
+        // Check enclosure type limit
+        const currentTypeCount = countEnclosureTypesOnAmp(ampInstance.outputs);
+        const typeAlreadyOnAmp = isEnclosureTypeOnAmp(ampInstance.outputs, enclosure.enclosure);
+        if (!typeAlreadyOnAmp && currentTypeCount >= MAX_ENCLOSURE_TYPES_PER_AMP) {
+          continue;
+        }
+
+        // Check if this amp has no empty outputs (otherwise we would have fitted above)
+        const emptyOutputs = ampInstance.outputs.filter(o => o.totalEnclosures === 0).length;
+        if (emptyOutputs > 0) continue; // Already tried fitting above
+
+        // Try to find an upgrade for this amp
+        const upgrade = findUpgradeCandidate(ampInstance, enclosure, remaining, allAmpConfigs);
+        if (!upgrade) continue;
+
+        console.log(`[buildSharedSolution] Upgrading ${ampInstance.id} to ${upgrade.ampConfig.key} to fit ${enclosure.enclosure}`);
+
+        // Perform the upgrade
+        upgradeAmpInstance(ampInstance, upgrade.ampConfig, allAmpConfigs, ampInstances);
+        configsUsed.add(upgrade.ampConfig.key);
+
+        // Now merge the new enclosure onto the upgraded amp
+        const currentLoad = calculateMixedLoadPercent(ampInstance.outputs, ampInstance.ampConfig.key, allAmpConfigs);
+        const { outputs, allocated } = mergeIntoOutputs(
+          ampInstance.outputs,
+          enclosure,
+          remaining,
+          { perOutput: upgrade.candidate.perOutput, perAmplifier: upgrade.candidate.perAmplifier, minImpedanceOverride: upgrade.candidate.minImpedanceOverride },
+          currentLoad
+        );
+
+        if (allocated > 0) {
+          console.log(`[buildSharedSolution] After upgrade, fitted ${allocated}x ${enclosure.enclosure} on ${ampInstance.id}`);
+          ampInstance.outputs = outputs;
+          ampInstance.totalEnclosures += allocated;
+          ampInstance.loadPercent = calculateMixedLoadPercent(ampInstance.outputs, ampInstance.ampConfig.key, allAmpConfigs);
+          remaining -= allocated;
+          upgradedExisting = true;
+          break; // Only upgrade one amp per iteration
+        }
+      }
+
+      if (upgradedExisting || remaining <= 0) continue;
+
+      // No existing amp can take this enclosure - create a new amp
+      // Strategy:
+      // 1. If NO shared-type amps exist yet, ALWAYS create one (to enable sharing)
+      // 2. Otherwise, use the most efficient amp for this specific remaining quantity
+      let chosenCandidate: SolverCandidate | null = null;
+
+      // Check if there are any existing amps of the shared type
+      const sharedTypeAmpsExist = ampInstances.some(amp => amp.ampConfig.key === ampConfig.key);
+
+      if (candidate && !sharedTypeAmpsExist) {
+        // No shared-type amps exist yet - create one to enable sharing with future enclosures
+        chosenCandidate = candidate;
+        console.log(`[buildSharedSolution] Creating new ${chosenCandidate.ampConfigKey} for ${enclosure.enclosure} (first shared amp - enables consolidation)`);
+      } else {
+        // Shared amps exist (or shared amp not compatible) - use most efficient for this quantity
+        const bestCandidate = findBestAmpConfig(enclosure, remaining, allAmpConfigs);
+        if (!bestCandidate) {
+          console.log(`[buildSharedSolution] ERROR: No compatible amp for ${enclosure.enclosure}`);
+          break;
+        }
+        chosenCandidate = bestCandidate;
+        console.log(`[buildSharedSolution] Creating new ${chosenCandidate.ampConfigKey} for ${enclosure.enclosure} (most efficient for ${remaining})`);
+      }
+
+
+      const chosenConfig = chosenCandidate.ampConfig;
+
+      configsUsed.add(chosenConfig.key);
 
       const toAllocate = Math.min(remaining, chosenCandidate.perAmplifier);
       const outputs = allocateToOutputs(enclosure, toAllocate, chosenConfig, {
