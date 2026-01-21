@@ -4,6 +4,10 @@
     {
       "enclosure": "5XT",
       "max_enclosures": {
+        "LA4": {
+          "per_output": 3,
+          "per_amplifier": 12
+        },
         "LA12X": {
           "per_output": 6,
           "per_amplifier": 24
@@ -403,6 +407,10 @@
     {
       "enclosure": "SB15m",
       "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
         "LA12X": {
           "per_output": 3,
           "per_amplifier": 12
@@ -430,6 +438,10 @@
     {
       "enclosure": "SB18 / SB18 IIi",
       "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
         "LA12X": {
           "per_output": 3,
           "per_amplifier": 12
@@ -746,6 +758,171 @@
         "LA2Xi_BTL": {
           "per_output": 1,
           "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "8XT",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 8
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "12XT (Active)",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "12XT (Passive)",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "115XT HiQ",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "112XT",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "115XT",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "MTD108a",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 8
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "MTD112b",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "MTD115b (Active)",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "MTD115b (Passive)",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "ARCS Wide/Focus",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "ARCS",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Kiva",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 8
+        }
+      },
+      "nominal_impedance_ohms": 16,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "Kilo",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 2,
+          "per_amplifier": 8
+        }
+      },
+      "nominal_impedance_ohms": 16,
+      "parallelAllowed": true
+    },
+    {
+      "enclosure": "SB118",
+      "max_enclosures": {
+        "LA4": {
+          "per_output": 1,
+          "per_amplifier": 4
         }
       },
       "nominal_impedance_ohms": 8,

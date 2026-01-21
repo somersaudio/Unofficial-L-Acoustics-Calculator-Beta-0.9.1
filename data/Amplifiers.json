@@ -2,6 +2,50 @@
   "schema": "amplifiers.v1",
   "amplifiers": [
     {
+      "amplifier": "LA4",
+      "outputs": 4,
+      "powerRank": 0.5,
+      "operatingModes": [],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": "4×500W",
+          "8_ohm": "4×800W",
+          "4_ohm": "4×1000W",
+          "2_7_ohm": null
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA4_UM_EN_10.0.pdf",
+          "label": "LA4 User Manual v10.0",
+          "version": "10.0"
+        },
+        "connector_family": "speakON",
+        "total_amp_channels": 4,
+        "pinout_templates": [
+          {
+            "output_type": "speakON_one_channel_template",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -"
+            }
+          },
+          {
+            "output_type": "speakON_two_channel_template",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            }
+          }
+        ],
+        "modes": null
+      }
+    },
+    {
       "amplifier": "LA2Xi",
       "outputs": 4,
       "powerRank": 1,

@@ -96,7 +96,7 @@ function validateAmplifiersSchema(
       valid = false;
     }
 
-    if (typeof ampObj.powerRank !== "number" || ampObj.powerRank < 1) {
+    if (typeof ampObj.powerRank !== "number" || ampObj.powerRank <= 0) {
       errors.push({
         type: "schema",
         file: "Amplifiers.json",
