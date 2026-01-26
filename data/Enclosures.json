@@ -12,7 +12,7 @@
           "per_output": 6,
           "per_amplifier": 24
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 3,
           "per_amplifier": 48
         },
@@ -35,7 +35,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -62,7 +62,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -89,7 +89,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 10
         },
@@ -116,7 +116,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 10
         },
@@ -165,7 +165,7 @@
           "per_output": 3,
           "per_amplifier": 3
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 4
         },
@@ -188,7 +188,7 @@
           "per_output": 3,
           "per_amplifier": 6
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -207,7 +207,7 @@
           "per_output": 3,
           "per_amplifier": 6
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -226,7 +226,7 @@
           "per_output": 2,
           "per_amplifier": 8
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -253,7 +253,7 @@
           "per_output": 2,
           "per_amplifier": 8
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -299,7 +299,7 @@
           "per_output": 3,
           "per_amplifier": 6
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -322,7 +322,7 @@
           "per_output": 3,
           "per_amplifier": 6
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -345,7 +345,7 @@
           "per_output": 6,
           "per_amplifier": 24
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 2,
           "per_amplifier": 32
         },
@@ -368,7 +368,7 @@
     {
       "enclosure": "L2 / L2D",
       "max_enclosures": {
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 1
         }
@@ -384,7 +384,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 2,
           "per_amplifier": 32
         },
@@ -415,7 +415,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 9
         },
@@ -446,7 +446,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 6
         },
@@ -473,7 +473,7 @@
           "per_output": 2,
           "per_amplifier": 8
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -496,7 +496,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -523,7 +523,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 10
         },
@@ -551,7 +551,7 @@
           "per_amplifier": 6,
           "min_impedance_override": 2
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -581,7 +581,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -608,7 +608,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 14
         },
@@ -635,7 +635,7 @@
           "per_output": 3,
           "per_amplifier": 6
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 8
         },
@@ -662,7 +662,7 @@
           "per_output": 6,
           "per_amplifier": 24
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 4,
           "per_amplifier": 64
         },
@@ -689,7 +689,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -716,7 +716,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },
@@ -743,7 +743,7 @@
           "per_output": 3,
           "per_amplifier": 12
         },
-        "LA7.16i": {
+        "LA7.16(i)": {
           "per_output": 1,
           "per_amplifier": 16
         },

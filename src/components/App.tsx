@@ -33,6 +33,10 @@ export default function App() {
     const saved = localStorage.getItem("darkMode");
     return saved ? JSON.parse(saved) : false;
   });
+  const [salesMode, setSalesMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem("salesMode");
+    return saved ? JSON.parse(saved) : false;
+  });
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
@@ -42,6 +46,10 @@ export default function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("salesMode", JSON.stringify(salesMode));
+  }, [salesMode]);
 
   useEffect(() => {
     async function loadData() {
@@ -135,17 +143,30 @@ export default function App() {
           alt="L-Acoustics"
           className="h-8"
         />
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="rounded-lg p-2 hover:bg-blue-700 dark:hover:bg-neutral-800 transition-colors"
-          title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {darkMode ? (
-            <SunIcon className="h-5 w-5 text-yellow-400" />
-          ) : (
-            <MoonIcon className="h-5 w-5 text-blue-200" />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSalesMode(!salesMode)}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              salesMode
+                ? "bg-green-500 text-white hover:bg-green-600"
+                : "bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+            }`}
+            title={salesMode ? "Switch to engineer mode" : "Switch to sales mode"}
+          >
+            {salesMode ? "Sales Mode" : "Engineer Mode"}
+          </button>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="rounded-lg p-2 hover:bg-blue-700 dark:hover:bg-neutral-800 transition-colors"
+            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? (
+              <SunIcon className="h-5 w-5 text-yellow-400" />
+            ) : (
+              <MoonIcon className="h-5 w-5 text-blue-200" />
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
@@ -157,12 +178,13 @@ export default function App() {
             ampConfigs={enabledAmpConfigs}
             requests={requests}
             onRequestsChange={setRequests}
+            salesMode={salesMode}
           />
         </section>
 
         {/* Right Panel - Amplifier Recommendation */}
         <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-neutral-950">
-          <SolverResults solution={solution} requests={requests} />
+          <SolverResults solution={solution} requests={requests} salesMode={salesMode} />
         </section>
       </main>
 
@@ -193,18 +215,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Solution Summary */}
-          <span className="text-xs text-gray-500 dark:text-neutral-500">
-            {requests.length > 0 && solution?.success && (
-              <>
-                Solution: {solution.summary.totalAmplifiers} amplifier
-                {solution.summary.totalAmplifiers !== 1 ? "s" : ""}
-              </>
-            )}
-            {requests.length > 0 && !solution?.success && solution?.errorMessage && (
-              <span className="text-red-500 dark:text-red-500">No valid configuration</span>
-            )}
-          </span>
         </div>
       </footer>
     </div>

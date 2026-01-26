@@ -230,10 +230,18 @@
       }
     },
     {
-      "amplifier": "LA7.16i",
+      "amplifier": "LA7.16(i)",
       "outputs": 16,
       "powerRank": 4,
       "operatingModes": [],
+      "channelTypes": {
+        "pattern": ["LC", "LF", "HF", "HF"],
+        "nominalImpedance": {
+          "LC": 8,
+          "LF": 8,
+          "HF": 8
+        }
+      },
       "maxOutputPower_W": {
         "byLoad": {
           "16_ohm": "16\u00d7580W",

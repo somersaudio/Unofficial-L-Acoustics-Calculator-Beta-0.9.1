@@ -16,12 +16,19 @@ export interface MaxOutputPower {
   };
 }
 
+/** Channel type configuration for multi-channel amps like LA7.16(i) */
+export interface ChannelTypes {
+  pattern: string[]; // Repeating pattern, e.g., ["LC", "LF", "HF", "HF"]
+  nominalImpedance: Record<string, number>; // e.g., { "LC": 8, "LF": 8, "HF": 8 }
+}
+
 export interface Amplifier {
   amplifier: string; // Model name, e.g., "LA12X"
   outputs: number; // Number of physical outputs
   powerRank: number; // 1 = lowest power, 4 = highest
   operatingModes: OperatingMode[];
   maxOutputPower_W: MaxOutputPower;
+  channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
 }
 
 export interface AmplifiersData {
@@ -39,7 +46,7 @@ export interface EnclosureLimits {
   min_impedance_override?: number; // Optional: allows impedance below normal minimum for this amp/enclosure combo
 }
 
-/** Keys like "LA12X", "LA7.16i", "LA4X", "LA2Xi_SE", "LA2Xi_BTL", "LA2Xi_PBTL" */
+/** Keys like "LA12X", "LA7.16(i)", "LA4X", "LA2Xi_SE", "LA2Xi_BTL", "LA2Xi_PBTL" */
 export type AmpConfigKey = string;
 
 export interface Enclosure {
@@ -92,6 +99,7 @@ export interface AmpConfig {
   mode?: string; // Optional mode for LA2Xi: "SE", "BTL", or "PBTL"
   outputs: number;
   powerRank: number;
+  channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
 }
 
 /** Validation error structure */

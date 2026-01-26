@@ -67,6 +67,103 @@ function countUsedOutputs(outputs: OutputAllocation[]): number {
 }
 
 /**
+ * Consolidate enclosures on an amp to free up outputs.
+ * This packs enclosures of the same type more tightly (up to perOutput limits)
+ * to create empty outputs for new enclosure types.
+ *
+ * Returns a new outputs array with enclosures consolidated, or null if consolidation isn't possible.
+ */
+function consolidateOutputs(
+  outputs: OutputAllocation[],
+  ampConfigKey: string,
+  allAmpConfigs: AmpConfig[]
+): OutputAllocation[] | null {
+  // Group enclosures by type
+  const enclosuresByType = new Map<string, { enclosure: Enclosure; totalCount: number }>();
+
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      const key = entry.enclosure.enclosure;
+      const existing = enclosuresByType.get(key);
+      if (existing) {
+        existing.totalCount += entry.count;
+      } else {
+        enclosuresByType.set(key, { enclosure: entry.enclosure, totalCount: entry.count });
+      }
+    }
+  }
+
+  if (enclosuresByType.size === 0) return null;
+
+  // Get the amp config
+  const ampConfig = allAmpConfigs.find(c => c.key === ampConfigKey);
+  if (!ampConfig) return null;
+
+  // Calculate the minimum outputs needed if we pack each type optimally
+  let minOutputsNeeded = 0;
+  const typeAllocations: Array<{ enclosure: Enclosure; count: number; outputsNeeded: number; perOutput: number }> = [];
+
+  for (const { enclosure, totalCount } of enclosuresByType.values()) {
+    const limits = enclosure.max_enclosures[ampConfigKey];
+    if (!limits) return null; // Not compatible
+
+    const outputsNeeded = Math.ceil(totalCount / limits.per_output);
+    minOutputsNeeded += outputsNeeded;
+    typeAllocations.push({ enclosure, count: totalCount, outputsNeeded, perOutput: limits.per_output });
+  }
+
+  // Check if consolidation can free up any outputs
+  const currentUsedOutputs = countUsedOutputs(outputs);
+  if (minOutputsNeeded >= currentUsedOutputs) {
+    // Can't free any outputs
+    return null;
+  }
+
+  console.log(`[consolidateOutputs] Can consolidate from ${currentUsedOutputs} to ${minOutputsNeeded} outputs`);
+
+  // Create new consolidated outputs
+  const newOutputs: OutputAllocation[] = [];
+  for (let i = 0; i < ampConfig.outputs; i++) {
+    newOutputs.push({
+      outputIndex: i,
+      enclosures: [],
+      totalEnclosures: 0,
+      impedanceOhms: Infinity,
+    });
+  }
+
+  // Allocate each enclosure type, packing as tightly as possible
+  let outputIdx = 0;
+  for (const { enclosure, count, perOutput } of typeAllocations) {
+    let remaining = count;
+
+    while (remaining > 0 && outputIdx < ampConfig.outputs) {
+      const toAllocate = Math.min(remaining, perOutput);
+
+      // Find the original limits to get minImpedanceOverride
+      const limits = enclosure.max_enclosures[ampConfigKey];
+
+      newOutputs[outputIdx].enclosures.push({ enclosure, count: toAllocate });
+      newOutputs[outputIdx].totalEnclosures = toAllocate;
+      newOutputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+        enclosure.nominal_impedance_ohms,
+        toAllocate
+      );
+      if (limits?.min_impedance_override !== undefined) {
+        newOutputs[outputIdx].minImpedanceOverride = limits.min_impedance_override;
+      }
+
+      remaining -= toAllocate;
+      outputIdx++;
+    }
+  }
+
+  console.log(`[consolidateOutputs] Consolidated: ${countUsedOutputs(newOutputs)} used outputs, ${ampConfig.outputs - countUsedOutputs(newOutputs)} empty`);
+
+  return newOutputs;
+}
+
+/**
  * Find a higher-output amp config that can accommodate all existing enclosures plus a new one.
  * Returns the upgrade candidate or null if no suitable upgrade exists.
  */
@@ -938,7 +1035,7 @@ function buildSharedSolution(
       const emptyOutputs = ampInstance.outputs.filter(o => o.totalEnclosures === 0).length;
       console.log(`[buildSharedSolution] Empty outputs: ${emptyOutputs}`);
 
-      const { outputs, allocated } = mergeIntoOutputs(
+      let { outputs, allocated } = mergeIntoOutputs(
         ampInstance.outputs,
         enclosure,
         remaining,
@@ -947,6 +1044,29 @@ function buildSharedSolution(
       );
 
       console.log(`[buildSharedSolution] Merge result: allocated=${allocated}`);
+
+      // If merge failed (no empty outputs) but amp has capacity, try consolidating
+      if (allocated === 0 && currentLoad < 100 && emptyOutputs === 0) {
+        console.log(`[buildSharedSolution] Attempting to consolidate outputs on ${ampInstance.id}`);
+        const consolidated = consolidateOutputs(ampInstance.outputs, ampInstance.ampConfig.key, allAmpConfigs);
+        if (consolidated) {
+          // Consolidation successful - update amp and retry merge
+          ampInstance.outputs = consolidated;
+          const newEmptyOutputs = consolidated.filter(o => o.totalEnclosures === 0).length;
+          console.log(`[buildSharedSolution] Consolidation freed ${newEmptyOutputs} outputs, retrying merge`);
+
+          const retryResult = mergeIntoOutputs(
+            ampInstance.outputs,
+            enclosure,
+            remaining,
+            { perOutput: candidate.perOutput, perAmplifier: candidate.perAmplifier, minImpedanceOverride: candidate.minImpedanceOverride },
+            currentLoad
+          );
+          outputs = retryResult.outputs;
+          allocated = retryResult.allocated;
+          console.log(`[buildSharedSolution] Retry merge result: allocated=${allocated}`);
+        }
+      }
 
       if (allocated > 0) {
         ampInstance.outputs = outputs;
@@ -1107,9 +1227,15 @@ function buildSharedSolution(
     totalAllocated += quantity;
   }
 
-  // Collect all amp configs used
-  const ampConfigsUsed = allAmpConfigs.filter((c) => configsUsed.has(c.key));
-  const maxPowerRank = Math.max(...ampConfigsUsed.map((c) => c.powerRank));
+  // Collect all amp configs actually used (from ampInstances, not configsUsed tracking set)
+  // The configsUsed set may contain stale entries from upgraded amps
+  const actualConfigKeys = new Set(ampInstances.map(i => i.ampConfig.key));
+  const ampConfigsUsed = allAmpConfigs.filter((c) => actualConfigKeys.has(c.key));
+  const maxPowerRank = ampConfigsUsed.length > 0 ? Math.max(...ampConfigsUsed.map((c) => c.powerRank)) : 0;
+
+  console.log('[buildSharedSolution] ampInstances:', ampInstances.map(i => `${i.id} (${i.ampConfig.key})`));
+  console.log('[buildSharedSolution] actualConfigKeys:', [...actualConfigKeys]);
+  console.log('[buildSharedSolution] ampConfigsUsed:', ampConfigsUsed.map(c => c.key));
 
   return {
     success: true,
@@ -1156,7 +1282,13 @@ function solveIndependently(
     maxPowerRank = Math.max(maxPowerRank, result.summary.maxPowerRank);
   }
 
-  const ampConfigsUsed = allAmpConfigs.filter((c) => configsUsed.has(c.key));
+  // Derive ampConfigsUsed from actual instances for consistency
+  const actualConfigKeys = new Set(allInstances.map(i => i.ampConfig.key));
+  const ampConfigsUsed = allAmpConfigs.filter((c) => actualConfigKeys.has(c.key));
+
+  console.log('[solveIndependently] allInstances:', allInstances.map(i => `${i.id} (${i.ampConfig.key})`));
+  console.log('[solveIndependently] actualConfigKeys:', [...actualConfigKeys]);
+  console.log('[solveIndependently] ampConfigsUsed:', ampConfigsUsed.map(c => c.key));
 
   return {
     success: true,

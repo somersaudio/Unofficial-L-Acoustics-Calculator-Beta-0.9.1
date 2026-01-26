@@ -7,6 +7,7 @@ interface EnclosureSelectorProps {
   ampConfigs: AmpConfig[];
   requests: EnclosureRequest[];
   onRequestsChange: (requests: EnclosureRequest[]) => void;
+  salesMode?: boolean;
 }
 
 export default function EnclosureSelector({
@@ -14,6 +15,7 @@ export default function EnclosureSelector({
   ampConfigs,
   requests,
   onRequestsChange,
+  salesMode = false,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -31,6 +33,41 @@ export default function EnclosureSelector({
   const selectedCompatibility = selectedEnclosure
     ? compatibilityMap.get(selectedEnclosure)
     : null;
+
+  // LA4-only enclosures (Legacy category)
+  const legacyEnclosureNames = new Set([
+    "8XT",
+    "12XT (Active)",
+    "12XT (Passive)",
+    "115XT HiQ",
+    "112XT",
+    "115XT",
+    "MTD108a",
+    "MTD112b",
+    "MTD115b (Active)",
+    "MTD115b (Passive)",
+    "ARCS Wide/Focus",
+    "ARCS",
+    "Kiva",
+    "Kilo",
+    "SB118",
+  ]);
+
+  // Categorize enclosures
+  const categorizedEnclosures = useMemo(() => {
+    const current: Enclosure[] = [];
+    const legacy: Enclosure[] = [];
+
+    for (const enc of enclosures) {
+      if (legacyEnclosureNames.has(enc.enclosure)) {
+        legacy.push(enc);
+      } else {
+        current.push(enc);
+      }
+    }
+
+    return { current, legacy };
+  }, [enclosures]);
 
   const handleAddEnclosure = () => {
     if (!selectedEnclosure) return;
@@ -89,17 +126,21 @@ export default function EnclosureSelector({
               className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"
             >
               <option value="">Select enclosure...</option>
-              {enclosures.map((enc) => {
-                const compat = compatibilityMap.get(enc.enclosure);
-                const limitedLabel = compat?.isLimitedCompatibility
-                  ? ` [${compat.autoSelectedAmp?.model}${compat.autoSelectedAmp?.mode ? " " + compat.autoSelectedAmp.mode : ""} only]`
-                  : "";
-                return (
-                  <option key={enc.enclosure} value={enc.enclosure}>
-                    {enc.enclosure} ({enc.nominal_impedance_ohms}Ω){limitedLabel}
-                  </option>
-                );
-              })}
+              {categorizedEnclosures.current.map((enc) => (
+                <option key={enc.enclosure} value={enc.enclosure}>
+                  {enc.enclosure}
+                </option>
+              ))}
+              {categorizedEnclosures.legacy.length > 0 && (
+                <>
+                  <option disabled>── Legacy ──</option>
+                  {categorizedEnclosures.legacy.map((enc) => (
+                    <option key={enc.enclosure} value={enc.enclosure}>
+                      {enc.enclosure}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
 
@@ -124,8 +165,8 @@ export default function EnclosureSelector({
           </button>
         </div>
 
-        {/* Compatibility Info for Selected Enclosure */}
-        {selectedCompatibility && (
+        {/* Compatibility Info for Selected Enclosure (hidden in sales mode) */}
+        {selectedCompatibility && !salesMode && (
           <div className="mt-3 rounded bg-white p-3 text-xs dark:bg-neutral-900">
             {selectedCompatibility.isLimitedCompatibility ? (
               <div className="flex items-center gap-2 text-amber-700 dark:text-amber-500">
@@ -172,19 +213,21 @@ export default function EnclosureSelector({
                     <div className="font-medium text-gray-900 dark:text-gray-200">
                       {request.enclosure.enclosure}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-neutral-500">
-                      {request.enclosure.nominal_impedance_ohms}Ω
-                      {!request.enclosure.parallelAllowed && (
-                        <span className="ml-2 text-amber-600 dark:text-amber-500">
-                          (No parallel)
-                        </span>
-                      )}
-                      {compat?.isLimitedCompatibility && (
-                        <span className="ml-2 text-blue-600 dark:text-blue-400">
-                          ({compat.autoSelectedAmp?.model} only)
-                        </span>
-                      )}
-                    </div>
+                    {!salesMode && (
+                      <div className="text-xs text-gray-500 dark:text-neutral-500">
+                        {request.enclosure.nominal_impedance_ohms}Ω
+                        {!request.enclosure.parallelAllowed && (
+                          <span className="ml-2 text-amber-600 dark:text-amber-500">
+                            (No parallel)
+                          </span>
+                        )}
+                        {compat?.isLimitedCompatibility && (
+                          <span className="ml-2 text-blue-600 dark:text-blue-400">
+                            ({compat.autoSelectedAmp?.model} only)
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2">

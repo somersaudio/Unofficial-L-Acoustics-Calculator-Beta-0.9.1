@@ -297,6 +297,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
           mode: mode.mode,
           outputs: amp.outputs,
           powerRank: amp.powerRank,
+          channelTypes: amp.channelTypes,
         });
       }
     } else {
@@ -306,6 +307,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
         model: amp.amplifier,
         outputs: amp.outputs,
         powerRank: amp.powerRank,
+        channelTypes: amp.channelTypes,
       });
     }
   }
