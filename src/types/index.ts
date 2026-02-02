@@ -24,7 +24,8 @@ export interface ChannelTypes {
 
 export interface Amplifier {
   amplifier: string; // Model name, e.g., "LA12X"
-  outputs: number; // Number of physical outputs
+  outputs: number; // Number of amp channels (used by solver for allocation)
+  physicalOutputs?: number; // Number of physical connectors on rear panel (for UI grouping; defaults to outputs)
   powerRank: number; // 1 = lowest power, 4 = highest
   operatingModes: OperatingMode[];
   maxOutputPower_W: MaxOutputPower;
@@ -97,7 +98,8 @@ export interface AmpConfig {
   key: AmpConfigKey; // e.g., "LA12X" or "LA2Xi_SE"
   model: string; // Base model name, e.g., "LA12X" or "LA2Xi"
   mode?: string; // Optional mode for LA2Xi: "SE", "BTL", or "PBTL"
-  outputs: number;
+  outputs: number; // Number of amp channels (solver uses this)
+  physicalOutputs: number; // Number of physical connectors (UI uses this for grouping)
   powerRank: number;
   channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
 }

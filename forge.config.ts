@@ -13,6 +13,19 @@ const config: ForgeConfig = {
     // Include the data directory in the packaged app
     extraResource: ['./data'],
     name: 'L-Acoustic Amp Calc',
+    osxSign: {
+      identity: 'Developer ID Application: John Somers (RY46BRL9M2)',
+      optionsForFile: () => ({
+        hardenedRuntime: true,
+        entitlements: './entitlements.plist',
+        'entitlements-inherit': './entitlements.plist',
+        'signature-flags': 'library',
+        timestamp: 'http://timestamp.apple.com/ts01',
+      }),
+    },
+    osxNotarize: {
+      keychainProfile: 'AC_PASSWORD',
+    },
   },
   rebuildConfig: {},
   makers: [

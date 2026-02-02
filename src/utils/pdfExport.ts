@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { SolverSolution, EnclosureRequest } from "../types";
+import lacousticsLogo from "../assets/lacoustics-logo.png";
 
 const PAGE_WIDTH = 210; // A4 width in mm
 const MARGIN = 20;
@@ -49,7 +50,7 @@ export async function generatePDFReport(options: PDFExportOptions): Promise<void
 
   // Logo
   try {
-    const logo = await loadImageWithDimensions("data/lacoustics-logo.png");
+    const logo = await loadImageWithDimensions(lacousticsLogo);
     // Calculate width from actual aspect ratio to avoid stretching
     const logoHeight = 8;
     const aspectRatio = logo.width / logo.height;

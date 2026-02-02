@@ -288,6 +288,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
   const configs: AmpConfig[] = [];
 
   for (const amp of amplifiers) {
+    const physicalOutputs = amp.physicalOutputs ?? amp.outputs;
     if (amp.operatingModes && amp.operatingModes.length > 0) {
       // Amp has operating modes (like LA2Xi with SE, BTL, PBTL)
       for (const mode of amp.operatingModes) {
@@ -296,6 +297,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
           model: amp.amplifier,
           mode: mode.mode,
           outputs: amp.outputs,
+          physicalOutputs,
           powerRank: amp.powerRank,
           channelTypes: amp.channelTypes,
         });
@@ -306,6 +308,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
         key: amp.amplifier,
         model: amp.amplifier,
         outputs: amp.outputs,
+        physicalOutputs,
         powerRank: amp.powerRank,
         channelTypes: amp.channelTypes,
       });

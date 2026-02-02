@@ -3,6 +3,7 @@ import type { DataLoadResult, EnclosureRequest, SolverSolution, AmpConfig } from
 import EnclosureSelector from "./EnclosureSelector";
 import SolverResults from "./SolverResults";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
+import lacousticsLogo from "../assets/lacoustics-logo.png";
 
 type AppState =
   | { status: "loading" }
@@ -25,13 +26,59 @@ function MoonIcon({ className }: { className?: string }) {
   );
 }
 
+function BugReportButton() {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleSend = () => {
+    if (!message.trim()) return;
+    const mailto = `mailto:Admin@somersaudio.com?subject=${encodeURIComponent("Bug Report – L-Acoustics Amp Calc")}&body=${encodeURIComponent(message)}`;
+    window.open(mailto, "_blank");
+    setMessage("");
+    setOpen(false);
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50">
+      {open && (
+        <div className="mb-2 w-72 rounded-lg border border-gray-300 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Report a Bug</span>
+            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none">&times;</button>
+          </div>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Describe the issue..."
+            rows={4}
+            className="w-full resize-none rounded border border-gray-300 bg-gray-50 p-2 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-200 dark:placeholder-neutral-500"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!message.trim()}
+            className="mt-2 w-full rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            Send
+          </button>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 shadow transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
+      >
+        Report Bug
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [requests, setRequests] = useState<EnclosureRequest[]>([]);
   const [disabledAmps, setDisabledAmps] = useState<Set<string>>(new Set());
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem("darkMode");
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true;
   });
   const [salesMode, setSalesMode] = useState<boolean>(() => {
     const saved = localStorage.getItem("salesMode");
@@ -139,7 +186,7 @@ export default function App() {
       {/* Header */}
       <header className="flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:bg-neutral-900 dark:border-b dark:border-neutral-800">
         <img
-          src="data/lacoustics-logo.png"
+          src={lacousticsLogo}
           alt="L-Acoustics"
           className="h-8"
         />
@@ -217,6 +264,7 @@ export default function App() {
 
         </div>
       </footer>
+      <BugReportButton />
     </div>
   );
 }

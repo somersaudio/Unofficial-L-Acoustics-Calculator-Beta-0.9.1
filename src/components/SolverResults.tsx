@@ -116,6 +116,94 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes }:
   );
 }
 
+/** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
+function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false }: { outputs: OutputAllocation[]; physicalIndex: number; salesMode?: boolean }) {
+  // Aggregate enclosures across channels in this physical output
+  const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
+  let totalEnclosures = 0;
+
+  for (const output of outputs) {
+    for (const entry of output.enclosures) {
+      const key = entry.enclosure.enclosure;
+      const existing = enclosureTotals.get(key);
+      if (existing) {
+        existing.count += entry.count;
+      } else {
+        enclosureTotals.set(key, { enclosure: entry.enclosure, count: entry.count });
+      }
+      totalEnclosures += entry.count;
+    }
+  }
+
+  const hasLoad = totalEnclosures > 0;
+
+  // Check impedance errors across all channels in this physical output
+  const hasImpedanceError = !salesMode && outputs.some(
+    (o) => o.impedanceOhms < (o.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && o.impedanceOhms !== Infinity
+  );
+
+  // Collect per-channel impedance info for display
+  const channelImpedances = outputs.map((o) => ({
+    channelIndex: o.outputIndex,
+    impedanceOhms: o.impedanceOhms,
+    minImpedanceOverride: o.minImpedanceOverride,
+  }));
+
+  return (
+    <div
+      className={`rounded border p-2 text-xs ${
+        hasImpedanceError
+          ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
+          : hasLoad
+          ? "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
+          : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
+      }`}
+    >
+      <div className="mb-1 font-medium text-gray-700 dark:text-neutral-400">
+        Output {physicalIndex + 1}
+        <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+      </div>
+      {hasLoad ? (
+        <>
+          <div className="space-y-1">
+            {Array.from(enclosureTotals.values()).map((entry, i) => (
+              <div key={i} className="text-gray-900 dark:text-gray-200">
+                {entry.count}x {entry.enclosure.enclosure}
+              </div>
+            ))}
+          </div>
+          {!salesMode && (
+            <div className={`mt-2 pt-1 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+              {channelImpedances.map((ch) => (
+                <div key={ch.channelIndex} className={getImpedanceColor(ch.impedanceOhms, ch.minImpedanceOverride)}>
+                  Ch {ch.channelIndex + 1}: {ch.impedanceOhms === Infinity ? "No load" : `${ch.impedanceOhms}Ω`}
+                  {!salesMode && ch.impedanceOhms < (ch.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && ch.impedanceOhms !== Infinity && (
+                    <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-gray-400 dark:text-neutral-600 italic">Empty</div>
+      )}
+    </div>
+  );
+}
+
+/** Group solver channel outputs into physical output groups */
+function groupByPhysicalOutputs(outputs: OutputAllocation[], channelCount: number, physicalCount: number): OutputAllocation[][] {
+  const channelsPerPhysical = Math.floor(channelCount / physicalCount);
+  const groups: OutputAllocation[][] = [];
+  for (let i = 0; i < physicalCount; i++) {
+    const start = i * channelsPerPhysical;
+    const end = start + channelsPerPhysical;
+    groups.push(outputs.slice(start, end));
+  }
+  return groups;
+}
+
 // Grouped amp card for sales mode - shows multiple amps of same type as one entry
 function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   const firstInstance = instances[0];
@@ -166,11 +254,18 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
 
 function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; salesMode?: boolean }) {
   const ampOutputCount = instance.ampConfig.outputs;
+  const physicalOutputCount = instance.ampConfig.physicalOutputs;
+  const usePhysicalGrouping = physicalOutputCount < ampOutputCount;
   const hasAnyImpedanceError = !salesMode && instance.outputs.some(
     (o) => o.impedanceOhms < (o.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && o.impedanceOhms !== Infinity
   );
   const enclosureTypeCount = countEnclosureTypes(instance);
   const isAtMaxTypes = enclosureTypeCount >= MAX_ENCLOSURE_TYPES_PER_AMP;
+
+  // Group channels into physical outputs when needed (e.g., LA12X: 4 channels -> 2 NL4 connectors)
+  const physicalGroups = usePhysicalGrouping
+    ? groupByPhysicalOutputs(instance.outputs, ampOutputCount, physicalOutputCount)
+    : null;
 
   return (
     <div className={`rounded-lg border shadow-sm ${
@@ -213,21 +308,36 @@ function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; sales
       {/* Outputs Grid - hidden in sales mode */}
       {!salesMode && (
         <div className="p-4">
-          <div className={`grid gap-2 ${
-            ampOutputCount <= 4
-              ? "grid-cols-4"
-              : "grid-cols-8"
-          }`}>
-            {instance.outputs.map((output) => (
-              <OutputCard
-                key={output.outputIndex}
-                output={output}
-                ampOutputCount={ampOutputCount}
-                salesMode={salesMode}
-                channelTypes={instance.ampConfig.channelTypes}
-              />
-            ))}
-          </div>
+          {usePhysicalGrouping && physicalGroups ? (
+            <div className={`grid gap-2 ${
+              physicalOutputCount === 2 ? "grid-cols-2" : physicalOutputCount <= 4 ? "grid-cols-4" : "grid-cols-8"
+            }`}>
+              {physicalGroups.map((group, i) => (
+                <PhysicalOutputCard
+                  key={i}
+                  outputs={group}
+                  physicalIndex={i}
+                  salesMode={salesMode}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className={`grid gap-2 ${
+              ampOutputCount <= 4
+                ? "grid-cols-4"
+                : "grid-cols-8"
+            }`}>
+              {instance.outputs.map((output) => (
+                <OutputCard
+                  key={output.outputIndex}
+                  output={output}
+                  ampOutputCount={ampOutputCount}
+                  salesMode={salesMode}
+                  channelTypes={instance.ampConfig.channelTypes}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

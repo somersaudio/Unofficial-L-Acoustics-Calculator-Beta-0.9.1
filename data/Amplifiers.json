@@ -20,25 +20,47 @@
           "label": "LA4 User Manual v10.0",
           "version": "10.0"
         },
-        "connector_family": "speakON",
+        "connector_family": "NL4",
         "total_amp_channels": 4,
-        "pinout_templates": [
+        "physical_outputs": [
           {
-            "output_type": "speakON_one_channel_template",
-            "channels_on_connector": 1,
-            "pins": {
-              "1+": "CH1 +",
-              "1-": "CH1 -"
-            }
-          },
-          {
-            "output_type": "speakON_two_channel_template",
+            "output": 1,
+            "connector": "NL4",
             "channels_on_connector": 2,
             "pins": {
               "1+": "CH1 +",
               "1-": "CH1 -",
               "2+": "CH2 +",
               "2-": "CH2 -"
+            }
+          },
+          {
+            "output": 2,
+            "connector": "NL4",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH2 +",
+              "1-": "CH2 -"
+            }
+          },
+          {
+            "output": 3,
+            "connector": "NL4",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH3 +",
+              "1-": "CH3 -",
+              "2+": "CH4 +",
+              "2-": "CH4 -"
+            }
+          },
+          {
+            "output": 4,
+            "connector": "NL4",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH4 +",
+              "1-": "CH4 -"
             }
           }
         ],
@@ -160,25 +182,47 @@
           "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
           "version": "1.0.0"
         },
-        "connector_family": "speakON",
+        "connector_family": "NL4",
         "total_amp_channels": 4,
-        "pinout_templates": [
+        "physical_outputs": [
           {
-            "output_type": "speakON_one_channel_template",
-            "channels_on_connector": 1,
-            "pins": {
-              "1+": "CH1 +",
-              "1-": "CH1 -"
-            }
-          },
-          {
-            "output_type": "speakON_two_channel_template",
+            "output": 1,
+            "connector": "NL4",
             "channels_on_connector": 2,
             "pins": {
               "1+": "CH1 +",
               "1-": "CH1 -",
               "2+": "CH2 +",
               "2-": "CH2 -"
+            }
+          },
+          {
+            "output": 2,
+            "connector": "NL4",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH2 +",
+              "1-": "CH2 -"
+            }
+          },
+          {
+            "output": 3,
+            "connector": "NL4",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH3 +",
+              "1-": "CH3 -",
+              "2+": "CH4 +",
+              "2-": "CH4 -"
+            }
+          },
+          {
+            "output": 4,
+            "connector": "NL4",
+            "channels_on_connector": 1,
+            "pins": {
+              "1+": "CH4 +",
+              "1-": "CH4 -"
             }
           }
         ],
@@ -188,6 +232,7 @@
     {
       "amplifier": "LA12X",
       "outputs": 4,
+      "physicalOutputs": 2,
       "powerRank": 3,
       "operatingModes": [],
       "maxOutputPower_W": {
@@ -204,25 +249,29 @@
           "label": "L-Acoustics amp pinouts + channel counts (from LA01205 v13.0)",
           "version": "1.0.0"
         },
-        "connector_family": "speakON",
+        "connector_family": "NL4",
         "total_amp_channels": 4,
-        "pinout_templates": [
+        "physical_outputs": [
           {
-            "output_type": "speakON_one_channel_template",
-            "channels_on_connector": 1,
-            "pins": {
-              "1+": "CH1 +",
-              "1-": "CH1 -"
-            }
-          },
-          {
-            "output_type": "speakON_two_channel_template",
+            "output": 1,
+            "connector": "NL4",
             "channels_on_connector": 2,
             "pins": {
               "1+": "CH1 +",
               "1-": "CH1 -",
               "2+": "CH2 +",
               "2-": "CH2 -"
+            }
+          },
+          {
+            "output": 2,
+            "connector": "NL4",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH3 +",
+              "1-": "CH3 -",
+              "2+": "CH4 +",
+              "2-": "CH4 -"
             }
           }
         ],
