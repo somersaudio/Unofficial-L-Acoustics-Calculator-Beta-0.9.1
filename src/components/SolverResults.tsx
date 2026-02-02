@@ -1,13 +1,15 @@
-import React from "react";
-import type { SolverSolution, AmpInstance, OutputAllocation, EnclosureRequest, ChannelTypes } from "../types";
-import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS } from "../types";
+import React from "react"; // eslint-disable-line
+import type { AmpInstance, OutputAllocation, ChannelTypes, ZoneWithSolution, SolverSolution } from "../types";
+import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
 import { getImpedanceErrors } from "../solver/ampSolver";
 import { generatePDFReport } from "../utils/pdfExport";
 
 interface SolverResultsProps {
-  solution: SolverSolution | null;
-  requests: EnclosureRequest[];
+  zoneSolutions: ZoneWithSolution[];
+  activeZoneId: string;
   salesMode?: boolean;
+  cableGaugeMm2?: number;
+  useFeet?: boolean;
 }
 
 function getImpedanceColor(impedance: number, minImpedanceOverride?: number): string {
@@ -45,7 +47,27 @@ function countEnclosureTypes(instance: AmpInstance): number {
   return types.size;
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes }) {
+/** Compact cable length display for a given impedance and selected gauge */
+function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: number; gaugeMm2: number; useFeet: boolean }) {
+  if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
+
+  const limit = getMaxCableLength(impedanceOhms, gaugeMm2);
+  if (!limit) return null;
+
+  const hasLimit = limit.meters !== null;
+
+  return (
+    <div className="mt-1 text-[10px] text-gray-500 dark:text-neutral-500">
+      {hasLimit ? (
+        <span>Max cable: <span className="font-medium text-gray-700 dark:text-neutral-300">{useFeet ? `${limit.feet}ft` : `${limit.meters}m`}</span></span>
+      ) : (
+        <span className="text-amber-500">Not rated for {gaugeMm2}mm² cable</span>
+      )}
+    </div>
+  );
+}
+
+function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [] }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[] }) {
   const hasLoad = output.totalEnclosures > 0;
   const channelType = ampOutputCount === 16 ? getChannelType(output.outputIndex) : null;
   const outputLabel = ampOutputCount === 16
@@ -71,41 +93,93 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes }:
           : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
     >
-      <div className={`${is16Channel ? "" : "mb-1"} font-medium text-gray-700 dark:text-neutral-400`}>{outputLabel}</div>
+      <div className={`${is16Channel ? "" : "mb-1"} font-medium text-gray-700 dark:text-neutral-400`}>
+        {outputLabel}
+        {!is16Channel && (
+          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+        )}
+      </div>
       {hasLoad ? (
-        <>
-          <div className={is16Channel ? "" : "space-y-1"}>
-            {output.enclosures.map((entry, i) => {
-              // Hide enclosure name for L2/L2D on 16-channel amps (they're implied by channel type)
-              const isL2Type = entry.enclosure.enclosure === "L2 / L2D";
-              const hideEnclosureName = is16Channel && isL2Type;
-              return hideEnclosureName ? null : (
-                <div key={i} className="text-gray-900 dark:text-gray-200">
-                  {entry.count}x {entry.enclosure.enclosure}
-                </div>
-              );
-            })}
-          </div>
-          {!salesMode && (
-            <div
-              className={`${is16Channel ? "mt-0.5 pt-0.5" : "mt-2 pt-1"} border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"} ${getImpedanceColor(
-                output.impedanceOhms,
-                output.minImpedanceOverride
-              )}`}
-            >
-              {output.impedanceOhms === Infinity
-                ? "No load"
-                : `${output.impedanceOhms}Ω`}
-              {hasImpedanceError && (
-                <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
-              )}
+        is16Channel ? (
+          /* 16-channel layout: enclosures first, then impedance (compact) */
+          <>
+            <div>
+              {(() => {
+                const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                return output.enclosures.map((entry, i) => {
+                  const isL2Type = entry.enclosure.enclosure === "L2 / L2D";
+                  const hideEnclosureName = isL2Type;
+                  return hideEnclosureName ? null : (
+                    <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                      {entry.count}x {entry.enclosure.enclosure}
+                      {impedanceAboveRated && (
+                        <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                        </svg>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
             </div>
-          )}
-        </>
+            {!salesMode && (
+              <div
+                className={`mt-0.5 pt-0.5 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"} ${getImpedanceColor(
+                  output.impedanceOhms,
+                  output.minImpedanceOverride
+                )}`}
+              >
+                {output.impedanceOhms === Infinity ? "No load" : `${output.impedanceOhms}Ω`}
+                {hasImpedanceError && (
+                  <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          /* Standard output layout: Ch label, impedance, enclosures, cable length (matching PhysicalOutputCard) */
+          <>
+            {!salesMode && (
+              <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+                <div className={`pt-1 ${getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}`}>
+                  Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                  {hasImpedanceError && (
+                    <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
+                  )}
+                </div>
+                {(() => {
+                  const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                  const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                  return output.enclosures.map((entry, i) => (
+                    <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                      {entry.count}x {entry.enclosure.enclosure}
+                      {impedanceAboveRated && (
+                        <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                        </svg>
+                      )}
+                    </div>
+                  ));
+                })()}
+                <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+              </div>
+            )}
+            {salesMode && (
+              <div className="space-y-1">
+                {output.enclosures.map((entry, i) => (
+                  <div key={i} className="text-gray-900 dark:text-gray-200">
+                    {entry.count}x {entry.enclosure.enclosure}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )
       ) : (
         // For 16-channel amps, show nominal impedance with same styling as loaded outputs; for 4-output amps, show "Empty"
         is16Channel && nominalImpedance && !salesMode ? (
-          <div className={`${is16Channel ? "mt-0.5 pt-0.5" : "mt-2 pt-1"} border-t border-gray-200 dark:border-neutral-700 text-green-600 dark:text-green-500`}>
+          <div className="mt-0.5 pt-0.5 border-t border-gray-200 dark:border-neutral-700 text-green-600 dark:text-green-500">
             {nominalImpedance}Ω
           </div>
         ) : !is16Channel ? (
@@ -117,7 +191,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes }:
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false }: { outputs: OutputAllocation[]; physicalIndex: number; salesMode?: boolean }) {
+function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [] }: { outputs: OutputAllocation[]; physicalIndex: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[] }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -142,13 +216,6 @@ function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false }: { out
     (o) => o.impedanceOhms < (o.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && o.impedanceOhms !== Infinity
   );
 
-  // Collect per-channel impedance info for display
-  const channelImpedances = outputs.map((o) => ({
-    channelIndex: o.outputIndex,
-    impedanceOhms: o.impedanceOhms,
-    minImpedanceOverride: o.minImpedanceOverride,
-  }));
-
   return (
     <div
       className={`rounded border p-2 text-xs ${
@@ -165,21 +232,43 @@ function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false }: { out
       </div>
       {hasLoad ? (
         <>
-          <div className="space-y-1">
-            {Array.from(enclosureTotals.values()).map((entry, i) => (
-              <div key={i} className="text-gray-900 dark:text-gray-200">
-                {entry.count}x {entry.enclosure.enclosure}
-              </div>
-            ))}
-          </div>
-          {!salesMode && (
-            <div className={`mt-2 pt-1 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
-              {channelImpedances.map((ch) => (
-                <div key={ch.channelIndex} className={getImpedanceColor(ch.impedanceOhms, ch.minImpedanceOverride)}>
-                  Ch {ch.channelIndex + 1}: {ch.impedanceOhms === Infinity ? "No load" : `${ch.impedanceOhms}Ω`}
-                  {!salesMode && ch.impedanceOhms < (ch.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && ch.impedanceOhms !== Infinity && (
-                    <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
-                  )}
+          {!salesMode ? (
+            <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+              {outputs.map((output) => {
+                const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                return (
+                  <div key={output.outputIndex} className={output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}>
+                    <div className={getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}>
+                      Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                      {output.impedanceOhms !== Infinity && output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && (
+                        <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
+                      )}
+                    </div>
+                    {(() => {
+                      const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                      return output.enclosures.map((entry, i) => (
+                        <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                          {entry.count}x {entry.enclosure.enclosure}
+                          {impedanceAboveRated && (
+                            <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                            </svg>
+                          )}
+                        </div>
+                      ));
+                    })()}
+                    {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && (
+                      <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {Array.from(enclosureTotals.values()).map((entry, i) => (
+                <div key={i} className="text-gray-900 dark:text-gray-200">
+                  {entry.count}x {entry.enclosure.enclosure}
                 </div>
               ))}
             </div>
@@ -252,7 +341,7 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   );
 }
 
-function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; salesMode?: boolean }) {
+function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean }) {
   const ampOutputCount = instance.ampConfig.outputs;
   const physicalOutputCount = instance.ampConfig.physicalOutputs;
   const usePhysicalGrouping = physicalOutputCount < ampOutputCount;
@@ -266,6 +355,12 @@ function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; sales
   const physicalGroups = usePhysicalGrouping
     ? groupByPhysicalOutputs(instance.outputs, ampOutputCount, physicalOutputCount)
     : null;
+
+  // Check if any output has impedance at or above max rated (for annotation legend)
+  const maxRated = instance.ampConfig.ratedImpedances.length > 0 ? Math.max(...instance.ampConfig.ratedImpedances) : Infinity;
+  const hasAboveRatedOutput = instance.outputs.some(
+    (o) => o.totalEnclosures > 0 && o.impedanceOhms !== Infinity && o.impedanceOhms > maxRated
+  );
 
   return (
     <div className={`rounded-lg border shadow-sm ${
@@ -318,6 +413,9 @@ function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; sales
                   outputs={group}
                   physicalIndex={i}
                   salesMode={salesMode}
+                  cableGaugeMm2={cableGaugeMm2}
+                  useFeet={useFeet}
+                  ratedImpedances={instance.ampConfig.ratedImpedances}
                 />
               ))}
             </div>
@@ -334,8 +432,19 @@ function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; sales
                   ampOutputCount={ampOutputCount}
                   salesMode={salesMode}
                   channelTypes={instance.ampConfig.channelTypes}
+                  cableGaugeMm2={cableGaugeMm2}
+                  useFeet={useFeet}
+                  ratedImpedances={instance.ampConfig.ratedImpedances}
                 />
               ))}
+            </div>
+          )}
+          {hasAboveRatedOutput && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
+              <svg className="h-3.5 w-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+              </svg>
+              Add 1 more enclosure for minimum recommended load
             </div>
           )}
         </div>
@@ -344,15 +453,8 @@ function AmpCard({ instance, salesMode = false }: { instance: AmpInstance; sales
   );
 }
 
-export default function SolverResults({ solution, requests, salesMode = false }: SolverResultsProps) {
-  if (!solution) {
-    return (
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-neutral-700 dark:text-neutral-500">
-        <p>Add enclosures to see amplifier recommendations.</p>
-      </div>
-    );
-  }
-
+/** Renders a single zone's solver results */
+function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean }) {
   if (!solution.success) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/40">
@@ -364,10 +466,6 @@ export default function SolverResults({ solution, requests, salesMode = false }:
 
   const impedanceErrors = getImpedanceErrors(solution);
   const hasErrors = impedanceErrors.length > 0;
-
-  const handleExportPDF = async () => {
-    await generatePDFReport({ solution, requests });
-  };
 
   return (
     <div className="space-y-6">
@@ -402,49 +500,36 @@ export default function SolverResults({ solution, requests, salesMode = false }:
           ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"
           : "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
       }`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className={`mb-3 font-bold ${hasErrors ? "text-amber-800 dark:text-amber-500" : "text-green-800 dark:text-green-500"}`}>
-              {hasErrors ? "Configuration (with errors)" : "Recommended Configuration"}
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Total Amplifiers</div>
-                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
-                  {solution.summary.totalAmplifiers}
-                </div>
-              </div>
-              <div>
-                <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Enclosures Allocated</div>
-                <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
-                  {solution.summary.totalEnclosuresAllocated}
-                </div>
+        <div>
+          <h3 className={`mb-3 font-bold ${hasErrors ? "text-amber-800 dark:text-amber-500" : "text-green-800 dark:text-green-500"}`}>
+            {hasErrors ? "Configuration (with errors)" : "Recommended Configuration"}
+          </h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Total Amplifiers</div>
+              <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
+                {solution.summary.totalAmplifiers}
               </div>
             </div>
-            <div className={`mt-3 border-t pt-3 text-sm ${
-              hasErrors ? "border-amber-200 text-amber-700 dark:border-amber-800 dark:text-amber-400" : "border-green-200 text-green-700 dark:border-green-800 dark:text-green-400"
-            }`}>
-              <span className="font-medium">Amp Types: </span>
-              {solution.summary.ampConfigsUsed.map((c, i) => (
-                <span key={c.key}>
-                  {i > 0 && ", "}
-                  {c.model}
-                  {c.mode && ` (${c.mode})`}
-                </span>
-              ))}
+            <div>
+              <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Enclosures Allocated</div>
+              <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
+                {solution.summary.totalEnclosuresAllocated}
+              </div>
             </div>
           </div>
-
-          {/* Export Button */}
-          <button
-            onClick={handleExportPDF}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Export PDF
-          </button>
+          <div className={`mt-3 border-t pt-3 text-sm ${
+            hasErrors ? "border-amber-200 text-amber-700 dark:border-amber-800 dark:text-amber-400" : "border-green-200 text-green-700 dark:border-green-800 dark:text-green-400"
+          }`}>
+            <span className="font-medium">Amp Types: </span>
+            {solution.summary.ampConfigsUsed.map((c, i) => (
+              <span key={c.key}>
+                {i > 0 && ", "}
+                {c.model}
+                {c.mode && ` (${c.mode})`}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -454,7 +539,6 @@ export default function SolverResults({ solution, requests, salesMode = false }:
           Amplifier Allocation Detail
         </h3>
         {salesMode ? (
-          // Group amps by config key for sales mode
           (() => {
             const grouped = new Map<string, AmpInstance[]>();
             for (const instance of solution.ampInstances) {
@@ -470,10 +554,68 @@ export default function SolverResults({ solution, requests, salesMode = false }:
           })()
         ) : (
           solution.ampInstances.map((instance) => (
-            <AmpCard key={instance.id} instance={instance} salesMode={salesMode} />
+            <AmpCard key={instance.id} instance={instance} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} />
           ))
         )}
       </div>
+    </div>
+  );
+}
+
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true }: SolverResultsProps) {
+  // Find the active zone's solution
+  const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
+  const activeSolution = activeZoneSolution?.solution ?? null;
+
+  const handleExportPDF = async () => {
+    // PDF exports ALL zones
+    await generatePDFReport({ zoneSolutions });
+  };
+
+  if (!activeSolution) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-end">
+          <button
+            onClick={handleExportPDF}
+            disabled={!zoneSolutions.some((zs) => zs.solution !== null)}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export PDF
+          </button>
+        </div>
+        <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-neutral-700 dark:text-neutral-500">
+          <p>Add enclosures to see amplifier recommendations.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Export Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleExportPDF}
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export PDF
+        </button>
+      </div>
+
+      {/* Active Zone Results */}
+      <ZoneSolutionSection
+        solution={activeSolution}
+        salesMode={salesMode}
+        cableGaugeMm2={cableGaugeMm2}
+        useFeet={useFeet}
+      />
     </div>
   );
 }

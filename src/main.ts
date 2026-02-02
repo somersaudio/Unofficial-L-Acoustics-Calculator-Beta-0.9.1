@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import path from "node:path";
+import fs from "node:fs/promises";
 import started from "electron-squirrel-startup";
 import { loadDataFromFiles } from "./data/dataLoader";
 import type { DataLoadResult } from "./types";
@@ -113,6 +114,42 @@ function setupIpcHandlers(): void {
       };
     }
     return appData;
+  });
+
+  ipcMain.handle("save-project", async (_event, data: string): Promise<{ success: boolean; filePath?: string; error?: string }> => {
+    const win = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showSaveDialog(win!, {
+      title: "Save Project",
+      defaultPath: "project.lacalc",
+      filters: [{ name: "L-Acoustics Amp Calc", extensions: ["lacalc"] }],
+    });
+    if (result.canceled || !result.filePath) {
+      return { success: false };
+    }
+    try {
+      await fs.writeFile(result.filePath, data, "utf-8");
+      return { success: true, filePath: result.filePath };
+    } catch (err: unknown) {
+      return { success: false, error: String(err) };
+    }
+  });
+
+  ipcMain.handle("load-project", async (): Promise<{ success: boolean; data?: string; error?: string }> => {
+    const win = BrowserWindow.getFocusedWindow();
+    const result = await dialog.showOpenDialog(win!, {
+      title: "Open Project",
+      filters: [{ name: "L-Acoustics Amp Calc", extensions: ["lacalc"] }],
+      properties: ["openFile"],
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false };
+    }
+    try {
+      const data = await fs.readFile(result.filePaths[0], "utf-8");
+      return { success: true, data };
+    } catch (err: unknown) {
+      return { success: false, error: String(err) };
+    }
   });
 }
 

@@ -102,6 +102,7 @@ export interface AmpConfig {
   physicalOutputs: number; // Number of physical connectors (UI uses this for grouping)
   powerRank: number;
   channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
+  ratedImpedances: number[]; // Impedances where byLoad is non-null (e.g., [8, 4, 2.7] for LA12X)
 }
 
 /** Validation error structure */
@@ -187,6 +188,82 @@ export const MIN_IMPEDANCE_OHMS = 2.7;
 export const IMPEDANCE_TOLERANCE = 0.15;
 export const HARD_FLOOR_IMPEDANCE = MIN_IMPEDANCE_OHMS - IMPEDANCE_TOLERANCE; // 2.55
 
+// =============================================================================
+// Cable Length Reference (from LA01205 v13.0, p.9)
+// =============================================================================
+
+export interface CableGaugeSpec {
+  mm2: number;
+  swg: number;
+  awg: number;
+}
+
+export interface CableLengthLimit {
+  meters: number | null; // null = not rated for this impedance
+  feet: number | null;
+}
+
+/** Impedance thresholds for cable length lookup (use the bracket at or below the actual impedance) */
+export const CABLE_IMPEDANCE_THRESHOLDS = [8, 4, 2.7] as const;
+
+/** Cable gauges available */
+export const CABLE_GAUGES: CableGaugeSpec[] = [
+  { mm2: 1.5, swg: 18, awg: 16 },
+  { mm2: 2.5, swg: 15, awg: 14 },
+  { mm2: 4, swg: 13, awg: 11 },
+  { mm2: 6, swg: 11, awg: 9 },
+];
+
+/**
+ * Recommended maximum cable length by gauge and impedance load.
+ * Key: mm² gauge. Value: { 8: limit, 4: limit, 2.7: limit }
+ * Source: L-Acoustics Amplification Reference v13.0, p.9
+ */
+export const CABLE_LENGTH_TABLE: Record<number, Record<number, CableLengthLimit>> = {
+  1.5: {
+    8:   { meters: 18, feet: 60 },
+    4:   { meters: 9, feet: 30 },
+    2.7: { meters: null, feet: null },
+  },
+  2.5: {
+    8:   { meters: 30, feet: 100 },
+    4:   { meters: 15, feet: 50 },
+    2.7: { meters: 10, feet: 33 },
+  },
+  4: {
+    8:   { meters: 50, feet: 160 },
+    4:   { meters: 25, feet: 80 },
+    2.7: { meters: 17, feet: 53 },
+  },
+  6: {
+    8:   { meters: 74, feet: 240 },
+    4:   { meters: 37, feet: 120 },
+    2.7: { meters: 25, feet: 80 },
+  },
+};
+
+/**
+ * Get the max cable length for a given impedance and cable gauge.
+ * Uses the impedance bracket at or below the actual impedance (conservative).
+ * Returns null if impedance is too low or infinite (no load).
+ */
+export function getMaxCableLength(impedanceOhms: number, gaugeMm2: number): CableLengthLimit | null {
+  if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
+
+  const gaugeTable = CABLE_LENGTH_TABLE[gaugeMm2];
+  if (!gaugeTable) return null;
+
+  // Find the appropriate impedance bracket (highest threshold that is <= actual impedance)
+  for (const threshold of CABLE_IMPEDANCE_THRESHOLDS) {
+    if (impedanceOhms >= threshold) {
+      return gaugeTable[threshold] ?? null;
+    }
+  }
+
+  // Below 2.7Ω — not rated
+  return { meters: null, feet: null };
+}
+
 /** Impedance validation result for an output */
 export interface ImpedanceValidation {
   impedanceOhms: number;
@@ -204,3 +281,42 @@ export interface EnclosureCompatibility {
 
 /** User's amplifier inventory - how many of each amp model they own */
 export type AmpInventory = Record<string, number>; // model name -> quantity (0 = disabled)
+
+// =============================================================================
+// Zone Types
+// =============================================================================
+
+/** A zone represents an isolated allocation group with its own enclosures and amp toggles */
+export interface Zone {
+  id: string;
+  name: string;
+  requests: EnclosureRequest[];
+  disabledAmps: Set<string>;
+}
+
+/** Zone paired with its computed solver result */
+export interface ZoneWithSolution {
+  zone: Zone;
+  solution: SolverSolution | null;
+  enabledAmpConfigs: AmpConfig[];
+}
+
+/** Serializable form of a Zone for JSON persistence */
+export interface ZoneSerialized {
+  id: string;
+  name: string;
+  requests: Array<{ enclosureName: string; quantity: number }>;
+  disabledAmps: string[];
+}
+
+/** Project file format for save/load */
+export interface ProjectFile {
+  version: 1;
+  zones: ZoneSerialized[];
+  settings: {
+    darkMode: boolean;
+    salesMode: boolean;
+    cableGaugeMm2: number;
+    useFeet: boolean;
+  };
+}

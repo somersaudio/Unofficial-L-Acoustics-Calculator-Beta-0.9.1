@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility } from "../types";
-import { getEnclosureCompatibility } from "../solver/ampSolver";
+import { getEnclosureCompatibility, getMinimumEnclosureCount } from "../solver/ampSolver";
 
 interface EnclosureSelectorProps {
   enclosures: Enclosure[];
@@ -8,6 +8,42 @@ interface EnclosureSelectorProps {
   requests: EnclosureRequest[];
   onRequestsChange: (requests: EnclosureRequest[]) => void;
   salesMode?: boolean;
+  onBump?: () => void;
+}
+
+/** Fading "Minimum enclosure count" message */
+function MinCountMessage({ show }: { show: boolean }) {
+  const [visible, setVisible] = useState(false);
+  const [fading, setFading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (show) {
+      setVisible(true);
+      setFading(false);
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        setFading(true);
+        timerRef.current = setTimeout(() => setVisible(false), 500);
+      }, 2500);
+    }
+    return () => clearTimeout(timerRef.current);
+  }, [show]);
+
+  if (!visible) return null;
+
+  return (
+    <span
+      className={`ml-2 inline-flex items-center gap-1 text-xs font-medium text-amber-500 transition-opacity duration-500 ${
+        fading ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      Minimum enclosure count
+      <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+      </svg>
+    </span>
+  );
 }
 
 export default function EnclosureSelector({
@@ -16,15 +52,27 @@ export default function EnclosureSelector({
   requests,
   onRequestsChange,
   salesMode = false,
+  onBump,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  // Track which request indices just got auto-bumped (for showing fade message)
+  const [bumpedIndices, setBumpedIndices] = useState<Set<number>>(new Set());
 
   // Get compatibility info for all enclosures
   const compatibilityMap = useMemo(() => {
     const map = new Map<string, EnclosureCompatibility>();
     for (const enc of enclosures) {
       map.set(enc.enclosure, getEnclosureCompatibility(enc, ampConfigs));
+    }
+    return map;
+  }, [enclosures, ampConfigs]);
+
+  // Compute minimum counts for all enclosure types
+  const minCountMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const enc of enclosures) {
+      map.set(enc.enclosure, getMinimumEnclosureCount(enc, ampConfigs));
     }
     return map;
   }, [enclosures, ampConfigs]);
@@ -75,22 +123,30 @@ export default function EnclosureSelector({
     const enclosure = enclosures.find((e) => e.enclosure === selectedEnclosure);
     if (!enclosure) return;
 
+    // Enforce minimum count
+    const minCount = minCountMap.get(selectedEnclosure) ?? 1;
+    const effectiveQuantity = Math.max(quantity, minCount);
+    const wasBumped = effectiveQuantity > quantity;
+
     // Check if this enclosure type already exists in requests
     const existingIndex = requests.findIndex(
       (r) => r.enclosure.enclosure === selectedEnclosure
     );
 
     if (existingIndex >= 0) {
-      // Update existing quantity
       const newRequests = [...requests];
       newRequests[existingIndex] = {
         ...newRequests[existingIndex],
-        quantity: newRequests[existingIndex].quantity + quantity,
+        quantity: newRequests[existingIndex].quantity + effectiveQuantity,
       };
       onRequestsChange(newRequests);
     } else {
-      // Add new request
-      onRequestsChange([...requests, { enclosure, quantity }]);
+      onRequestsChange([...requests, { enclosure, quantity: effectiveQuantity }]);
+      if (wasBumped) {
+        // The new request will be at the end
+        setBumpedIndices(new Set([requests.length]));
+        onBump?.();
+      }
     }
 
     // Reset form
@@ -104,10 +160,21 @@ export default function EnclosureSelector({
   };
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    const encName = requests[index].enclosure.enclosure;
+    const minCount = minCountMap.get(encName) ?? 1;
+    const effectiveQuantity = Math.max(newQuantity, minCount);
+    if (effectiveQuantity < 1) return;
+
+    const wasBumped = newQuantity < minCount;
+
     const newRequests = [...requests];
-    newRequests[index] = { ...newRequests[index], quantity: newQuantity };
+    newRequests[index] = { ...newRequests[index], quantity: effectiveQuantity };
     onRequestsChange(newRequests);
+
+    if (wasBumped) {
+      setBumpedIndices(new Set([index]));
+      onBump?.();
+    }
   };
 
   return (
@@ -204,14 +271,22 @@ export default function EnclosureSelector({
           <div className="space-y-2">
             {requests.map((request, index) => {
               const compat = compatibilityMap.get(request.enclosure.enclosure);
+              const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
+              const showBumpMessage = bumpedIndices.has(index);
               return (
                 <div
                   key={`${request.enclosure.enclosure}-${index}`}
                   className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
                 >
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900 dark:text-gray-200">
-                      {request.enclosure.enclosure}
+                    <div className="flex items-center">
+                      <span className="font-medium text-gray-900 dark:text-gray-200">
+                        {request.enclosure.enclosure}
+                      </span>
+                      <MinCountMessage
+                        show={showBumpMessage}
+                        key={showBumpMessage ? Date.now() : "stable"}
+                      />
                     </div>
                     {!salesMode && (
                       <div className="text-xs text-gray-500 dark:text-neutral-500">
@@ -235,19 +310,19 @@ export default function EnclosureSelector({
                       onClick={() =>
                         handleQuantityChange(index, request.quantity - 1)
                       }
-                      disabled={request.quantity <= 1}
+                      disabled={request.quantity <= minCount}
                       className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                     >
                       -
                     </button>
                     <input
                       type="number"
-                      min="1"
+                      min={minCount}
                       value={request.quantity}
                       onChange={(e) =>
                         handleQuantityChange(
                           index,
-                          parseInt(e.target.value) || 1
+                          parseInt(e.target.value) || minCount
                         )
                       }
                       className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"

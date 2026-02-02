@@ -374,35 +374,68 @@ function findBestAmpConfig(
 // =============================================================================
 
 /**
+ * Check if a given impedance is rated for the amp.
+ * E.g., 8Ω is rated on LA12X (which has [8, 4, 2.7]), but 16Ω is not.
+ * An impedance is rated if it is at or below the highest rated impedance threshold.
+ * 16Ω on LA12X: 16 > max(8,4,2.7) = 8 → NOT rated.
+ * 8Ω on LA12X: 8 <= 8 → rated.
+ * 16Ω on LA4X: 16 <= max(16,8,4) = 16 → rated.
+ */
+function isImpedanceRated(impedanceOhms: number, ratedImpedances: number[]): boolean {
+  if (ratedImpedances.length === 0) return false;
+  const maxRated = Math.max(...ratedImpedances);
+  return impedanceOhms <= maxRated;
+}
+
+/**
  * Calculate the minimum number of enclosures needed per output to achieve acceptable impedance.
- * The amp reference tables indicate what impedance ranges are supported.
- * Typically, impedances at exactly 16Ω aren't recommended (like 1x 16Ω enclosure).
+ * Uses the amp's rated impedances from byLoad data to determine valid ranges.
  *
  * Returns the minimum count needed, or the perOutput limit if even max doesn't work.
  */
 function getMinimumPerOutputForImpedance(
   enclosure: Enclosure,
-  limits: { perOutput: number; minImpedanceOverride?: number }
+  limits: { perOutput: number; minImpedanceOverride?: number },
+  ratedImpedances?: number[]
 ): number {
-  // Maximum recommended impedance - at or above this is "not recommended"
-  // Most L-Acoustics amps support down to 2.7Ω and UP TO (but not including) 16Ω per output
-  // So 8Ω is fine, but 16Ω (like a single 5XT) is not recommended
-  const MAX_RECOMMENDED_IMPEDANCE = 16;
-
   const minAllowedImpedance = limits.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
 
-  // Find minimum count where impedance is within acceptable range
+  // Find minimum count where impedance is above the hard floor.
+  // Above-rated impedance (e.g., 16Ω on an 8Ω-max amp) is allowed — it just shows
+  // a warning icon, not a forced minimum count bump.
   for (let count = 1; count <= limits.perOutput; count++) {
     const impedance = calculateParallelImpedance(enclosure.nominal_impedance_ohms, count);
-    // Check if impedance is in valid range: not too low (below amp minimum) and below max recommended
-    // Note: strictly less than MAX_RECOMMENDED_IMPEDANCE, so 16Ω is NOT acceptable
-    if (impedance >= minAllowedImpedance && impedance < MAX_RECOMMENDED_IMPEDANCE) {
-      return count;
-    }
+    if (impedance >= minAllowedImpedance) return count;
   }
 
   // If no count gives acceptable impedance, use preferredPerOutput or 1
   return enclosure.preferredPerOutput;
+}
+
+/**
+ * Get the minimum enclosure count needed for a given enclosure across all enabled amp configs.
+ * Returns 1 if at least one amp can handle 1 enclosure at a rated impedance.
+ * Used by UI to enforce minimum quantity and show "Minimum enclosure count" message.
+ */
+export function getMinimumEnclosureCount(
+  enclosure: Enclosure,
+  enabledAmpConfigs: AmpConfig[]
+): number {
+  let globalMin = Infinity;
+
+  for (const config of enabledAmpConfigs) {
+    const limits = enclosure.max_enclosures[config.key];
+    if (!limits) continue; // This amp doesn't support this enclosure
+
+    const minForThisAmp = getMinimumPerOutputForImpedance(
+      enclosure,
+      { perOutput: limits.per_output, minImpedanceOverride: limits.min_impedance_override },
+      config.ratedImpedances
+    );
+    globalMin = Math.min(globalMin, minForThisAmp);
+  }
+
+  return globalMin === Infinity ? 1 : globalMin;
 }
 
 /**
@@ -437,14 +470,19 @@ function allocateToOutputs(
 
   if (enclosure.parallelAllowed) {
     // Calculate minimum per output for valid impedance
-    const minPerOutputForImpedance = getMinimumPerOutputForImpedance(enclosure, limits);
+    const minPerOutputForImpedance = getMinimumPerOutputForImpedance(enclosure, limits, ampConfig.ratedImpedances);
 
     // Effective minimum per output - use the higher of impedance requirement and preferredPerOutput
     // But preferredPerOutput of 1 means "spread as much as possible when valid"
     // So if impedance requires 2, use 2. If impedance allows 1 and preferred is 1, use 1.
     const effectiveMinPerOutput = Math.max(minPerOutputForImpedance, enclosure.preferredPerOutput);
 
-    // Phase 1: Spread enclosures across outputs (effectiveMinPerOutput each)
+    // Max rated impedance threshold - outputs at or above this show "add 1 more enclosure" warning
+    const maxRated = ampConfig.ratedImpedances.length > 0 ? Math.max(...ampConfig.ratedImpedances) : Infinity;
+
+    // Phase 1: Spread enclosures across outputs, but pack each output past the above-rated
+    // threshold before moving to the next. This ensures enclosures go to outputs that need
+    // them (showing "add 1 more" warning) rather than spreading thinly across many outputs.
     let outputIdx = 0;
     while (remaining >= effectiveMinPerOutput && outputIdx < ampConfig.outputs) {
       const initialAllocation = Math.min(effectiveMinPerOutput, limits.perOutput);
@@ -461,20 +499,40 @@ function allocateToOutputs(
         outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
       }
       remaining -= initialAllocation;
+
+      // If this output is still at or above maxRated, keep adding enclosures to it
+      // before moving to the next output (resolves "add 1 more enclosure" warning)
+      while (
+        remaining > 0 &&
+        outputs[outputIdx].impedanceOhms > maxRated &&
+        outputs[outputIdx].totalEnclosures < limits.perOutput
+      ) {
+        const newCount = outputs[outputIdx].totalEnclosures + 1;
+        outputs[outputIdx].enclosures[0].count = newCount;
+        outputs[outputIdx].totalEnclosures = newCount;
+        outputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+          enclosure.nominal_impedance_ohms,
+          newCount
+        );
+        remaining--;
+      }
+
       outputIdx++;
     }
 
-    // Phase 2: Pack additional enclosures into existing outputs (round-robin style to balance load)
-    // Continue adding to outputs that have room until we've allocated everything
+    // Phase 2: Pack additional enclosures into existing outputs
+    // Prioritize outputs that are still at or above maxRated (showing warning) first
     while (remaining > 0) {
       let allocated = false;
-      for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
-        if (outputs[i].totalEnclosures > 0 && outputs[i].totalEnclosures < limits.perOutput) {
-          // Add one more to this output
-          const currentCount = outputs[i].totalEnclosures;
-          const newCount = currentCount + 1;
 
-          // Update the enclosure entry
+      // First pass: add to above-rated outputs (those showing "add 1 more" warning)
+      for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
+        if (
+          outputs[i].totalEnclosures > 0 &&
+          outputs[i].totalEnclosures < limits.perOutput &&
+          outputs[i].impedanceOhms > maxRated
+        ) {
+          const newCount = outputs[i].totalEnclosures + 1;
           outputs[i].enclosures[0].count = newCount;
           outputs[i].totalEnclosures = newCount;
           outputs[i].impedanceOhms = calculateParallelImpedance(
@@ -486,8 +544,23 @@ function allocateToOutputs(
         }
       }
 
-      // If we couldn't allocate any more (all outputs full or at max), break
-      // This shouldn't happen if count <= perAmplifier, but safety check
+      // Second pass: if no above-rated outputs remain, use round-robin on all outputs
+      if (!allocated) {
+        for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
+          if (outputs[i].totalEnclosures > 0 && outputs[i].totalEnclosures < limits.perOutput) {
+            const newCount = outputs[i].totalEnclosures + 1;
+            outputs[i].enclosures[0].count = newCount;
+            outputs[i].totalEnclosures = newCount;
+            outputs[i].impedanceOhms = calculateParallelImpedance(
+              enclosure.nominal_impedance_ohms,
+              newCount
+            );
+            remaining--;
+            allocated = true;
+          }
+        }
+      }
+
       if (!allocated) break;
     }
 

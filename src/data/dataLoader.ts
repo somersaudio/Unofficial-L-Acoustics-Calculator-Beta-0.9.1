@@ -284,13 +284,33 @@ function validateLoadTablesSchema(
 // Cross-Reference Validation
 // =============================================================================
 
+/** Map byLoad keys to numeric impedance values */
+const BYLOAD_KEY_TO_IMPEDANCE: Record<string, number> = {
+  "16_ohm": 16,
+  "8_ohm": 8,
+  "4_ohm": 4,
+  "2_7_ohm": 2.7,
+};
+
+function extractRatedImpedances(amp: Amplifier): number[] {
+  const rated: number[] = [];
+  const byLoad = amp.maxOutputPower_W?.byLoad;
+  if (!byLoad) return rated;
+  for (const [key, value] of Object.entries(byLoad)) {
+    if (value !== null && BYLOAD_KEY_TO_IMPEDANCE[key] !== undefined) {
+      rated.push(BYLOAD_KEY_TO_IMPEDANCE[key]);
+    }
+  }
+  return rated;
+}
+
 function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
   const configs: AmpConfig[] = [];
 
   for (const amp of amplifiers) {
     const physicalOutputs = amp.physicalOutputs ?? amp.outputs;
+    const ratedImpedances = extractRatedImpedances(amp);
     if (amp.operatingModes && amp.operatingModes.length > 0) {
-      // Amp has operating modes (like LA2Xi with SE, BTL, PBTL)
       for (const mode of amp.operatingModes) {
         configs.push({
           key: `${amp.amplifier}_${mode.mode}`,
@@ -300,10 +320,10 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
           physicalOutputs,
           powerRank: amp.powerRank,
           channelTypes: amp.channelTypes,
+          ratedImpedances,
         });
       }
     } else {
-      // Standard amp without modes
       configs.push({
         key: amp.amplifier,
         model: amp.amplifier,
@@ -311,6 +331,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
         physicalOutputs,
         powerRank: amp.powerRank,
         channelTypes: amp.channelTypes,
+        ratedImpedances,
       });
     }
   }

@@ -1,14 +1,28 @@
-import React, { useEffect, useState, useMemo } from "react";
-import type { DataLoadResult, EnclosureRequest, SolverSolution, AmpConfig } from "../types";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile } from "../types";
+import { CABLE_GAUGES } from "../types";
 import EnclosureSelector from "./EnclosureSelector";
 import SolverResults from "./SolverResults";
+import ZoneTabBar from "./ZoneTabBar";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
+import { serializeZones, deserializeZones } from "../utils/zoneSerializer";
 import lacousticsLogo from "../assets/lacoustics-logo.png";
 
 type AppState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "ready"; data: NonNullable<DataLoadResult["data"]> };
+
+const DEFAULT_DISABLED_AMPS = ["LA4", "LA2Xi", "LA7.16(i)"];
+
+function createDefaultZone(): Zone {
+  return {
+    id: crypto.randomUUID(),
+    name: "Main",
+    requests: [],
+    disabledAmps: new Set(DEFAULT_DISABLED_AMPS),
+  };
+}
 
 function SunIcon({ className }: { className?: string }) {
   return (
@@ -39,9 +53,9 @@ function BugReportButton() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="relative">
       {open && (
-        <div className="mb-2 w-72 rounded-lg border border-gray-300 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="absolute bottom-full right-0 mb-2 w-72 rounded-lg border border-gray-300 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Report a Bug</span>
             <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none">&times;</button>
@@ -74,8 +88,8 @@ function BugReportButton() {
 
 export default function App() {
   const [state, setState] = useState<AppState>({ status: "loading" });
-  const [requests, setRequests] = useState<EnclosureRequest[]>([]);
-  const [disabledAmps, setDisabledAmps] = useState<Set<string>>(new Set());
+  const [zones, setZones] = useState<Zone[]>([createDefaultZone()]);
+  const [activeZoneId, setActiveZoneId] = useState<string>(zones[0].id);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem("darkMode");
     return saved ? JSON.parse(saved) : true;
@@ -84,6 +98,16 @@ export default function App() {
     const saved = localStorage.getItem("salesMode");
     return saved ? JSON.parse(saved) : false;
   });
+  const [cableGaugeMm2, setCableGaugeMm2] = useState<number>(() => {
+    const saved = localStorage.getItem("cableGaugeMm2");
+    return saved ? JSON.parse(saved) : 2.5;
+  });
+  const [useFeet, setUseFeet] = useState<boolean>(() => {
+    const saved = localStorage.getItem("useFeet");
+    return saved ? JSON.parse(saved) : true;
+  });
+  // Restore zones from localStorage once data is loaded
+  const [zonesRestored, setZonesRestored] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
@@ -97,6 +121,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("salesMode", JSON.stringify(salesMode));
   }, [salesMode]);
+
+  useEffect(() => {
+    localStorage.setItem("cableGaugeMm2", JSON.stringify(cableGaugeMm2));
+  }, [cableGaugeMm2]);
+
+  useEffect(() => {
+    localStorage.setItem("useFeet", JSON.stringify(useFeet));
+  }, [useFeet]);
 
   useEffect(() => {
     async function loadData() {
@@ -123,19 +155,129 @@ export default function App() {
     loadData();
   }, []);
 
-  // Filter amp configs based on disabled amps
-  const enabledAmpConfigs = useMemo<AmpConfig[]>(() => {
+  // Restore zones from localStorage after data is loaded
+  useEffect(() => {
+    if (state.status !== "ready" || zonesRestored) return;
+    setZonesRestored(true);
+
+    try {
+      const saved = localStorage.getItem("zones");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const restored = deserializeZones(parsed, state.data.enclosures.enclosures);
+        if (restored.length > 0) {
+          setZones(restored);
+          setActiveZoneId(restored[0].id);
+        }
+      }
+    } catch {
+      // Corrupt localStorage data — keep default zone
+    }
+  }, [state, zonesRestored]);
+
+  // Safety: recreate default zone if zones array is ever empty
+  useEffect(() => {
+    if (zones.length === 0) {
+      const def = createDefaultZone();
+      setZones([def]);
+      setActiveZoneId(def.id);
+    }
+  }, [zones]);
+
+  // Auto-save zones to localStorage
+  useEffect(() => {
+    if (!zonesRestored) return;
+    localStorage.setItem("zones", JSON.stringify(serializeZones(zones)));
+  }, [zones, zonesRestored]);
+
+  // Zone mutation helpers
+  const updateZone = useCallback((zoneId: string, updater: (zone: Zone) => Zone) => {
+    setZones((prev) => prev.map((z) => (z.id === zoneId ? updater(z) : z)));
+  }, []);
+
+  const addZone = useCallback(() => {
+    const newZone: Zone = {
+      id: crypto.randomUUID(),
+      name: `Zone ${String.fromCharCode(65 + zones.length)}`,
+      requests: [],
+      disabledAmps: new Set(DEFAULT_DISABLED_AMPS),
+    };
+    setZones((prev) => [...prev, newZone]);
+    setActiveZoneId(newZone.id);
+  }, [zones.length]);
+
+  const removeZone = useCallback((zoneId: string) => {
+    setZones((prev) => {
+      if (prev.length <= 1) return prev;
+      const filtered = prev.filter((z) => z.id !== zoneId);
+      return filtered;
+    });
+    setActiveZoneId((prevId) => {
+      if (prevId === zoneId) {
+        const remaining = zones.filter((z) => z.id !== zoneId);
+        return remaining.length > 0 ? remaining[0].id : prevId;
+      }
+      return prevId;
+    });
+  }, [zones]);
+
+  const renameZone = useCallback((zoneId: string, name: string) => {
+    updateZone(zoneId, (z) => ({ ...z, name }));
+  }, [updateZone]);
+
+  // File save/load
+  const handleSaveProject = useCallback(async () => {
+    const project: ProjectFile = {
+      version: 1,
+      zones: serializeZones(zones),
+      settings: { darkMode, salesMode, cableGaugeMm2, useFeet },
+    };
+    await window.electronAPI.saveProject(JSON.stringify(project, null, 2));
+  }, [zones, darkMode, salesMode, cableGaugeMm2, useFeet]);
+
+  const handleLoadProject = useCallback(async () => {
+    if (state.status !== "ready") return;
+    const result = await window.electronAPI.loadProject();
+    if (!result.success || !result.data) return;
+    try {
+      const project: ProjectFile = JSON.parse(result.data);
+      const restored = deserializeZones(project.zones, state.data.enclosures.enclosures);
+      if (restored.length > 0) {
+        setZones(restored);
+        setActiveZoneId(restored[0].id);
+      }
+      if (project.settings) {
+        setDarkMode(project.settings.darkMode);
+        setSalesMode(project.settings.salesMode);
+        setCableGaugeMm2(project.settings.cableGaugeMm2);
+        setUseFeet(project.settings.useFeet);
+      }
+    } catch {
+      // Invalid project file
+    }
+  }, [state]);
+
+  // Derive active zone
+  const activeZone = zones.find((z) => z.id === activeZoneId) ?? zones[0];
+
+  // Compute solver solutions for all zones
+  const zoneSolutions = useMemo<ZoneWithSolution[]>(() => {
     if (state.status !== "ready") return [];
-    return state.data.ampConfigs.filter((config) => !disabledAmps.has(config.model));
-  }, [state, disabledAmps]);
+    return zones.map((zone) => {
+      const enabledAmpConfigs = state.data.ampConfigs.filter(
+        (config) => !zone.disabledAmps.has(config.model)
+      );
+      const solution =
+        zone.requests.length > 0
+          ? solveAmplifierAllocation(zone.requests, enabledAmpConfigs)
+          : null;
+      return { zone, solution, enabledAmpConfigs };
+    });
+  }, [state, zones]);
 
-  // Compute solution whenever requests or enabled amps change
-  const solution = useMemo<SolverSolution | null>(() => {
-    if (state.status !== "ready") return null;
-    if (requests.length === 0) return null;
-
-    return solveAmplifierAllocation(requests, enabledAmpConfigs);
-  }, [state, requests, enabledAmpConfigs]);
+  // Get active zone's enabled amp configs for the EnclosureSelector
+  const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
+  const activeEnabledAmpConfigs = activeZoneSolution?.enabledAmpConfigs ?? [];
 
   // Get unique amp models for the footer toggle
   const ampModels = useMemo<string[]>(() => {
@@ -145,14 +287,14 @@ export default function App() {
   }, [state]);
 
   const toggleAmp = (model: string) => {
-    setDisabledAmps((prev) => {
-      const newSet = new Set(prev);
+    updateZone(activeZoneId, (zone) => {
+      const newSet = new Set(zone.disabledAmps);
       if (newSet.has(model)) {
         newSet.delete(model);
       } else {
         newSet.add(model);
       }
-      return newSet;
+      return { ...zone, disabledAmps: newSet };
     });
   };
 
@@ -192,6 +334,21 @@ export default function App() {
         />
         <div className="flex items-center gap-2">
           <button
+            onClick={handleLoadProject}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
+            title="Open project file"
+          >
+            Open
+          </button>
+          <button
+            onClick={handleSaveProject}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
+            title="Save project file"
+          >
+            Save
+          </button>
+          <div className="mx-1 h-6 w-px bg-blue-600 dark:bg-neutral-700" />
+          <button
             onClick={() => setSalesMode(!salesMode)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               salesMode
@@ -219,19 +376,29 @@ export default function App() {
       {/* Main Content */}
       <main className="flex flex-1 overflow-hidden">
         {/* Left Panel - Enclosure Selection */}
-        <section className="w-1/2 overflow-auto border-r border-gray-300 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-          <EnclosureSelector
-            enclosures={data.enclosures.enclosures}
-            ampConfigs={enabledAmpConfigs}
-            requests={requests}
-            onRequestsChange={setRequests}
-            salesMode={salesMode}
+        <section className="w-1/2 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+          <ZoneTabBar
+            zones={zones}
+            activeZoneId={activeZoneId}
+            onSelectZone={setActiveZoneId}
+            onAddZone={addZone}
+            onRemoveZone={removeZone}
+            onRenameZone={renameZone}
           />
+          <div className="flex-1 overflow-auto p-6">
+            <EnclosureSelector
+              enclosures={data.enclosures.enclosures}
+              ampConfigs={activeEnabledAmpConfigs}
+              requests={activeZone.requests}
+              onRequestsChange={(reqs) => updateZone(activeZoneId, (z) => ({ ...z, requests: reqs }))}
+              salesMode={salesMode}
+            />
+          </div>
         </section>
 
         {/* Right Panel - Amplifier Recommendation */}
         <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-neutral-950">
-          <SolverResults solution={solution} requests={requests} salesMode={salesMode} />
+          <SolverResults zoneSolutions={zoneSolutions} activeZoneId={activeZoneId} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} />
         </section>
       </main>
 
@@ -240,10 +407,12 @@ export default function App() {
         <div className="flex items-center justify-between">
           {/* Amplifier Toggles */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-600 dark:text-neutral-500">Available Amps:</span>
+            <span className="text-xs font-medium text-gray-600 dark:text-neutral-500">
+              Amps{zones.length > 1 ? ` (${activeZone.name})` : ""}:
+            </span>
             <div className="flex gap-1">
               {ampModels.map((model) => {
-                const isDisabled = disabledAmps.has(model);
+                const isDisabled = activeZone.disabledAmps.has(model);
                 return (
                   <button
                     key={model}
@@ -262,9 +431,53 @@ export default function App() {
             </div>
           </div>
 
+          {/* Unit Toggle + Cable Gauge Selector + Bug Report */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setUseFeet(true)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                  useFeet
+                    ? "bg-blue-600 text-white dark:bg-blue-700"
+                    : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                }`}
+              >
+                ft
+              </button>
+              <button
+                onClick={() => setUseFeet(false)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                  !useFeet
+                    ? "bg-blue-600 text-white dark:bg-blue-700"
+                    : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                }`}
+              >
+                m
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-600 dark:text-neutral-500">Cable Gauge:</span>
+              <div className="flex gap-1">
+                {CABLE_GAUGES.map((gauge) => (
+                  <button
+                    key={gauge.mm2}
+                    onClick={() => setCableGaugeMm2(gauge.mm2)}
+                    className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                      cableGaugeMm2 === gauge.mm2
+                        ? "bg-blue-600 text-white dark:bg-blue-700"
+                        : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                    }`}
+                    title={`${gauge.mm2}mm² / ${gauge.awg} AWG / ${gauge.swg} SWG`}
+                  >
+                    {gauge.mm2}mm²
+                  </button>
+                ))}
+              </div>
+            </div>
+            <BugReportButton />
+          </div>
         </div>
       </footer>
-      <BugReportButton />
     </div>
   );
 }
