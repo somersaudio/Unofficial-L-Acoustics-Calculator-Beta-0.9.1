@@ -26,7 +26,9 @@
         }
       },
       "nominal_impedance_ohms": 16,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -54,7 +56,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -82,7 +86,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -110,7 +116,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -138,7 +146,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -150,7 +160,12 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "LF",
+        "MF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -162,7 +177,9 @@
         }
       },
       "nominal_impedance_ohms": 4,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": false
     },
     {
@@ -182,7 +199,12 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "LF",
+        "MF",
+        "HF"
+      ],
       "impedance_sections_ohms": {
         "HF": 16
       },
@@ -206,7 +228,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -226,7 +250,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -254,7 +280,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -282,7 +310,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -302,7 +332,9 @@
         }
       },
       "nominal_impedance_ohms": 4,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": false
     },
     {
@@ -326,7 +358,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -350,7 +385,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -378,7 +416,9 @@
         }
       },
       "nominal_impedance_ohms": 16,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -390,7 +430,24 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LC",
+        "LF",
+        "MF",
+        "HF",
+        "LC",
+        "LF",
+        "MF",
+        "HF",
+        "LC",
+        "LF",
+        "MF",
+        "HF",
+        "LC",
+        "LF",
+        "MF",
+        "HF"
+      ],
       "parallelAllowed": false,
       "parallel_notes": "User constraint: L2/L2D cannot be placed in parallel."
     },
@@ -419,7 +476,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -451,7 +510,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -483,7 +544,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -507,7 +570,9 @@
         }
       },
       "nominal_impedance_ohms": 4,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -535,7 +600,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -563,7 +630,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -595,7 +664,9 @@
         "LA12X can drive up to two Syva Low per output, but no more than six per controller at high level."
       ],
       "nominal_impedance_ohms": 4,
-      "signal_type": "LF",
+      "signal_channels": [
+        "LF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -623,7 +694,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "LF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -651,7 +724,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -679,7 +754,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -707,7 +785,9 @@
         }
       },
       "nominal_impedance_ohms": 16,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -735,7 +815,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -763,7 +845,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -791,7 +875,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -803,7 +889,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -815,7 +903,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -827,7 +918,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -839,7 +932,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -851,7 +947,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -863,7 +961,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -875,7 +976,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -887,7 +990,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -899,7 +1004,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -911,7 +1019,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -923,7 +1033,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -935,7 +1047,10 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "PA",
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
       "parallelAllowed": true
     },
     {
@@ -947,7 +1062,9 @@
         }
       },
       "nominal_impedance_ohms": 16,
-      "signal_type": "PA",
+      "signal_channels": [
+        "PA"
+      ],
       "parallelAllowed": true
     },
     {
@@ -959,7 +1076,9 @@
         }
       },
       "nominal_impedance_ohms": 16,
-      "signal_type": "PA",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     },
     {
@@ -971,7 +1090,9 @@
         }
       },
       "nominal_impedance_ohms": 8,
-      "signal_type": "LF",
+      "signal_channels": [
+        "SB"
+      ],
       "parallelAllowed": true
     }
   ]

@@ -2,15 +2,64 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* PP Neue Montreal Font */
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-semibolditalic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('../pp-neue-montreal-cufonfonts/ppneuemontreal-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Custom styles for L-Acoustic Amp Calc */
 :root {
   --color-primary: #1e40af;
   --color-primary-dark: #1e3a8a;
 }
 
-/* Set Arial as the default font */
+/* Set PP Neue Montreal as the default font */
 html {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'PP Neue Montreal', Arial, Helvetica, sans-serif;
 }
 
 /* Smooth transitions for dark mode */

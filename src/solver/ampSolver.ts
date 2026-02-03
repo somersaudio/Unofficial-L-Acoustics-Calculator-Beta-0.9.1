@@ -78,12 +78,23 @@ function consolidateOutputs(
   ampConfigKey: string,
   allAmpConfigs: AmpConfig[]
 ): OutputAllocation[] | null {
-  // Group enclosures by type
+  // Group enclosures by type - for multi-channel, count units not per-channel entries
   const enclosuresByType = new Map<string, { enclosure: Enclosure; totalCount: number }>();
+  const seenMultiChannelGroups = new Set<string>();
 
   for (const output of outputs) {
     for (const entry of output.enclosures) {
       const key = entry.enclosure.enclosure;
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+
+      if (channelsPerUnit > 1) {
+        // For multi-channel, only count once per group
+        const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+        const groupKey = `${key}_${groupIdx}`;
+        if (seenMultiChannelGroups.has(groupKey)) continue;
+        seenMultiChannelGroups.add(groupKey);
+      }
+
       const existing = enclosuresByType.get(key);
       if (existing) {
         existing.totalCount += entry.count;
@@ -107,7 +118,9 @@ function consolidateOutputs(
     const limits = enclosure.max_enclosures[ampConfigKey];
     if (!limits) return null; // Not compatible
 
-    const outputsNeeded = Math.ceil(totalCount / limits.per_output);
+    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const groupsNeeded = Math.ceil(totalCount / limits.per_output);
+    const outputsNeeded = groupsNeeded * channelsPerUnit;
     minOutputsNeeded += outputsNeeded;
     typeAllocations.push({ enclosure, count: totalCount, outputsNeeded, perOutput: limits.per_output });
   }
@@ -136,25 +149,48 @@ function consolidateOutputs(
   let outputIdx = 0;
   for (const { enclosure, count, perOutput } of typeAllocations) {
     let remaining = count;
+    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const limits = enclosure.max_enclosures[ampConfigKey];
 
-    while (remaining > 0 && outputIdx < ampConfig.outputs) {
-      const toAllocate = Math.min(remaining, perOutput);
+    if (channelsPerUnit > 1) {
+      // Multi-channel: allocate in groups
+      const groups = buildChannelGroups(ampConfig.outputs, channelsPerUnit);
+      for (const group of groups) {
+        if (remaining <= 0) break;
+        // Check if group is empty
+        if (newOutputs[group[0]].totalEnclosures > 0) continue;
 
-      // Find the original limits to get minImpedanceOverride
-      const limits = enclosure.max_enclosures[ampConfigKey];
-
-      newOutputs[outputIdx].enclosures.push({ enclosure, count: toAllocate });
-      newOutputs[outputIdx].totalEnclosures = toAllocate;
-      newOutputs[outputIdx].impedanceOhms = calculateParallelImpedance(
-        enclosure.nominal_impedance_ohms,
-        toAllocate
-      );
-      if (limits?.min_impedance_override !== undefined) {
-        newOutputs[outputIdx].minImpedanceOverride = limits.min_impedance_override;
+        const toStack = Math.min(remaining, perOutput);
+        for (let c = 0; c < channelsPerUnit; c++) {
+          const oi = group[c];
+          const sectionZ = getSectionImpedance(enclosure, c);
+          newOutputs[oi].enclosures.push({ enclosure, count: toStack });
+          newOutputs[oi].totalEnclosures = toStack;
+          newOutputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
+          if (limits?.min_impedance_override !== undefined) {
+            newOutputs[oi].minImpedanceOverride = limits.min_impedance_override;
+          }
+        }
+        remaining -= toStack;
       }
+    } else {
+      // Single-channel: pack sequentially
+      while (remaining > 0 && outputIdx < ampConfig.outputs) {
+        const toAllocate = Math.min(remaining, perOutput);
 
-      remaining -= toAllocate;
-      outputIdx++;
+        newOutputs[outputIdx].enclosures.push({ enclosure, count: toAllocate });
+        newOutputs[outputIdx].totalEnclosures = toAllocate;
+        newOutputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+          enclosure.nominal_impedance_ohms,
+          toAllocate
+        );
+        if (limits?.min_impedance_override !== undefined) {
+          newOutputs[outputIdx].minImpedanceOverride = limits.min_impedance_override;
+        }
+
+        remaining -= toAllocate;
+        outputIdx++;
+      }
     }
   }
 
@@ -291,6 +327,31 @@ function calculateParallelImpedance(
   if (count === 1) return nominalImpedance;
   // Parallel impedance: Z_total = Z / n
   return Math.round((nominalImpedance / count) * 10) / 10;
+}
+
+/** Get the number of amp channels one unit of this enclosure requires */
+function getChannelsPerUnit(enclosure: Enclosure): number {
+  return enclosure.signal_channels.length;
+}
+
+/** Get impedance for a specific channel within a multi-channel enclosure unit */
+function getSectionImpedance(enclosure: Enclosure, channelIndexInUnit: number): number {
+  const signalType = enclosure.signal_channels[channelIndexInUnit];
+  return enclosure.impedance_sections_ohms?.[signalType] ?? enclosure.nominal_impedance_ohms;
+}
+
+/** Build channel groups for multi-channel enclosures on a given amp */
+function buildChannelGroups(ampOutputCount: number, channelsPerUnit: number): number[][] {
+  const numGroups = Math.floor(ampOutputCount / channelsPerUnit);
+  const groups: number[][] = [];
+  for (let g = 0; g < numGroups; g++) {
+    const group: number[] = [];
+    for (let c = 0; c < channelsPerUnit; c++) {
+      group.push(g * channelsPerUnit + c);
+    }
+    groups.push(group);
+  }
+  return groups;
 }
 
 /** Generate a unique ID for an amp instance */
@@ -468,6 +529,78 @@ function allocateToOutputs(
     });
   }
 
+  const channelsPerUnit = getChannelsPerUnit(enclosure);
+
+  // --- Multi-channel enclosure allocation ---
+  if (channelsPerUnit > 1) {
+    const groups = buildChannelGroups(ampConfig.outputs, channelsPerUnit);
+
+    if (enclosure.parallelAllowed && limits.perOutput > 1) {
+      // Parallel stacking within groups: spread first, then pack
+      // Phase 1: place 1 unit per group
+      let groupIdx = 0;
+      while (remaining > 0 && groupIdx < groups.length) {
+        const group = groups[groupIdx];
+        for (let c = 0; c < channelsPerUnit; c++) {
+          const oi = group[c];
+          const sectionZ = getSectionImpedance(enclosure, c);
+          outputs[oi].enclosures.push({ enclosure, count: 1 });
+          outputs[oi].totalEnclosures = 1;
+          outputs[oi].impedanceOhms = sectionZ;
+          if (limits.minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
+          }
+        }
+        remaining--;
+        groupIdx++;
+      }
+
+      // Phase 2: pack additional units into existing groups (up to perOutput per group)
+      while (remaining > 0) {
+        let allocated = false;
+        for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
+          const firstChannel = groups[gi][0];
+          const currentCount = outputs[firstChannel].enclosures.length > 0
+            ? outputs[firstChannel].enclosures[0].count : 0;
+          if (currentCount > 0 && currentCount < limits.perOutput) {
+            const newCount = currentCount + 1;
+            for (let c = 0; c < channelsPerUnit; c++) {
+              const oi = groups[gi][c];
+              const sectionZ = getSectionImpedance(enclosure, c);
+              outputs[oi].enclosures[0].count = newCount;
+              outputs[oi].totalEnclosures = newCount;
+              outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, newCount);
+            }
+            remaining--;
+            allocated = true;
+          }
+        }
+        if (!allocated) break;
+      }
+    } else {
+      // No parallel or perOutput=1: 1 unit per group
+      let groupIdx = 0;
+      while (remaining > 0 && groupIdx < groups.length) {
+        const group = groups[groupIdx];
+        for (let c = 0; c < channelsPerUnit; c++) {
+          const oi = group[c];
+          const sectionZ = getSectionImpedance(enclosure, c);
+          outputs[oi].enclosures.push({ enclosure, count: 1 });
+          outputs[oi].totalEnclosures = 1;
+          outputs[oi].impedanceOhms = sectionZ;
+          if (limits.minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
+          }
+        }
+        remaining--;
+        groupIdx++;
+      }
+    }
+
+    return outputs;
+  }
+
+  // --- Single-channel enclosure allocation (existing logic) ---
   // Channel fill order: custom order if specified (e.g., LA4X: [0,2,1,3]), otherwise sequential
   const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
 
@@ -648,6 +781,40 @@ function mergeIntoOutputs(
     return { outputs, allocated: 0 };
   }
 
+  const channelsPerUnit = getChannelsPerUnit(enclosure);
+
+  // --- Multi-channel merge ---
+  if (channelsPerUnit > 1) {
+    const groups = buildChannelGroups(outputs.length, channelsPerUnit);
+
+    for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
+      const group = groups[gi];
+      // Check if all channels in this group are empty
+      const allEmpty = group.every(oi => outputs[oi].totalEnclosures === 0);
+      if (!allEmpty) continue;
+
+      // Check load
+      if (currentLoad + loadPerEnclosure > 100) break;
+
+      // Place 1 unit across the group
+      for (let c = 0; c < channelsPerUnit; c++) {
+        const oi = group[c];
+        const sectionZ = getSectionImpedance(enclosure, c);
+        outputs[oi].enclosures.push({ enclosure, count: 1 });
+        outputs[oi].totalEnclosures = 1;
+        outputs[oi].impedanceOhms = sectionZ;
+        if (limits.minImpedanceOverride !== undefined) {
+          outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
+        }
+      }
+      remaining--;
+      currentLoad += loadPerEnclosure;
+    }
+
+    return { outputs, allocated: count - remaining };
+  }
+
+  // --- Single-channel merge (existing logic) ---
   if (enclosure.parallelAllowed) {
     // Only add to EMPTY outputs - never mix enclosure types on the same output
     for (let i = 0; i < outputs.length && remaining > 0; i++) {
@@ -908,8 +1075,10 @@ function calculateTotalOutputsNeeded(
     if (!candidate) return Infinity; // Not compatible
 
     // Calculate outputs needed for this enclosure type
-    const outputsNeeded = Math.ceil(request.quantity / candidate.perOutput);
-    totalOutputs += outputsNeeded;
+    // Multi-channel enclosures occupy channelsPerUnit channels per group
+    const channelsPerUnit = getChannelsPerUnit(request.enclosure);
+    const groupsNeeded = Math.ceil(request.quantity / candidate.perOutput);
+    totalOutputs += groupsNeeded * channelsPerUnit;
   }
 
   return totalOutputs;
@@ -1029,12 +1198,23 @@ function calculateMixedLoadPercent(
   ampConfigKey: string,
   allAmpConfigs: AmpConfig[]
 ): number {
-  // Count enclosures by type
+  // Count enclosures by type - for multi-channel, count units not per-channel entries
   const enclosureCounts = new Map<string, { count: number; enclosure: Enclosure }>();
+  const seenMultiChannelGroups = new Set<string>();
 
   for (const output of outputs) {
     for (const entry of output.enclosures) {
       const key = entry.enclosure.enclosure;
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+
+      if (channelsPerUnit > 1) {
+        // For multi-channel, only count once per group
+        const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+        const groupKey = `${key}_${groupIdx}`;
+        if (seenMultiChannelGroups.has(groupKey)) continue;
+        seenMultiChannelGroups.add(groupKey);
+      }
+
       const existing = enclosureCounts.get(key);
       if (existing) {
         existing.count += entry.count;
@@ -1485,16 +1665,37 @@ export function getAllEnclosureCompatibility(
  */
 export function repackAmpInstance(instance: AmpInstance): AmpInstance {
   const ampConfig = instance.ampConfig;
-  const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
+  // For packing, use sequential order (0, 1, 2, 3...) to minimize physical outputs used
+  // regardless of the channelFillOrder used during balanced spreading
+  const order = Array.from({ length: ampConfig.outputs }, (_, i) => i);
+
+  console.log(`[repackAmpInstance] Repacking ${instance.id} (${ampConfig.key}), order:`, order);
 
   // Collect all enclosures and their min_impedance_override from the current allocation
+  // For multi-channel enclosures, count unique units (not per-channel entries)
   const collected: Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number }> = [];
+  const seenMultiChannel = new Set<string>();
   for (const output of instance.outputs) {
     for (const entry of output.enclosures) {
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
       const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
       if (existing) {
-        existing.totalCount += entry.count;
+        if (channelsPerUnit > 1) {
+          // For multi-channel, only count once per group (use outputIndex to detect group boundaries)
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          const groupKey = `${entry.enclosure.enclosure}_${groupIdx}`;
+          if (!seenMultiChannel.has(groupKey)) {
+            seenMultiChannel.add(groupKey);
+            existing.totalCount += entry.count; // entry.count = units stacked in this group
+          }
+        } else {
+          existing.totalCount += entry.count;
+        }
       } else {
+        if (channelsPerUnit > 1) {
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          seenMultiChannel.add(`${entry.enclosure.enclosure}_${groupIdx}`);
+        }
         collected.push({
           enclosure: entry.enclosure,
           totalCount: entry.count,
@@ -1515,50 +1716,81 @@ export function repackAmpInstance(instance: AmpInstance): AmpInstance {
     });
   }
 
-  // Pack each enclosure type: fill each output to max (per_output) before moving to next
+  // Pack each enclosure type
   for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
     const limits = enclosure.max_enclosures[ampConfig.key];
-    if (!limits) continue;
+    if (!limits) {
+      console.log(`[repackAmpInstance] No limits for ${enclosure.enclosure} on ${ampConfig.key}`);
+      continue;
+    }
 
-    let remaining = totalCount;
-    for (let idx = 0; idx < order.length && remaining > 0; idx++) {
-      const oi = order[idx];
-      // How much room is left on this output (accounting for other enclosure types already placed)
-      const currentOnOutput = outputs[oi].totalEnclosures;
-      const maxForThisType = limits.per_output;
-      // For packed mode, fill to per_output limit
-      const toAdd = Math.min(remaining, maxForThisType);
-      if (toAdd > 0 && currentOnOutput === 0) {
-        outputs[oi].enclosures.push({ enclosure, count: toAdd });
-        outputs[oi].totalEnclosures += toAdd;
-        if (minImpedanceOverride !== undefined) {
-          outputs[oi].minImpedanceOverride = minImpedanceOverride;
+    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    console.log(`[repackAmpInstance] Packing ${totalCount}x ${enclosure.enclosure}, per_output=${limits.per_output}, channelsPerUnit=${channelsPerUnit}`);
+
+    if (channelsPerUnit > 1) {
+      // Multi-channel: pack into channel groups
+      const groups = buildChannelGroups(ampConfig.outputs, channelsPerUnit);
+      let remaining = totalCount;
+
+      for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
+        const group = groups[gi];
+        // Check if group is empty
+        if (outputs[group[0]].totalEnclosures > 0) continue;
+
+        const toStack = Math.min(remaining, limits.per_output);
+        for (let c = 0; c < channelsPerUnit; c++) {
+          const oi = group[c];
+          const sectionZ = getSectionImpedance(enclosure, c);
+          outputs[oi].enclosures.push({ enclosure, count: toStack });
+          outputs[oi].totalEnclosures = toStack;
+          outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
+          if (minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = minImpedanceOverride;
+          }
         }
-        remaining -= toAdd;
-      } else if (toAdd > 0 && currentOnOutput > 0) {
-        // Output already has enclosures — only add if same type and room left
-        const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
-        if (existingEntry) {
-          const canAdd = Math.min(remaining, maxForThisType - existingEntry.count);
-          if (canAdd > 0) {
-            existingEntry.count += canAdd;
-            outputs[oi].totalEnclosures += canAdd;
-            remaining -= canAdd;
+        remaining -= toStack;
+      }
+    } else {
+      // Single-channel: existing pack logic
+      let remaining = totalCount;
+      for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+        const oi = order[idx];
+        const currentOnOutput = outputs[oi].totalEnclosures;
+        const maxForThisType = limits.per_output;
+        const toAdd = Math.min(remaining, maxForThisType);
+        if (toAdd > 0 && currentOnOutput === 0) {
+          outputs[oi].enclosures.push({ enclosure, count: toAdd });
+          outputs[oi].totalEnclosures += toAdd;
+          if (minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = minImpedanceOverride;
+          }
+          remaining -= toAdd;
+        } else if (toAdd > 0 && currentOnOutput > 0) {
+          const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+          if (existingEntry) {
+            const canAdd = Math.min(remaining, maxForThisType - existingEntry.count);
+            if (canAdd > 0) {
+              existingEntry.count += canAdd;
+              outputs[oi].totalEnclosures += canAdd;
+              remaining -= canAdd;
+            }
           }
         }
       }
     }
   }
 
-  // Recalculate impedance for each output
+  // Recalculate impedance for single-channel outputs
   for (const output of outputs) {
+    // Skip multi-channel outputs (already calculated above)
+    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure) > 1) continue;
+
     if (output.totalEnclosures > 0 && output.enclosures.length === 1) {
       output.impedanceOhms = calculateParallelImpedance(
         output.enclosures[0].enclosure.nominal_impedance_ohms,
         output.enclosures[0].count
       );
     } else if (output.totalEnclosures > 0) {
-      // Multiple enclosure types: use reciprocal sum for parallel impedance
       let reciprocalSum = 0;
       for (const entry of output.enclosures) {
         const sectionImpedance = entry.enclosure.nominal_impedance_ohms / entry.count;
@@ -1573,7 +1805,254 @@ export function repackAmpInstance(instance: AmpInstance): AmpInstance {
   for (const output of outputs) {
     totalEnclosures += output.totalEnclosures;
   }
-  // Keep the same load percent (total enclosures hasn't changed, just redistributed)
+
+  // Log the result
+  const usedOutputs = outputs.filter(o => o.totalEnclosures > 0);
+  console.log(`[repackAmpInstance] Result: ${usedOutputs.length} outputs used:`, usedOutputs.map(o => `Ch${o.outputIndex + 1}: ${o.totalEnclosures}x`).join(', '));
+
+  return {
+    ...instance,
+    outputs,
+    totalEnclosures,
+  };
+}
+
+/**
+ * Calculate the minimum enclosures per output needed to avoid the "above rated" warning.
+ * For 16Ω enclosures on an 8Ω-max amp, this returns 2 (since 16/2 = 8Ω = rated).
+ * Returns 1 if a single enclosure is at or below the max rated impedance.
+ */
+function getMinimumForRatedImpedance(
+  enclosure: Enclosure,
+  ampConfig: AmpConfig,
+  perOutputLimit: number
+): number {
+  const nominalZ = enclosure.nominal_impedance_ohms;
+  const maxRated = ampConfig.ratedImpedances.length > 0
+    ? Math.max(...ampConfig.ratedImpedances)
+    : Infinity;
+
+  // If single enclosure impedance is at or below max rated, return 1
+  if (nominalZ <= maxRated) return 1;
+
+  // Find minimum count where parallel impedance <= maxRated
+  // Parallel impedance = Z / count, so count >= Z / maxRated
+  for (let count = 1; count <= perOutputLimit; count++) {
+    const parallelZ = nominalZ / count;
+    if (parallelZ <= maxRated) return count;
+  }
+
+  // If even at perOutputLimit we can't reach rated impedance, return perOutputLimit
+  // (This handles edge cases, but the UI will still show a warning)
+  return perOutputLimit;
+}
+
+/**
+ * Spread an amp instance's outputs to "prioritize channels" mode: enclosures spread across channels
+ * while respecting the minimum count needed to avoid impedance warnings.
+ * Returns a new AmpInstance with redistributed outputs.
+ */
+export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
+  const ampConfig = instance.ampConfig;
+  const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
+
+  // Collect all enclosures and their min_impedance_override from the current allocation
+  // For multi-channel enclosures, count unique units (not per-channel entries)
+  const collected: Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number }> = [];
+  const seenMultiChannel = new Set<string>();
+  for (const output of instance.outputs) {
+    for (const entry of output.enclosures) {
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+      const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
+      if (existing) {
+        if (channelsPerUnit > 1) {
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          const groupKey = `${entry.enclosure.enclosure}_${groupIdx}`;
+          if (!seenMultiChannel.has(groupKey)) {
+            seenMultiChannel.add(groupKey);
+            existing.totalCount += entry.count;
+          }
+        } else {
+          existing.totalCount += entry.count;
+        }
+      } else {
+        if (channelsPerUnit > 1) {
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          seenMultiChannel.add(`${entry.enclosure.enclosure}_${groupIdx}`);
+        }
+        collected.push({
+          enclosure: entry.enclosure,
+          totalCount: entry.count,
+          minImpedanceOverride: output.minImpedanceOverride,
+        });
+      }
+    }
+  }
+
+  // Create fresh outputs
+  const outputs: OutputAllocation[] = [];
+  for (let i = 0; i < ampConfig.outputs; i++) {
+    outputs.push({
+      outputIndex: i,
+      enclosures: [],
+      totalEnclosures: 0,
+      impedanceOhms: Infinity,
+    });
+  }
+
+  // Spread each enclosure type with minimum count to avoid warnings
+  for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
+    const limits = enclosure.max_enclosures[ampConfig.key];
+    if (!limits) continue;
+
+    const channelsPerUnit = getChannelsPerUnit(enclosure);
+
+    if (channelsPerUnit > 1) {
+      // Multi-channel: spread across channel groups
+      const groups = buildChannelGroups(ampConfig.outputs, channelsPerUnit);
+      let remaining = totalCount;
+
+      // Calculate minimum per group to avoid warning
+      const minPerGroup = getMinimumForRatedImpedance(enclosure, ampConfig, limits.per_output);
+
+      // Phase 1: Allocate minimum per group to each empty group
+      for (let gi = 0; gi < groups.length && remaining >= minPerGroup; gi++) {
+        const group = groups[gi];
+        // Check if group is empty
+        if (outputs[group[0]].totalEnclosures > 0) continue;
+
+        const toStack = minPerGroup;
+        for (let c = 0; c < channelsPerUnit; c++) {
+          const oi = group[c];
+          const sectionZ = getSectionImpedance(enclosure, c);
+          outputs[oi].enclosures.push({ enclosure, count: toStack });
+          outputs[oi].totalEnclosures = toStack;
+          outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
+          if (minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = minImpedanceOverride;
+          }
+        }
+        remaining -= toStack;
+      }
+
+      // Phase 2: If we still have remaining, pack them into existing groups
+      if (remaining > 0) {
+        for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
+          const group = groups[gi];
+          const currentCount = outputs[group[0]].totalEnclosures;
+          if (currentCount > 0 && currentCount < limits.per_output) {
+            const canAdd = Math.min(remaining, limits.per_output - currentCount);
+            for (let c = 0; c < channelsPerUnit; c++) {
+              const oi = group[c];
+              const sectionZ = getSectionImpedance(enclosure, c);
+              outputs[oi].enclosures[0].count += canAdd;
+              outputs[oi].totalEnclosures += canAdd;
+              outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, outputs[oi].totalEnclosures);
+            }
+            remaining -= canAdd;
+          }
+        }
+      }
+
+      // Phase 3: If still remaining (not enough for a full minPerGroup), allocate what's left
+      // to a new group (will show warning but better than not allocating)
+      if (remaining > 0) {
+        for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
+          const group = groups[gi];
+          if (outputs[group[0]].totalEnclosures > 0) continue;
+
+          const toStack = remaining;
+          for (let c = 0; c < channelsPerUnit; c++) {
+            const oi = group[c];
+            const sectionZ = getSectionImpedance(enclosure, c);
+            outputs[oi].enclosures.push({ enclosure, count: toStack });
+            outputs[oi].totalEnclosures = toStack;
+            outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
+            if (minImpedanceOverride !== undefined) {
+              outputs[oi].minImpedanceOverride = minImpedanceOverride;
+            }
+          }
+          remaining = 0;
+        }
+      }
+    } else {
+      // Single-channel: spread with minimum count to avoid warnings
+      let remaining = totalCount;
+
+      // Calculate minimum per output to avoid warning (e.g., 2 for 16Ω on 8Ω-max amp)
+      const minPerOutput = getMinimumForRatedImpedance(enclosure, ampConfig, limits.per_output);
+
+      // Phase 1: Allocate minimum per output to each empty channel
+      for (let idx = 0; idx < order.length && remaining >= minPerOutput; idx++) {
+        const oi = order[idx];
+        if (outputs[oi].totalEnclosures === 0) {
+          outputs[oi].enclosures.push({ enclosure, count: minPerOutput });
+          outputs[oi].totalEnclosures = minPerOutput;
+          if (minImpedanceOverride !== undefined) {
+            outputs[oi].minImpedanceOverride = minImpedanceOverride;
+          }
+          remaining -= minPerOutput;
+        }
+      }
+
+      // Phase 2: If remaining, add to existing channels (up to per_output limit)
+      if (remaining > 0) {
+        for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+          const oi = order[idx];
+          const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+          if (existingEntry) {
+            const canAdd = Math.min(remaining, limits.per_output - existingEntry.count);
+            if (canAdd > 0) {
+              existingEntry.count += canAdd;
+              outputs[oi].totalEnclosures += canAdd;
+              remaining -= canAdd;
+            }
+          }
+        }
+      }
+
+      // Phase 3: If still remaining (not enough for minPerOutput), allocate what's left
+      // to a new channel (will show warning but better than not allocating)
+      if (remaining > 0) {
+        for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+          const oi = order[idx];
+          if (outputs[oi].totalEnclosures === 0) {
+            outputs[oi].enclosures.push({ enclosure, count: remaining });
+            outputs[oi].totalEnclosures = remaining;
+            if (minImpedanceOverride !== undefined) {
+              outputs[oi].minImpedanceOverride = minImpedanceOverride;
+            }
+            remaining = 0;
+          }
+        }
+      }
+    }
+  }
+
+  // Recalculate impedance for single-channel outputs
+  for (const output of outputs) {
+    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure) > 1) continue;
+
+    if (output.totalEnclosures > 0 && output.enclosures.length === 1) {
+      output.impedanceOhms = calculateParallelImpedance(
+        output.enclosures[0].enclosure.nominal_impedance_ohms,
+        output.enclosures[0].count
+      );
+    } else if (output.totalEnclosures > 0) {
+      let reciprocalSum = 0;
+      for (const entry of output.enclosures) {
+        const sectionImpedance = entry.enclosure.nominal_impedance_ohms / entry.count;
+        reciprocalSum += 1 / sectionImpedance;
+      }
+      output.impedanceOhms = Math.round((1 / reciprocalSum) * 10) / 10;
+    }
+  }
+
+  // Recalculate total
+  let totalEnclosures = 0;
+  for (const output of outputs) {
+    totalEnclosures += output.totalEnclosures;
+  }
   return {
     ...instance,
     outputs,

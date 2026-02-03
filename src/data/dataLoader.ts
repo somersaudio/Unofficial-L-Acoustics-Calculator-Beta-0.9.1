@@ -235,6 +235,16 @@ function validateEnclosuresSchema(
       valid = false;
     }
 
+    if (!Array.isArray(encObj.signal_channels) || encObj.signal_channels.length === 0) {
+      errors.push({
+        type: "schema",
+        file: "Enclosures.json",
+        message: `"signal_channels" must be a non-empty array of strings`,
+        path: `enclosures[${index}].signal_channels`,
+      });
+      valid = false;
+    }
+
     if (typeof encObj.parallelAllowed !== "boolean") {
       errors.push({
         type: "schema",

@@ -291,13 +291,8 @@ export default function EnclosureSelector({
                     {!salesMode && (
                       <div className="text-xs text-gray-500 dark:text-neutral-500">
                         {request.enclosure.nominal_impedance_ohms}Ω
-                        {!request.enclosure.parallelAllowed && (
-                          <span className="ml-2 text-amber-600 dark:text-amber-500">
-                            (No parallel)
-                          </span>
-                        )}
                         {compat?.isLimitedCompatibility && (
-                          <span className="ml-2 text-blue-600 dark:text-blue-400">
+                          <span className="ml-2">
                             ({compat.autoSelectedAmp?.model} only)
                           </span>
                         )}

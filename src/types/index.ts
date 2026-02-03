@@ -57,7 +57,7 @@ export interface Enclosure {
   nominal_impedance_ohms: number; // 4, 8, or 16
   parallelAllowed: boolean;
   preferredPerOutput: number; // Preferred count per output when spreading (default: 1)
-  signal_type?: string; // What signal the enclosure pulls: "PA" (full range), "LF" (sub/low), etc.
+  signal_channels: string[]; // Ordered amp channels needed: ["PA"], ["LF","HF"], ["LF","LF","MF","HF"], ["SB"], etc.
   impedance_sections_ohms?: Record<string, number>; // Optional, e.g., { "HF": 16 }
   impedance_notes?: string;
   parallel_notes?: string;

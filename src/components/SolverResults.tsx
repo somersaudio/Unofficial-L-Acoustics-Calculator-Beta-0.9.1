@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react"; // eslint-disable-line
 import type { AmpInstance, OutputAllocation, ChannelTypes, ZoneWithSolution, SolverSolution } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
-import { getImpedanceErrors, repackAmpInstance } from "../solver/ampSolver";
+import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { generatePDFReport } from "../utils/pdfExport";
 
 interface SolverResultsProps {
@@ -70,7 +70,7 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -85,6 +85,48 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
 
   const is16Channel = ampOutputCount === 16;
 
+  // Get the signal channel label for this output (for multi-channel enclosures)
+  const signalLabel = hasLoad && output.enclosures[0]?.enclosure.signal_channels?.length > 1
+    ? output.enclosures[0].enclosure.signal_channels[output.outputIndex % output.enclosures[0].enclosure.signal_channels.length]
+    : null;
+
+  // Secondary channel: shaded appearance, only show "Ch N: ZΩ" and signal label
+  // Match primary card structure for vertical alignment
+  if (isSecondaryChannel && hasLoad) {
+    return (
+      <div
+        className={`flex flex-col rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
+          hasImpedanceError
+            ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
+            : "border-blue-200/60 bg-blue-100/40 dark:border-neutral-700 dark:bg-neutral-800/60"
+        }`}
+        style={!hasImpedanceError ? { backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' } : undefined}
+      >
+        {/* Invisible header spacer to match primary card's "Output N NL4" header height */}
+        {!is16Channel && (
+          <div className="mb-1 font-medium invisible" aria-hidden="true">X</div>
+        )}
+        {!salesMode ? (
+          <>
+            <div className={`${is16Channel ? "" : "mb-1"} font-medium`} style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+              Ch {output.outputIndex + 1}
+            </div>
+            <div className={`flex-1 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`}>
+              {/* Spacer to push signal label to bottom */}
+            </div>
+            {signalLabel && (
+              <div className="pt-0.5 text-gray-400 dark:text-neutral-500">{signalLabel}</div>
+            )}
+          </>
+        ) : (
+          signalLabel && (
+            <div className="text-gray-400 dark:text-neutral-500">{signalLabel}</div>
+          )
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
@@ -95,7 +137,10 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
           : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
     >
-      <div className={`${is16Channel ? "" : "mb-1"} font-medium text-gray-700 dark:text-neutral-400`}>
+      <div
+        className={`${is16Channel ? "" : "mb-1"} font-medium ${is16Channel ? "" : "text-gray-700 dark:text-neutral-400"}`}
+        style={is16Channel ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}
+      >
         {outputLabel}
         {!is16Channel && (
           <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
@@ -116,36 +161,45 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
               </div>
               {(() => {
                 const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
-                const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
                 return output.enclosures.map((entry, i) => (
                   <div key={i}>
-                    <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
-                      {entry.count}x {entry.enclosure.enclosure}
-                      {impedanceAboveRated && (
-                        <>
-                          <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                          </svg>
-                          {onAdjustEnclosure && (
-                            <button
-                              onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                              className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                              title="Add 1 more for recommended load"
-                            >
-                              + 1
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                    {is16Channel && entry.enclosure.signal_type && (
-                      <div className="text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_type}</div>
+                    {/* Hide enclosure name when shown as header above (L2/L2D on 16ch) */}
+                    {!hideEnclosureName && (
+                      <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                        {entry.count}x {entry.enclosure.enclosure}
+                        {impedanceAboveRated && (
+                          <>
+                            <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                            </svg>
+                            {onAdjustEnclosure && (
+                              <button
+                                onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                title="Add 1 more for recommended load"
+                              >
+                                + 1
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {/* For non-16ch amps, show signal label inline with enclosure */}
+                    {!is16Channel && entry.enclosure.signal_channels?.length > 1 && (
+                      <div className="text-[10px] text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}</div>
                     )}
                   </div>
                 ));
               })()}
               {!is16Channel && (
                 <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+              )}
+              {/* For 16ch amps, show signal label at bottom of card for uniform positioning */}
+              {is16Channel && signalLabel && (
+                <div className="pt-0.5 text-gray-400 dark:text-neutral-500">{signalLabel}</div>
               )}
             </div>
           )}
@@ -236,25 +290,31 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                       )}
                     </div>
                     {(() => {
-                      const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                      const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                      const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
                       return output.enclosures.map((entry, i) => (
-                        <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
-                          {entry.count}x {entry.enclosure.enclosure}
-                          {impedanceAboveRated && (
-                            <>
-                              <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                              </svg>
-                              {onAdjustEnclosure && (
-                                <button
-                                  onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                  className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                  title="Add 1 more for recommended load"
-                                >
-                                  + 1
-                                </button>
-                              )}
-                            </>
+                        <div key={i}>
+                          <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                            {entry.count}x {entry.enclosure.enclosure}
+                            {impedanceAboveRated && (
+                              <>
+                                <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                </svg>
+                                {onAdjustEnclosure && (
+                                  <button
+                                    onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                    className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                    title="Add 1 more for recommended load"
+                                  >
+                                    + 1
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
+                          {entry.enclosure.signal_channels?.length > 1 && (
+                            <div className="text-[10px] text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}</div>
                           )}
                         </div>
                       ));
@@ -345,12 +405,18 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
 
 function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
   const [packed, setPacked] = useState(false);
+  const [spread, setSpread] = useState(false);
 
-  // Compute the repacked instance when in packed mode
-  const instance = useMemo(
-    () => packed ? repackAmpInstance(rawInstance) : rawInstance,
-    [packed, rawInstance]
-  );
+  // Compute the repacked/spread instance based on mode
+  const instance = useMemo(() => {
+    if (packed && spread) {
+      // Prioritize Channels: pack first, then spread
+      return spreadAmpInstance(repackAmpInstance(rawInstance));
+    } else if (packed) {
+      return repackAmpInstance(rawInstance);
+    }
+    return rawInstance;
+  }, [packed, spread, rawInstance]);
 
   const ampOutputCount = instance.ampConfig.outputs;
   const physicalOutputCount = instance.ampConfig.physicalOutputs;
@@ -369,11 +435,55 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     ? groupByPhysicalOutputs(instance.outputs, ampOutputCount, physicalOutputCount)
     : null;
 
+  // Detect secondary channels of multi-channel enclosures
+  const secondaryChannelSet = useMemo(() => {
+    const set = new Set<number>();
+    for (const output of instance.outputs) {
+      for (const entry of output.enclosures) {
+        const channelsPerUnit = entry.enclosure.signal_channels.length;
+        if (channelsPerUnit > 1) {
+          const posInGroup = output.outputIndex % channelsPerUnit;
+          if (posInGroup > 0) {
+            set.add(output.outputIndex);
+          }
+        }
+      }
+    }
+    return set;
+  }, [instance.outputs]);
+
   // Check if any output has impedance at or above max rated (for annotation legend)
+  // Skip multi-channel enclosure outputs — their per-section impedance is fixed by speaker design
   const maxRated = instance.ampConfig.ratedImpedances.length > 0 ? Math.max(...instance.ampConfig.ratedImpedances) : Infinity;
   const hasAboveRatedOutput = instance.outputs.some(
     (o) => o.totalEnclosures > 0 && o.impedanceOhms !== Infinity && o.impedanceOhms > maxRated
+      && !o.enclosures.some(e => e.enclosure.signal_channels.length > 1)
   );
+
+  // Check if this is a 16-channel amp with only L2 or L2D enclosures filling all channels
+  // If so, show enclosure name as a centered header above the grid
+  const l2HeaderEnclosure = useMemo(() => {
+    if (ampOutputCount !== 16) return null;
+
+    // Get unique enclosure names on this amp
+    const enclosureNames = new Set<string>();
+    for (const output of instance.outputs) {
+      for (const entry of output.enclosures) {
+        enclosureNames.add(entry.enclosure.enclosure);
+      }
+    }
+
+    // Check if it's only L2, L2D, or "L2 / L2D" (exactly one type)
+    if (enclosureNames.size !== 1) return null;
+    const name = Array.from(enclosureNames)[0];
+    if (name !== "L2" && name !== "L2D" && name !== "L2 / L2D") return null;
+
+    // Check if all 16 channels are used
+    const usedChannels = instance.outputs.filter(o => o.totalEnclosures > 0).length;
+    if (usedChannels !== 16) return null;
+
+    return name;
+  }, [ampOutputCount, instance.outputs]);
 
   return (
     <div className={`rounded-lg border shadow-sm ${
@@ -395,24 +505,42 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
             )}
             <span className="text-sm text-gray-500 dark:text-neutral-500">#{rawInstance.id.split("-").pop()}</span>
             {showPackToggle && (
-              <button
-                onClick={() => setPacked(!packed)}
-                className={`ml-1 flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
-                  packed
-                    ? "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
-                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
-                }`}
-                title={packed ? "Switch to balanced mode (spread across outputs)" : "Switch to packed mode (minimize outputs used)"}
-              >
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  {packed ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-                {packed ? "Packed" : "Balanced"}
-              </button>
+              <>
+                <button
+                  onClick={() => { setPacked(!packed); if (packed) setSpread(false); }}
+                  className={`ml-1 flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                    packed
+                      ? "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
+                      : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
+                  }`}
+                  title={packed ? "Switch to balanced mode (spread across outputs)" : "Switch to packed mode (minimize outputs used)"}
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    {packed ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                  {packed ? "Packed" : "Balanced"}
+                </button>
+                {packed && (
+                  <button
+                    onClick={() => setSpread(!spread)}
+                    className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                      spread
+                        ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/60"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
+                    }`}
+                    title={spread ? "Disable channel prioritization" : "Spread enclosures across channels (1 per channel when possible)"}
+                  >
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01" />
+                    </svg>
+                    Prioritize Channels
+                  </button>
+                )}
+              </>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -436,6 +564,12 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
       {/* Outputs Grid - hidden in sales mode */}
       {!salesMode && (
         <div className="p-4">
+          {/* L2/L2D header when all 16 channels are used */}
+          {l2HeaderEnclosure && (
+            <div className="mb-3 text-center">
+              <span className="text-lg font-bold text-gray-900 dark:text-gray-200">{l2HeaderEnclosure}</span>
+            </div>
+          )}
           {usePhysicalGrouping && physicalGroups ? (
             <div className={`grid gap-2 ${
               physicalOutputCount === 2 ? "grid-cols-2" : physicalOutputCount <= 4 ? "grid-cols-4" : "grid-cols-8"
@@ -471,6 +605,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   useFeet={useFeet}
                   ratedImpedances={instance.ampConfig.ratedImpedances}
                   onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
+                  isSecondaryChannel={secondaryChannelSet.has(output.outputIndex)}
+                  hideEnclosureName={!!l2HeaderEnclosure}
                 />
               ))}
             </div>
