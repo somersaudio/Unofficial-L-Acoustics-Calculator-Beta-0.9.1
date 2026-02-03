@@ -56,15 +56,24 @@ const ENCLOSURE_TYPE_COLORS_DARK = [
   "rgba(222, 170, 66, 0.12)",  // 3rd type: #deaa42 - amber
 ];
 
-/** Build a map of enclosure name -> type index (0, 1, 2) for coloring */
+/** Build a map of enclosure name -> type index (0, 1, 2) for coloring
+ * Color is determined by which 4-channel group the enclosure FIRST appears in:
+ * - Channels 1-4 (index 0-3) → Color 0 (gold/olive)
+ * - Channels 5-8 (index 4-7) → Color 1 (teal)
+ * - Channels 9-12 (index 8-11) → Color 2 (amber)
+ * All subsequent appearances of the same enclosure type get the same color.
+ */
 function buildEnclosureTypeMap(instance: AmpInstance): Map<string, number> {
   const typeMap = new Map<string, number>();
-  let index = 0;
   for (const output of instance.outputs) {
     for (const entry of output.enclosures) {
       const name = entry.enclosure.enclosure;
-      if (!typeMap.has(name) && index < MAX_ENCLOSURE_TYPES_PER_AMP) {
-        typeMap.set(name, index++);
+      if (!typeMap.has(name)) {
+        // Color based on 4-channel group where this enclosure first appears
+        const channelGroup = Math.floor(output.outputIndex / 4);
+        // Cap at max color index (0, 1, or 2)
+        const colorIndex = Math.min(channelGroup, MAX_ENCLOSURE_TYPES_PER_AMP - 1);
+        typeMap.set(name, colorIndex);
       }
     }
   }
@@ -617,67 +626,103 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                       </div>
                     );
                   } else {
-                    // Single-channel output - render normally
-                    rendered.add(output.outputIndex);
-                    const hasChannelError = output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && output.impedanceOhms !== Infinity;
+                    // Single-channel outputs - collect all remaining channels in this physical output
+                    // and render them side by side like multi-channel enclosures
+                    const groupOutputs: OutputAllocation[] = [];
+                    for (let i = outputIdx; i < outputs.length; i++) {
+                      const o = outputs[i];
+                      if (!rendered.has(o.outputIndex)) {
+                        const oIsMultiChannel = o.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                        if (!oIsMultiChannel) {
+                          groupOutputs.push(o);
+                          rendered.add(o.outputIndex);
+                        }
+                      }
+                    }
+
+                    if (groupOutputs.length === 0) continue;
+
                     const isFirstInPhysical = outputIdx === 0;
+                    // Find the first output with load for cable length display
+                    const firstWithLoad = groupOutputs.find(o => o.totalEnclosures > 0);
 
                     elements.push(
                       <div
                         key={output.outputIndex}
                         className={`flex flex-col rounded -mx-1 px-1 ${!isFirstInPhysical ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                       >
-                        <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
-                          Ch {output.outputIndex + 1}
-                          {hasChannelError && (
-                            <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          {(() => {
-                            const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                            return output.enclosures.map((entry, i) => (
-                              <div key={i}>
-                                <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
-                                  {entry.count}x {entry.enclosure.enclosure}
-                                  {impedanceAboveRated && (
-                                    <>
-                                      <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                                      </svg>
-                                      {onAdjustEnclosure && (
-                                        <button
-                                          onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                          className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                          title="Add 1 more for recommended load"
-                                        >
-                                          + 1
-                                        </button>
-                                      )}
-                                    </>
+                        {/* Channel content side by side */}
+                        <div className={`flex-1 ${groupOutputs.length > 1 ? "grid gap-2" : ""}`} style={groupOutputs.length > 1 ? { gridTemplateColumns: `repeat(${groupOutputs.length}, 1fr)` } : undefined}>
+                          {groupOutputs.map((grpOutput, idx) => {
+                            const hasChannelError = grpOutput.impedanceOhms < (grpOutput.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && grpOutput.impedanceOhms !== Infinity;
+                            const hasLoad = grpOutput.totalEnclosures > 0;
+                            const impedanceAboveRated = hasLoad && grpOutput.impedanceOhms !== Infinity && grpOutput.impedanceOhms > maxRated;
+
+                            return (
+                              <div
+                                key={grpOutput.outputIndex}
+                                className={`flex flex-col ${idx > 0 ? "border-l border-blue-200 dark:border-neutral-700 pl-2" : ""}`}
+                              >
+                                <div className="font-medium" style={getChannelPurpleStyle(grpOutput.outputIndex, ampOutputCount)}>
+                                  Ch {grpOutput.outputIndex + 1}
+                                  {hasChannelError && (
+                                    <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                                   )}
                                 </div>
-                                <div
-                                  className="text-[10px] font-medium"
-                                  style={getSignalTypeGoldStyle(0, 1)}
-                                >
-                                  {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
-                                </div>
+                                {hasLoad ? (
+                                  <>
+                                    <div className="flex-1">
+                                      {grpOutput.enclosures.map((entry, i) => (
+                                        <div key={i}>
+                                          <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
+                                            {entry.count}x {entry.enclosure.enclosure}
+                                            {impedanceAboveRated && (
+                                              <>
+                                                <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                                </svg>
+                                                {onAdjustEnclosure && (
+                                                  <button
+                                                    onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                                    className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                                    title="Add 1 more for recommended load"
+                                                  >
+                                                    + 1
+                                                  </button>
+                                                )}
+                                              </>
+                                            )}
+                                          </div>
+                                          <div
+                                            className="text-[10px] font-medium"
+                                            style={getSignalTypeGoldStyle(0, 1)}
+                                          >
+                                            {entry.enclosure.signal_channels[grpOutput.outputIndex % entry.enclosure.signal_channels.length]}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {/* Impedance at bottom right */}
+                                    <div className="flex items-end justify-end pt-0.5 text-[10px]">
+                                      <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                                        {grpOutput.impedanceOhms === Infinity ? "" : `${grpOutput.impedanceOhms}Ω`}
+                                      </span>
+                                    </div>
+                                  </>
+                                ) : (
+                                  /* Empty channel - just show the header */
+                                  <div className="flex-1" />
+                                )}
                               </div>
-                            ));
-                          })()}
+                            );
+                          })}
                         </div>
-                        {/* Bottom row: cable length at left, impedance at right */}
-                        <div className="flex items-end justify-between pt-0.5 text-[10px]">
-                          {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 ? (
-                            <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
-                          ) : (
-                            <span />
-                          )}
-                          <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
-                            {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-                          </span>
-                        </div>
+                        {/* Cable length on its own line at the bottom for combined card */}
+                        {firstWithLoad && firstWithLoad.impedanceOhms !== Infinity && firstWithLoad.impedanceOhms > 0 && (
+                          <div className="pt-1 text-[10px]">
+                            <CableLengthInfo impedanceOhms={firstWithLoad.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                          </div>
+                        )}
                       </div>
                     );
                   }
