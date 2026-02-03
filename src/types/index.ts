@@ -30,6 +30,7 @@ export interface Amplifier {
   operatingModes: OperatingMode[];
   maxOutputPower_W: MaxOutputPower;
   channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
+  channelFillOrder?: number[]; // Optional: custom output fill order (0-indexed), e.g., [0, 2, 1, 3] for LA4X
 }
 
 export interface AmplifiersData {
@@ -56,6 +57,7 @@ export interface Enclosure {
   nominal_impedance_ohms: number; // 4, 8, or 16
   parallelAllowed: boolean;
   preferredPerOutput: number; // Preferred count per output when spreading (default: 1)
+  signal_type?: string; // What signal the enclosure pulls: "PA" (full range), "LF" (sub/low), etc.
   impedance_sections_ohms?: Record<string, number>; // Optional, e.g., { "HF": 16 }
   impedance_notes?: string;
   parallel_notes?: string;
@@ -102,6 +104,7 @@ export interface AmpConfig {
   physicalOutputs: number; // Number of physical connectors (UI uses this for grouping)
   powerRank: number;
   channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
+  channelFillOrder?: number[]; // Optional: custom output fill order (0-indexed)
   ratedImpedances: number[]; // Impedances where byLoad is non-null (e.g., [8, 4, 2.7] for LA12X)
 }
 

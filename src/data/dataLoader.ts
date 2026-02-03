@@ -320,6 +320,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
           physicalOutputs,
           powerRank: amp.powerRank,
           channelTypes: amp.channelTypes,
+          channelFillOrder: amp.channelFillOrder,
           ratedImpedances,
         });
       }
@@ -331,6 +332,7 @@ function buildAmpConfigs(amplifiers: Amplifier[]): AmpConfig[] {
         physicalOutputs,
         powerRank: amp.powerRank,
         channelTypes: amp.channelTypes,
+        channelFillOrder: amp.channelFillOrder,
         ratedImpedances,
       });
     }

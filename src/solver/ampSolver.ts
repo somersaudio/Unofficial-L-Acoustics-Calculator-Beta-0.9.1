@@ -468,6 +468,9 @@ function allocateToOutputs(
     });
   }
 
+  // Channel fill order: custom order if specified (e.g., LA4X: [0,2,1,3]), otherwise sequential
+  const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
+
   if (enclosure.parallelAllowed) {
     // Calculate minimum per output for valid impedance
     const minPerOutputForImpedance = getMinimumPerOutputForImpedance(enclosure, limits, ampConfig.ratedImpedances);
@@ -480,23 +483,23 @@ function allocateToOutputs(
     // Max rated impedance threshold - outputs at or above this show "add 1 more enclosure" warning
     const maxRated = ampConfig.ratedImpedances.length > 0 ? Math.max(...ampConfig.ratedImpedances) : Infinity;
 
-    // Phase 1: Spread enclosures across outputs, but pack each output past the above-rated
-    // threshold before moving to the next. This ensures enclosures go to outputs that need
-    // them (showing "add 1 more" warning) rather than spreading thinly across many outputs.
-    let outputIdx = 0;
-    while (remaining >= effectiveMinPerOutput && outputIdx < ampConfig.outputs) {
+    // Phase 1: Spread enclosures across outputs (following fill order), but pack each output
+    // past the above-rated threshold before moving to the next.
+    let orderIdx = 0;
+    while (remaining >= effectiveMinPerOutput && orderIdx < order.length) {
+      const oi = order[orderIdx];
       const initialAllocation = Math.min(effectiveMinPerOutput, limits.perOutput);
-      outputs[outputIdx].enclosures.push({
+      outputs[oi].enclosures.push({
         enclosure,
         count: initialAllocation,
       });
-      outputs[outputIdx].totalEnclosures = initialAllocation;
-      outputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+      outputs[oi].totalEnclosures = initialAllocation;
+      outputs[oi].impedanceOhms = calculateParallelImpedance(
         enclosure.nominal_impedance_ohms,
         initialAllocation
       );
       if (limits.minImpedanceOverride !== undefined) {
-        outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
+        outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
       }
       remaining -= initialAllocation;
 
@@ -504,38 +507,39 @@ function allocateToOutputs(
       // before moving to the next output (resolves "add 1 more enclosure" warning)
       while (
         remaining > 0 &&
-        outputs[outputIdx].impedanceOhms > maxRated &&
-        outputs[outputIdx].totalEnclosures < limits.perOutput
+        outputs[oi].impedanceOhms > maxRated &&
+        outputs[oi].totalEnclosures < limits.perOutput
       ) {
-        const newCount = outputs[outputIdx].totalEnclosures + 1;
-        outputs[outputIdx].enclosures[0].count = newCount;
-        outputs[outputIdx].totalEnclosures = newCount;
-        outputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+        const newCount = outputs[oi].totalEnclosures + 1;
+        outputs[oi].enclosures[0].count = newCount;
+        outputs[oi].totalEnclosures = newCount;
+        outputs[oi].impedanceOhms = calculateParallelImpedance(
           enclosure.nominal_impedance_ohms,
           newCount
         );
         remaining--;
       }
 
-      outputIdx++;
+      orderIdx++;
     }
 
-    // Phase 2: Pack additional enclosures into existing outputs
+    // Phase 2: Pack additional enclosures into existing outputs (following fill order)
     // Prioritize outputs that are still at or above maxRated (showing warning) first
     while (remaining > 0) {
       let allocated = false;
 
       // First pass: add to above-rated outputs (those showing "add 1 more" warning)
-      for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
+      for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+        const oi = order[idx];
         if (
-          outputs[i].totalEnclosures > 0 &&
-          outputs[i].totalEnclosures < limits.perOutput &&
-          outputs[i].impedanceOhms > maxRated
+          outputs[oi].totalEnclosures > 0 &&
+          outputs[oi].totalEnclosures < limits.perOutput &&
+          outputs[oi].impedanceOhms > maxRated
         ) {
-          const newCount = outputs[i].totalEnclosures + 1;
-          outputs[i].enclosures[0].count = newCount;
-          outputs[i].totalEnclosures = newCount;
-          outputs[i].impedanceOhms = calculateParallelImpedance(
+          const newCount = outputs[oi].totalEnclosures + 1;
+          outputs[oi].enclosures[0].count = newCount;
+          outputs[oi].totalEnclosures = newCount;
+          outputs[oi].impedanceOhms = calculateParallelImpedance(
             enclosure.nominal_impedance_ohms,
             newCount
           );
@@ -546,12 +550,13 @@ function allocateToOutputs(
 
       // Second pass: if no above-rated outputs remain, use round-robin on all outputs
       if (!allocated) {
-        for (let i = 0; i < ampConfig.outputs && remaining > 0; i++) {
-          if (outputs[i].totalEnclosures > 0 && outputs[i].totalEnclosures < limits.perOutput) {
-            const newCount = outputs[i].totalEnclosures + 1;
-            outputs[i].enclosures[0].count = newCount;
-            outputs[i].totalEnclosures = newCount;
-            outputs[i].impedanceOhms = calculateParallelImpedance(
+        for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+          const oi = order[idx];
+          if (outputs[oi].totalEnclosures > 0 && outputs[oi].totalEnclosures < limits.perOutput) {
+            const newCount = outputs[oi].totalEnclosures + 1;
+            outputs[oi].enclosures[0].count = newCount;
+            outputs[oi].totalEnclosures = newCount;
+            outputs[oi].impedanceOhms = calculateParallelImpedance(
               enclosure.nominal_impedance_ohms,
               newCount
             );
@@ -566,46 +571,48 @@ function allocateToOutputs(
 
     // Phase 3: If there are still remaining enclosures and empty outputs,
     // allocate to them (for cases where effectiveMinPerOutput > remaining initially)
-    outputIdx = 0;
+    orderIdx = 0;
     while (remaining > 0) {
-      // Find next empty output
-      while (outputIdx < ampConfig.outputs && outputs[outputIdx].totalEnclosures > 0) {
-        outputIdx++;
+      // Find next empty output in fill order
+      while (orderIdx < order.length && outputs[order[orderIdx]].totalEnclosures > 0) {
+        orderIdx++;
       }
-      if (outputIdx >= ampConfig.outputs) break;
+      if (orderIdx >= order.length) break;
 
+      const oi = order[orderIdx];
       const toAllocate = Math.min(remaining, limits.perOutput);
-      outputs[outputIdx].enclosures.push({
+      outputs[oi].enclosures.push({
         enclosure,
         count: toAllocate,
       });
-      outputs[outputIdx].totalEnclosures = toAllocate;
-      outputs[outputIdx].impedanceOhms = calculateParallelImpedance(
+      outputs[oi].totalEnclosures = toAllocate;
+      outputs[oi].impedanceOhms = calculateParallelImpedance(
         enclosure.nominal_impedance_ohms,
         toAllocate
       );
       if (limits.minImpedanceOverride !== undefined) {
-        outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
+        outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
       }
       remaining -= toAllocate;
-      outputIdx++;
+      orderIdx++;
     }
   } else {
-    // Spread 1 per output (no parallel)
-    let outputIdx = 0;
-    while (remaining > 0 && outputIdx < ampConfig.outputs) {
-      outputs[outputIdx].enclosures.push({
+    // Spread 1 per output (no parallel) — follow fill order
+    let orderIdx = 0;
+    while (remaining > 0 && orderIdx < order.length) {
+      const oi = order[orderIdx];
+      outputs[oi].enclosures.push({
         enclosure,
         count: 1,
       });
-      outputs[outputIdx].totalEnclosures = 1;
-      outputs[outputIdx].impedanceOhms = enclosure.nominal_impedance_ohms;
+      outputs[oi].totalEnclosures = 1;
+      outputs[oi].impedanceOhms = enclosure.nominal_impedance_ohms;
       // Set impedance override if manufacturer allows lower impedance
       if (limits.minImpedanceOverride !== undefined) {
-        outputs[outputIdx].minImpedanceOverride = limits.minImpedanceOverride;
+        outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
       }
       remaining--;
-      outputIdx++;
+      orderIdx++;
     }
   }
 
@@ -1471,5 +1478,107 @@ export function getAllEnclosureCompatibility(
 // =============================================================================
 // Utility Exports
 // =============================================================================
+
+/**
+ * Repack an amp instance's outputs in "packed" mode: maximize enclosures per channel,
+ * using the fewest outputs possible. Returns a new AmpInstance with redistributed outputs.
+ */
+export function repackAmpInstance(instance: AmpInstance): AmpInstance {
+  const ampConfig = instance.ampConfig;
+  const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
+
+  // Collect all enclosures and their min_impedance_override from the current allocation
+  const collected: Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number }> = [];
+  for (const output of instance.outputs) {
+    for (const entry of output.enclosures) {
+      const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
+      if (existing) {
+        existing.totalCount += entry.count;
+      } else {
+        collected.push({
+          enclosure: entry.enclosure,
+          totalCount: entry.count,
+          minImpedanceOverride: output.minImpedanceOverride,
+        });
+      }
+    }
+  }
+
+  // Create fresh outputs
+  const outputs: OutputAllocation[] = [];
+  for (let i = 0; i < ampConfig.outputs; i++) {
+    outputs.push({
+      outputIndex: i,
+      enclosures: [],
+      totalEnclosures: 0,
+      impedanceOhms: Infinity,
+    });
+  }
+
+  // Pack each enclosure type: fill each output to max (per_output) before moving to next
+  for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
+    const limits = enclosure.max_enclosures[ampConfig.key];
+    if (!limits) continue;
+
+    let remaining = totalCount;
+    for (let idx = 0; idx < order.length && remaining > 0; idx++) {
+      const oi = order[idx];
+      // How much room is left on this output (accounting for other enclosure types already placed)
+      const currentOnOutput = outputs[oi].totalEnclosures;
+      const maxForThisType = limits.per_output;
+      // For packed mode, fill to per_output limit
+      const toAdd = Math.min(remaining, maxForThisType);
+      if (toAdd > 0 && currentOnOutput === 0) {
+        outputs[oi].enclosures.push({ enclosure, count: toAdd });
+        outputs[oi].totalEnclosures += toAdd;
+        if (minImpedanceOverride !== undefined) {
+          outputs[oi].minImpedanceOverride = minImpedanceOverride;
+        }
+        remaining -= toAdd;
+      } else if (toAdd > 0 && currentOnOutput > 0) {
+        // Output already has enclosures — only add if same type and room left
+        const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+        if (existingEntry) {
+          const canAdd = Math.min(remaining, maxForThisType - existingEntry.count);
+          if (canAdd > 0) {
+            existingEntry.count += canAdd;
+            outputs[oi].totalEnclosures += canAdd;
+            remaining -= canAdd;
+          }
+        }
+      }
+    }
+  }
+
+  // Recalculate impedance for each output
+  for (const output of outputs) {
+    if (output.totalEnclosures > 0 && output.enclosures.length === 1) {
+      output.impedanceOhms = calculateParallelImpedance(
+        output.enclosures[0].enclosure.nominal_impedance_ohms,
+        output.enclosures[0].count
+      );
+    } else if (output.totalEnclosures > 0) {
+      // Multiple enclosure types: use reciprocal sum for parallel impedance
+      let reciprocalSum = 0;
+      for (const entry of output.enclosures) {
+        const sectionImpedance = entry.enclosure.nominal_impedance_ohms / entry.count;
+        reciprocalSum += 1 / sectionImpedance;
+      }
+      output.impedanceOhms = Math.round((1 / reciprocalSum) * 10) / 10;
+    }
+  }
+
+  // Recalculate load percent
+  let totalEnclosures = 0;
+  for (const output of outputs) {
+    totalEnclosures += output.totalEnclosures;
+  }
+  // Keep the same load percent (total enclosures hasn't changed, just redistributed)
+  return {
+    ...instance,
+    outputs,
+    totalEnclosures,
+  };
+}
 
 export { calculateParallelImpedance, getCompatibleConfigs };

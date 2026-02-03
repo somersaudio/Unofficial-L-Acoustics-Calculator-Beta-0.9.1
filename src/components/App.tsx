@@ -398,7 +398,24 @@ export default function App() {
 
         {/* Right Panel - Amplifier Recommendation */}
         <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-neutral-950">
-          <SolverResults zoneSolutions={zoneSolutions} activeZoneId={activeZoneId} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+          <SolverResults
+            zoneSolutions={zoneSolutions}
+            activeZoneId={activeZoneId}
+            salesMode={salesMode}
+            cableGaugeMm2={cableGaugeMm2}
+            useFeet={useFeet}
+            onAdjustEnclosure={(enclosureName, delta) => {
+              updateZone(activeZoneId, (zone) => {
+                const idx = zone.requests.findIndex((r) => r.enclosure.enclosure === enclosureName);
+                if (idx < 0) return zone;
+                const newQuantity = zone.requests[idx].quantity + delta;
+                if (newQuantity < 1) return zone;
+                const newRequests = [...zone.requests];
+                newRequests[idx] = { ...newRequests[idx], quantity: newQuantity };
+                return { ...zone, requests: newRequests };
+              });
+            }}
+          />
         </section>
       </main>
 
@@ -420,7 +437,7 @@ export default function App() {
                     className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                       isDisabled
                         ? "bg-gray-200 text-gray-400 line-through dark:bg-neutral-800 dark:text-neutral-600"
-                        : "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700"
+                        : "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60"
                     }`}
                     title={isDisabled ? `Enable ${model}` : `Disable ${model}`}
                   >
@@ -438,7 +455,7 @@ export default function App() {
                 onClick={() => setUseFeet(true)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   useFeet
-                    ? "bg-blue-600 text-white dark:bg-blue-700"
+                    ? "bg-amber-500 text-white dark:bg-amber-600"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
               >
@@ -448,7 +465,7 @@ export default function App() {
                 onClick={() => setUseFeet(false)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   !useFeet
-                    ? "bg-blue-600 text-white dark:bg-blue-700"
+                    ? "bg-amber-500 text-white dark:bg-amber-600"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
               >
@@ -464,7 +481,7 @@ export default function App() {
                     onClick={() => setCableGaugeMm2(gauge.mm2)}
                     className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                       cableGaugeMm2 === gauge.mm2
-                        ? "bg-blue-600 text-white dark:bg-blue-700"
+                        ? "bg-amber-500 text-white dark:bg-amber-600"
                         : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                     }`}
                     title={`${gauge.mm2}mm² / ${gauge.awg} AWG / ${gauge.swg} SWG`}

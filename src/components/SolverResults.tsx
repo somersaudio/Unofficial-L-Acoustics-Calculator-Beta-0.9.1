@@ -1,7 +1,7 @@
-import React from "react"; // eslint-disable-line
+import React, { useState, useMemo } from "react"; // eslint-disable-line
 import type { AmpInstance, OutputAllocation, ChannelTypes, ZoneWithSolution, SolverSolution } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
-import { getImpedanceErrors } from "../solver/ampSolver";
+import { getImpedanceErrors, repackAmpInstance } from "../solver/ampSolver";
 import { generatePDFReport } from "../utils/pdfExport";
 
 interface SolverResultsProps {
@@ -10,6 +10,7 @@ interface SolverResultsProps {
   salesMode?: boolean;
   cableGaugeMm2?: number;
   useFeet?: boolean;
+  onAdjustEnclosure?: (enclosureName: string, delta: number) => void;
 }
 
 function getImpedanceColor(impedance: number, minImpedanceOverride?: number): string {
@@ -17,7 +18,17 @@ function getImpedanceColor(impedance: number, minImpedanceOverride?: number): st
   const minAllowed = minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
   if (impedance < minAllowed) return "text-red-600 dark:text-red-500 font-bold";
   if (impedance < MIN_IMPEDANCE_OHMS) return "text-amber-500 dark:text-amber-500";
-  return "text-green-600 dark:text-green-500";
+  return ""; // valid — purple color applied via inline style
+}
+
+/** Returns inline style for purple channel color that darkens as channel index increases */
+function getChannelPurpleStyle(channelIndex: number, totalChannels: number): React.CSSProperties {
+  const t = totalChannels <= 1 ? 0 : channelIndex / (totalChannels - 1);
+  const isDark = document.documentElement.classList.contains("dark");
+  // Light mode: 60% (lightest, Ch 1) → 30% (darkest, Ch 16)
+  // Dark mode: 80% (lightest) → 55% (darkest)
+  const lightness = isDark ? 80 - t * 25 : 60 - t * 30;
+  return { color: `hsl(270, 70%, ${lightness}%)` };
 }
 
 function getLoadColor(loadPercent: number): string {
@@ -28,14 +39,6 @@ function getLoadColor(loadPercent: number): string {
 
 const MAX_ENCLOSURE_TYPES_PER_AMP = 3;
 
-// Get channel type for LA7.16(i) 16-channel amps
-// Pattern: Ch 1,5,9,13 = LC | Ch 2,6,10,14 = LF | Ch 3,4,7,8,11,12,15,16 = HF
-function getChannelType(outputIndex: number): string {
-  const position = outputIndex % 4;
-  if (position === 0) return "LC";
-  if (position === 1) return "LF";
-  return "HF";
-}
 
 function countEnclosureTypes(instance: AmpInstance): number {
   const types = new Set<string>();
@@ -67,18 +70,17 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [] }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[] }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
   const hasLoad = output.totalEnclosures > 0;
-  const channelType = ampOutputCount === 16 ? getChannelType(output.outputIndex) : null;
   const outputLabel = ampOutputCount === 16
-    ? `Ch ${output.outputIndex + 1} ${channelType}`
+    ? `Ch ${output.outputIndex + 1}`
     : `Output ${output.outputIndex + 1}`;
   const minAllowed = output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
   const hasImpedanceError = !salesMode && output.impedanceOhms < minAllowed && output.impedanceOhms !== Infinity;
 
-  // Get nominal impedance for this channel type (for 16-channel amps)
-  const nominalImpedance = channelType && channelTypes?.nominalImpedance
-    ? channelTypes.nominalImpedance[channelType]
+  // Get nominal impedance for empty 16-channel outputs (use first value from nominalImpedance map)
+  const nominalImpedance = channelTypes?.nominalImpedance
+    ? Object.values(channelTypes.nominalImpedance)[0] ?? null
     : null;
 
   const is16Channel = ampOutputCount === 16;
@@ -100,87 +102,70 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
         )}
       </div>
       {hasLoad ? (
-        is16Channel ? (
-          /* 16-channel layout: enclosures first, then impedance (compact) */
-          <>
-            <div>
-              {(() => {
-                const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
-                const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                return output.enclosures.map((entry, i) => {
-                  const isL2Type = entry.enclosure.enclosure === "L2 / L2D";
-                  const hideEnclosureName = isL2Type;
-                  return hideEnclosureName ? null : (
-                    <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
-                      {entry.count}x {entry.enclosure.enclosure}
-                      {impedanceAboveRated && (
-                        <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-            {!salesMode && (
-              <div
-                className={`mt-0.5 pt-0.5 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"} ${getImpedanceColor(
-                  output.impedanceOhms,
-                  output.minImpedanceOverride
-                )}`}
-              >
-                {output.impedanceOhms === Infinity ? "No load" : `${output.impedanceOhms}Ω`}
+        <>
+          {!salesMode && (
+            <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+              <div className={`pt-1 ${getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}`} style={!getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride) ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}>
+                {is16Channel
+                  ? (output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`)
+                  : <>Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}</>
+                }
                 {hasImpedanceError && (
                   <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
                 )}
               </div>
-            )}
-          </>
-        ) : (
-          /* Standard output layout: Ch label, impedance, enclosures, cable length (matching PhysicalOutputCard) */
-          <>
-            {!salesMode && (
-              <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
-                <div className={`pt-1 ${getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}`}>
-                  Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-                  {hasImpedanceError && (
-                    <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
-                  )}
-                </div>
-                {(() => {
-                  const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
-                  const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                  return output.enclosures.map((entry, i) => (
-                    <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+              {(() => {
+                const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                const impedanceAboveRated = output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                return output.enclosures.map((entry, i) => (
+                  <div key={i}>
+                    <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
                       {entry.count}x {entry.enclosure.enclosure}
                       {impedanceAboveRated && (
-                        <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                        </svg>
+                        <>
+                          <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                          </svg>
+                          {onAdjustEnclosure && (
+                            <button
+                              onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                              className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                              title="Add 1 more for recommended load"
+                            >
+                              + 1
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
-                  ));
-                })()}
-                <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
-              </div>
-            )}
-            {salesMode && (
-              <div className="space-y-1">
-                {output.enclosures.map((entry, i) => (
-                  <div key={i} className="text-gray-900 dark:text-gray-200">
-                    {entry.count}x {entry.enclosure.enclosure}
+                    {is16Channel && entry.enclosure.signal_type && (
+                      <div className="text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_type}</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </>
-        )
+                ));
+              })()}
+              {!is16Channel && (
+                <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+              )}
+            </div>
+          )}
+          {salesMode && (
+            <div className="space-y-1">
+              {output.enclosures.map((entry, i) => (
+                <div key={i} className="text-gray-900 dark:text-gray-200">
+                  {entry.count}x {entry.enclosure.enclosure}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       ) : (
-        // For 16-channel amps, show nominal impedance with same styling as loaded outputs; for 4-output amps, show "Empty"
+        // For 16-channel amps, show nominal impedance; for 4-output amps, show "Empty"
         is16Channel && nominalImpedance && !salesMode ? (
-          <div className="mt-0.5 pt-0.5 border-t border-gray-200 dark:border-neutral-700 text-green-600 dark:text-green-500">
-            {nominalImpedance}Ω
+          <div className="border-t border-gray-200 dark:border-neutral-700">
+            <div className="pt-0.5" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+              {nominalImpedance}Ω
+            </div>
           </div>
         ) : !is16Channel ? (
           <div className="text-gray-400 dark:text-neutral-600 italic">Empty</div>
@@ -191,7 +176,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [] }: { outputs: OutputAllocation[]; physicalIndex: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[] }) {
+function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -228,7 +213,13 @@ function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false, cableGa
     >
       <div className="mb-1 font-medium text-gray-700 dark:text-neutral-400">
         Output {physicalIndex + 1}
-        <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+        {outputs.length >= 2 && outputs.filter(o => o.totalEnclosures > 0).length >= 2 ? (
+          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
+            NL4 <span className="mx-0.5">&rarr;</span> NL4/NL2_Y <span className="mx-0.5">&rarr;</span> NL2 ({outputs.length})
+          </span>
+        ) : (
+          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+        )}
       </div>
       {hasLoad ? (
         <>
@@ -238,7 +229,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false, cableGa
                 const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
                 return (
                   <div key={output.outputIndex} className={output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}>
-                    <div className={getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}>
+                    <div className={getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)} style={!getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride) ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}>
                       Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                       {output.impedanceOhms !== Infinity && output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && (
                         <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
@@ -250,9 +241,20 @@ function PhysicalOutputCard({ outputs, physicalIndex, salesMode = false, cableGa
                         <div key={i} className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
                           {entry.count}x {entry.enclosure.enclosure}
                           {impedanceAboveRated && (
-                            <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                            </svg>
+                            <>
+                              <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                              </svg>
+                              {onAdjustEnclosure && (
+                                <button
+                                  onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                  className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                  title="Add 1 more for recommended load"
+                                >
+                                  + 1
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       ));
@@ -341,7 +343,15 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   );
 }
 
-function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
+  const [packed, setPacked] = useState(false);
+
+  // Compute the repacked instance when in packed mode
+  const instance = useMemo(
+    () => packed ? repackAmpInstance(rawInstance) : rawInstance,
+    [packed, rawInstance]
+  );
+
   const ampOutputCount = instance.ampConfig.outputs;
   const physicalOutputCount = instance.ampConfig.physicalOutputs;
   const usePhysicalGrouping = physicalOutputCount < ampOutputCount;
@@ -350,6 +360,9 @@ function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { inst
   );
   const enclosureTypeCount = countEnclosureTypes(instance);
   const isAtMaxTypes = enclosureTypeCount >= MAX_ENCLOSURE_TYPES_PER_AMP;
+
+  // Only show toggle when there are enclosures to redistribute
+  const showPackToggle = rawInstance.totalEnclosures > 1 && !salesMode;
 
   // Group channels into physical outputs when needed (e.g., LA12X: 4 channels -> 2 NL4 connectors)
   const physicalGroups = usePhysicalGrouping
@@ -371,16 +384,36 @@ function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { inst
         hasAnyImpedanceError ? "border-red-200 bg-red-100 dark:border-red-800 dark:bg-red-950/50" : "border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
       }`}>
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center gap-2">
             <span className="font-bold text-gray-900 dark:text-gray-200">
               {instance.ampConfig.model}
             </span>
             {instance.ampConfig.mode && (
-              <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-neutral-700 dark:text-gray-300">
+              <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-neutral-700 dark:text-gray-300">
                 {instance.ampConfig.mode}
               </span>
             )}
-            <span className="ml-2 text-sm text-gray-500 dark:text-neutral-500">#{instance.id.split("-").pop()}</span>
+            <span className="text-sm text-gray-500 dark:text-neutral-500">#{rawInstance.id.split("-").pop()}</span>
+            {showPackToggle && (
+              <button
+                onClick={() => setPacked(!packed)}
+                className={`ml-1 flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                  packed
+                    ? "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
+                }`}
+                title={packed ? "Switch to balanced mode (spread across outputs)" : "Switch to packed mode (minimize outputs used)"}
+              >
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  {packed ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+                {packed ? "Packed" : "Balanced"}
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {isAtMaxTypes && (
@@ -412,10 +445,12 @@ function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { inst
                   key={i}
                   outputs={group}
                   physicalIndex={i}
+                  ampOutputCount={ampOutputCount}
                   salesMode={salesMode}
                   cableGaugeMm2={cableGaugeMm2}
                   useFeet={useFeet}
                   ratedImpedances={instance.ampConfig.ratedImpedances}
+                  onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
                 />
               ))}
             </div>
@@ -435,11 +470,12 @@ function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { inst
                   cableGaugeMm2={cableGaugeMm2}
                   useFeet={useFeet}
                   ratedImpedances={instance.ampConfig.ratedImpedances}
+                  onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
                 />
               ))}
             </div>
           )}
-          {hasAboveRatedOutput && (
+          {hasAboveRatedOutput && !packed && (
             <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
               <svg className="h-3.5 w-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
@@ -454,7 +490,7 @@ function AmpCard({ instance, salesMode = false, cableGaugeMm2, useFeet }: { inst
 }
 
 /** Renders a single zone's solver results */
-function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean }) {
+function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
   if (!solution.success) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/40">
@@ -495,41 +531,34 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet }: { 
       )}
 
       {/* Summary Card */}
-      <div className={`rounded-lg border p-4 ${
+      <div className={`rounded-lg border px-3 py-2 ${
         hasErrors
           ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"
           : "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
       }`}>
-        <div>
-          <h3 className={`mb-3 font-bold ${hasErrors ? "text-amber-800 dark:text-amber-500" : "text-green-800 dark:text-green-500"}`}>
+        <div className="flex items-center justify-between gap-4 text-sm">
+          <h3 className={`font-bold ${hasErrors ? "text-amber-800 dark:text-amber-500" : "text-green-800 dark:text-green-500"}`}>
             {hasErrors ? "Configuration (with errors)" : "Recommended Configuration"}
           </h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Total Amplifiers</div>
-              <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
-                {solution.summary.totalAmplifiers}
-              </div>
-            </div>
-            <div>
-              <div className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>Enclosures Allocated</div>
-              <div className={`text-2xl font-bold ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>
-                {solution.summary.totalEnclosuresAllocated}
-              </div>
-            </div>
+          <div className="flex items-center gap-4">
+            <span className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>
+              <span className={`font-bold text-base ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>{solution.summary.totalAmplifiers}</span> amp{solution.summary.totalAmplifiers !== 1 ? "s" : ""}
+            </span>
+            <span className={hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500"}>
+              <span className={`font-bold text-base ${hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400"}`}>{solution.summary.totalEnclosuresAllocated}</span> encl.
+            </span>
           </div>
-          <div className={`mt-3 border-t pt-3 text-sm ${
-            hasErrors ? "border-amber-200 text-amber-700 dark:border-amber-800 dark:text-amber-400" : "border-green-200 text-green-700 dark:border-green-800 dark:text-green-400"
-          }`}>
-            <span className="font-medium">Amp Types: </span>
-            {solution.summary.ampConfigsUsed.map((c, i) => (
-              <span key={c.key}>
-                {i > 0 && ", "}
-                {c.model}
-                {c.mode && ` (${c.mode})`}
-              </span>
-            ))}
-          </div>
+        </div>
+        <div className={`mt-1 text-xs ${
+          hasErrors ? "text-amber-700 dark:text-amber-400" : "text-green-700 dark:text-green-400"
+        }`}>
+          {solution.summary.ampConfigsUsed.map((c, i) => (
+            <span key={c.key}>
+              {i > 0 && ", "}
+              {c.model}
+              {c.mode && ` (${c.mode})`}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -554,7 +583,7 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet }: { 
           })()
         ) : (
           solution.ampInstances.map((instance) => (
-            <AmpCard key={instance.id} instance={instance} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+            <AmpCard key={instance.id} instance={instance} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} onAdjustEnclosure={onAdjustEnclosure} />
           ))
         )}
       </div>
@@ -562,7 +591,7 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet }: { 
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
@@ -615,6 +644,7 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
         salesMode={salesMode}
         cableGaugeMm2={cableGaugeMm2}
         useFeet={useFeet}
+        onAdjustEnclosure={onAdjustEnclosure}
       />
     </div>
   );

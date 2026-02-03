@@ -52,11 +52,19 @@ export default function ZoneTabBar({
     onRemoveZone(zoneId);
   };
 
+  const ZONE_COLORS = [
+    { border: "border-green-600 dark:border-green-500", text: "text-green-700 dark:text-green-400", hover: "hover:border-green-300 hover:text-green-600 dark:hover:border-green-700 dark:hover:text-green-400" },
+    { border: "border-orange-500 dark:border-orange-400", text: "text-orange-600 dark:text-orange-400", hover: "hover:border-orange-300 hover:text-orange-500 dark:hover:border-orange-700 dark:hover:text-orange-400" },
+    { border: "border-pink-500 dark:border-pink-400", text: "text-pink-600 dark:text-pink-400", hover: "hover:border-pink-300 hover:text-pink-500 dark:hover:border-pink-700 dark:hover:text-pink-400" },
+    { border: "border-yellow-500 dark:border-yellow-400", text: "text-yellow-600 dark:text-yellow-400", hover: "hover:border-yellow-300 hover:text-yellow-500 dark:hover:border-yellow-700 dark:hover:text-yellow-400" },
+  ];
+
   return (
     <div className="flex items-center border-b border-gray-200 bg-gray-50 px-4 dark:border-neutral-800 dark:bg-neutral-950">
-      {zones.map((zone) => {
+      {zones.map((zone, zoneIndex) => {
         const isActive = zone.id === activeZoneId;
         const isEditing = editingId === zone.id;
+        const color = ZONE_COLORS[zoneIndex % ZONE_COLORS.length];
 
         return (
           <div
@@ -65,8 +73,8 @@ export default function ZoneTabBar({
             onDoubleClick={() => startEditing(zone)}
             className={`group relative flex cursor-pointer items-center gap-1 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               isActive
-                ? "border-blue-600 text-blue-700 dark:border-blue-500 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-neutral-500 dark:hover:border-neutral-600 dark:hover:text-neutral-300"
+                ? `${color.border} ${color.text}`
+                : `border-transparent text-gray-500 dark:text-neutral-500 ${color.hover}`
             }`}
           >
             {isEditing ? (
