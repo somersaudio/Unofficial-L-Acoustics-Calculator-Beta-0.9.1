@@ -7,6 +7,7 @@ import ZoneTabBar from "./ZoneTabBar";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
 import { serializeZones, deserializeZones } from "../utils/zoneSerializer";
 import { getLowestFrequency } from "../utils/frequencyData";
+import { generatePDFReport } from "../utils/pdfExport";
 import lacousticsLogo from "../assets/lacoustics-logo.png";
 import subHemisphere from "../assets/sub-hemisphere.png";
 
@@ -303,11 +304,23 @@ export default function App() {
       );
 
       // Calculate enclosures already allocated to locked amps
+      // For multi-channel enclosures, only count on the primary channel to avoid double-counting
       const lockedEnclosureCounts = new Map<string, number>();
       for (const lockedAmp of zone.lockedAmpInstances) {
+        const seenMultiChannel = new Set<string>();
         for (const output of lockedAmp.outputs) {
           for (const entry of output.enclosures) {
             const name = entry.enclosure.enclosure;
+            const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
+
+            if (channelsPerUnit > 1) {
+              // Multi-channel enclosure: only count on primary channel (to avoid double-counting)
+              const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+              const groupKey = `${name}_${groupIdx}`;
+              if (seenMultiChannel.has(groupKey)) continue;
+              seenMultiChannel.add(groupKey);
+            }
+
             lockedEnclosureCounts.set(name, (lockedEnclosureCounts.get(name) ?? 0) + entry.count);
           }
         }
@@ -330,11 +343,12 @@ export default function App() {
           : null;
 
       // Combine locked amps with newly solved amps
+      // Put solved amps first (they represent "remaining" allocations), locked amps at end
       let solution: typeof solverResult = null;
       if (zone.lockedAmpInstances.length > 0 || solverResult) {
         const lockedAmps = zone.lockedAmpInstances;
         const solvedAmps = solverResult?.ampInstances ?? [];
-        const allAmps = [...lockedAmps, ...solvedAmps];
+        const allAmps = [...solvedAmps, ...lockedAmps];
 
         // Calculate summary
         const totalEnclosuresAllocated = allAmps.reduce((sum, amp) => sum + amp.totalEnclosures, 0);
@@ -363,12 +377,24 @@ export default function App() {
   const activeEnabledAmpConfigs = activeZoneSolution?.enabledAmpConfigs ?? [];
 
   // Calculate locked enclosure counts for the active zone
+  // For multi-channel enclosures, only count on the primary channel to avoid double-counting
   const activeLockedEnclosureCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const lockedAmp of activeZone.lockedAmpInstances) {
+      const seenMultiChannel = new Set<string>();
       for (const output of lockedAmp.outputs) {
         for (const entry of output.enclosures) {
           const name = entry.enclosure.enclosure;
+          const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
+
+          if (channelsPerUnit > 1) {
+            // Multi-channel enclosure: only count on primary channel (to avoid double-counting)
+            const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+            const groupKey = `${name}_${groupIdx}`;
+            if (seenMultiChannel.has(groupKey)) continue;
+            seenMultiChannel.add(groupKey);
+          }
+
           counts.set(name, (counts.get(name) ?? 0) + entry.count);
         }
       }
@@ -430,6 +456,18 @@ export default function App() {
           className="h-8"
         />
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => generatePDFReport({ zoneSolutions })}
+            disabled={!zoneSolutions.some((zs) => zs.solution !== null)}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
+            title="Export PDF report"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            PDF
+          </button>
+          <div className="mx-1 h-6 w-px bg-blue-600 dark:bg-neutral-700" />
           <button
             onClick={handleLoadProject}
             className="rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
