@@ -39,6 +39,41 @@ function getLoadColor(loadPercent: number): string {
 
 const MAX_ENCLOSURE_TYPES_PER_AMP = 3;
 
+/** Background colors for enclosure types (faint saturation) */
+const ENCLOSURE_TYPE_COLORS = [
+  "rgba(189, 199, 124, 0.15)", // 1st type: #bdc77c - gold/olive
+  "rgba(132, 190, 197, 0.15)", // 2nd type: #84bec5 - teal
+  "rgba(222, 170, 66, 0.15)",  // 3rd type: #deaa42 - amber
+];
+
+const ENCLOSURE_TYPE_COLORS_DARK = [
+  "rgba(189, 199, 124, 0.12)", // 1st type: #bdc77c - gold/olive
+  "rgba(132, 190, 197, 0.12)", // 2nd type: #84bec5 - teal
+  "rgba(222, 170, 66, 0.12)",  // 3rd type: #deaa42 - amber
+];
+
+/** Build a map of enclosure name -> type index (0, 1, 2) for coloring */
+function buildEnclosureTypeMap(instance: AmpInstance): Map<string, number> {
+  const typeMap = new Map<string, number>();
+  let index = 0;
+  for (const output of instance.outputs) {
+    for (const entry of output.enclosures) {
+      const name = entry.enclosure.enclosure;
+      if (!typeMap.has(name) && index < MAX_ENCLOSURE_TYPES_PER_AMP) {
+        typeMap.set(name, index++);
+      }
+    }
+  }
+  return typeMap;
+}
+
+/** Get background color for an enclosure type */
+function getEnclosureTypeBackground(enclosureName: string, typeMap: Map<string, number>): string | undefined {
+  const typeIndex = typeMap.get(enclosureName);
+  if (typeIndex === undefined) return undefined;
+  const isDark = document.documentElement.classList.contains("dark");
+  return isDark ? ENCLOSURE_TYPE_COLORS_DARK[typeIndex] : ENCLOSURE_TYPE_COLORS[typeIndex];
+}
 
 function countEnclosureTypes(instance: AmpInstance): number {
   const types = new Set<string>();
@@ -70,7 +105,7 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number> }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -79,6 +114,11 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
   const hasImpedanceError = !salesMode && output.impedanceOhms < minAllowed && output.impedanceOhms !== Infinity;
 
   const is16Channel = ampOutputCount === 16;
+
+  // Get enclosure type background for the entire card (based on first enclosure)
+  const cardTypeBg = hasLoad && enclosureTypeMap && output.enclosures[0]
+    ? getEnclosureTypeBackground(output.enclosures[0].enclosure.enclosure, enclosureTypeMap)
+    : undefined;
 
   // Get the signal channel label for this output (for multi-channel enclosures)
   const signalLabel = hasLoad && output.enclosures[0]?.enclosure.signal_channels?.length > 1
@@ -131,6 +171,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
           ? "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
           : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
+      style={cardTypeBg && !hasImpedanceError ? { backgroundColor: cardTypeBg } : undefined}
     >
       <div
         className={`${is16Channel ? "" : "mb-1"} font-medium ${is16Channel ? "" : "text-gray-700 dark:text-neutral-400"}`}
@@ -219,7 +260,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
+function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number> }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -270,8 +311,16 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
             <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
               {outputs.map((output) => {
                 const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                const channelTypeBg = output.enclosures[0] && enclosureTypeMap
+                  ? getEnclosureTypeBackground(output.enclosures[0].enclosure.enclosure, enclosureTypeMap)
+                  : undefined;
+                const hasChannelError = output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && output.impedanceOhms !== Infinity;
                 return (
-                  <div key={output.outputIndex} className={output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}>
+                  <div
+                    key={output.outputIndex}
+                    className={`rounded -mx-1 px-1 ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                    style={channelTypeBg && !hasChannelError ? { backgroundColor: channelTypeBg } : undefined}
+                  >
                     <div className={getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)} style={!getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride) ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}>
                       Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                       {output.impedanceOhms !== Infinity && output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && (
@@ -439,6 +488,9 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     return set;
   }, [instance.outputs]);
 
+  // Build enclosure type map for coloring
+  const enclosureTypeMap = useMemo(() => buildEnclosureTypeMap(instance), [instance]);
+
   // Check if any output has impedance at or above max rated (for annotation legend)
   // Skip multi-channel enclosure outputs — their per-section impedance is fixed by speaker design
   const maxRated = instance.ampConfig.ratedImpedances.length > 0 ? Math.max(...instance.ampConfig.ratedImpedances) : Infinity;
@@ -572,6 +624,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   useFeet={useFeet}
                   ratedImpedances={instance.ampConfig.ratedImpedances}
                   onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
+                  enclosureTypeMap={enclosureTypeMap}
                 />
               ))}
             </div>
@@ -593,6 +646,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
                   isSecondaryChannel={secondaryChannelSet.has(output.outputIndex)}
                   hideEnclosureName={!!l2HeaderEnclosure}
+                  enclosureTypeMap={enclosureTypeMap}
                 />
               ))}
             </div>
