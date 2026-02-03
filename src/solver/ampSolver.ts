@@ -355,8 +355,9 @@ function buildChannelGroups(ampOutputCount: number, channelsPerUnit: number): nu
 }
 
 /** Generate a unique ID for an amp instance */
-function generateAmpId(ampConfigKey: string, index: number): string {
-  return `${ampConfigKey}-${index + 1}`;
+function generateAmpId(ampConfigKey: string, _index: number): string {
+  // Use UUID for truly unique IDs (important when locked amps exist)
+  return `${ampConfigKey}-${crypto.randomUUID().split("-").pop()}`;
 }
 
 /** Get compatible amp configs for an enclosure, sorted by powerRank (lowest first) */

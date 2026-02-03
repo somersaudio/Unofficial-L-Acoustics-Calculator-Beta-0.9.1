@@ -12,6 +12,8 @@ interface SolverResultsProps {
   cableGaugeMm2?: number;
   useFeet?: boolean;
   onAdjustEnclosure?: (enclosureName: string, delta: number) => void;
+  onLockAmpInstance?: (ampInstance: AmpInstance) => void;
+  onUnlockAmpInstance?: (ampInstanceId: string) => void;
 }
 
 /** Returns inline style for purple channel color that darkens as channel index increases */
@@ -147,7 +149,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
   if (isSecondaryChannel && hasLoad) {
     return (
       <div
-        className={`flex flex-col rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
+        className={`flex flex-col rounded border p-2 text-xs ${
           hasImpedanceError
             ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
             : "border-blue-200/60 dark:border-neutral-700"
@@ -217,7 +219,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 
   return (
     <div
-      className={`flex flex-col rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
+      className={`flex flex-col rounded border p-2 text-xs ${
         hasImpedanceError
           ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
           : hasLoad
@@ -348,7 +350,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
 
   return (
     <div
-      className={`flex flex-col rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
+      className={`flex flex-col rounded border p-2 text-xs ${
         hasImpedanceError
           ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
           : "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
@@ -822,7 +824,7 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: (instance: AmpInstance) => void; onUnlock?: (instanceId: string) => void }) {
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
@@ -897,11 +899,34 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
       hasAnyImpedanceError ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/30" : "border-gray-300 bg-white dark:border-neutral-700 dark:bg-neutral-900"
     }`}>
       {/* Amp Header */}
-      <div className={`border-b px-4 py-3 ${
+      <div className={`border-b px-4 py-1.5 ${
         hasAnyImpedanceError ? "border-red-200 bg-red-100 dark:border-red-800 dark:bg-red-950/50" : "border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
       }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
+            {/* Lock/Unlock button */}
+            {isLocked ? (
+              <button
+                onClick={() => onUnlock?.(rawInstance.id)}
+                className="rounded p-1 transition-colors"
+                style={{ backgroundColor: 'rgba(181, 158, 95, 0.2)', color: '#b59e5f' }}
+                title="Unlock this amplifier configuration"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+              </button>
+            ) : onLock && (
+              <button
+                onClick={() => onLock(instance)}
+                className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                title="Lock this amplifier configuration"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                </svg>
+              </button>
+            )}
             <span className="font-bold text-gray-900 dark:text-gray-200">
               {instance.ampConfig.model}
             </span>
@@ -910,7 +935,6 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 {instance.ampConfig.mode}
               </span>
             )}
-            <span className="text-sm text-gray-500 dark:text-neutral-500">#{rawInstance.id.split("-").pop()}</span>
             {showPackToggle && (
               <>
                 <button
@@ -1083,7 +1107,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 }
 
 /** Renders a single zone's solver results */
-function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
+function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void }) {
   // Track packed/spread state per amp index (independent per amp)
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
@@ -1209,6 +1233,8 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
             const packed = packedMap[index] ?? false;
             const spread = spreadMap[index] ?? false;
 
+            const isLocked = lockedAmpIds?.has(instance.id) ?? false;
+
             return (
               <AmpCard
                 key={instance.id}
@@ -1232,6 +1258,9 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
                 onToggleSpread={() => {
                   setSpreadMap(prev => ({ ...prev, [index]: !(prev[index] ?? false) }));
                 }}
+                isLocked={isLocked}
+                onLock={onLockAmpInstance}
+                onUnlock={onUnlockAmpInstance}
               />
             );
           })
@@ -1241,7 +1270,7 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onUnlockAmpInstance }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
@@ -1295,6 +1324,9 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
         cableGaugeMm2={cableGaugeMm2}
         useFeet={useFeet}
         onAdjustEnclosure={onAdjustEnclosure}
+        lockedAmpIds={new Set(activeZoneSolution?.zone.lockedAmpInstances.map(a => a.id) ?? [])}
+        onLockAmpInstance={onLockAmpInstance}
+        onUnlockAmpInstance={onUnlockAmpInstance}
       />
     </div>
   );

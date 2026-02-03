@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile } from "../types";
+import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile, AmpInstance } from "../types";
 import { CABLE_GAUGES } from "../types";
 import EnclosureSelector from "./EnclosureSelector";
 import SolverResults from "./SolverResults";
@@ -23,6 +23,7 @@ function createDefaultZone(): Zone {
     name: "Main",
     requests: [],
     disabledAmps: new Set(DEFAULT_DISABLED_AMPS),
+    lockedAmpInstances: [],
   };
 }
 
@@ -60,9 +61,9 @@ function FrequencyHemisphere({ frequency }: { frequency: number | null }) {
         <span
           className="absolute inset-x-0 flex justify-center font-bold"
           style={{
-            fontSize: 14,
+            fontSize: 18,
             color: "#000000",
-            top: -4,
+            top: -6,
           }}
         >
           {frequency}Hz
@@ -196,7 +197,7 @@ export default function App() {
       const saved = localStorage.getItem("zones");
       if (saved) {
         const parsed = JSON.parse(saved);
-        const restored = deserializeZones(parsed, state.data.enclosures.enclosures);
+        const restored = deserializeZones(parsed, state.data.enclosures.enclosures, state.data.ampConfigs);
         if (restored.length > 0) {
           setZones(restored);
           setActiveZoneId(restored[0].id);
@@ -233,6 +234,7 @@ export default function App() {
       name: `Zone ${String.fromCharCode(65 + zones.length)}`,
       requests: [],
       disabledAmps: new Set(DEFAULT_DISABLED_AMPS),
+      lockedAmpInstances: [],
     };
     setZones((prev) => [...prev, newZone]);
     setActiveZoneId(newZone.id);
@@ -273,7 +275,7 @@ export default function App() {
     if (!result.success || !result.data) return;
     try {
       const project: ProjectFile = JSON.parse(result.data);
-      const restored = deserializeZones(project.zones, state.data.enclosures.enclosures);
+      const restored = deserializeZones(project.zones, state.data.enclosures.enclosures, state.data.ampConfigs);
       if (restored.length > 0) {
         setZones(restored);
         setActiveZoneId(restored[0].id);
@@ -299,10 +301,59 @@ export default function App() {
       const enabledAmpConfigs = state.data.ampConfigs.filter(
         (config) => !zone.disabledAmps.has(config.model)
       );
-      const solution =
-        zone.requests.length > 0
-          ? solveAmplifierAllocation(zone.requests, enabledAmpConfigs)
+
+      // Calculate enclosures already allocated to locked amps
+      const lockedEnclosureCounts = new Map<string, number>();
+      for (const lockedAmp of zone.lockedAmpInstances) {
+        for (const output of lockedAmp.outputs) {
+          for (const entry of output.enclosures) {
+            const name = entry.enclosure.enclosure;
+            lockedEnclosureCounts.set(name, (lockedEnclosureCounts.get(name) ?? 0) + entry.count);
+          }
+        }
+      }
+
+      // Subtract locked enclosures from requests to get remaining
+      const remainingRequests = zone.requests
+        .map((req) => {
+          const lockedCount = lockedEnclosureCounts.get(req.enclosure.enclosure) ?? 0;
+          const remaining = req.quantity - lockedCount;
+          if (remaining <= 0) return null;
+          return { ...req, quantity: remaining };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      // Solve for remaining enclosures only
+      const solverResult =
+        remainingRequests.length > 0
+          ? solveAmplifierAllocation(remainingRequests, enabledAmpConfigs)
           : null;
+
+      // Combine locked amps with newly solved amps
+      let solution: typeof solverResult = null;
+      if (zone.lockedAmpInstances.length > 0 || solverResult) {
+        const lockedAmps = zone.lockedAmpInstances;
+        const solvedAmps = solverResult?.ampInstances ?? [];
+        const allAmps = [...lockedAmps, ...solvedAmps];
+
+        // Calculate summary
+        const totalEnclosuresAllocated = allAmps.reduce((sum, amp) => sum + amp.totalEnclosures, 0);
+        const ampConfigsUsed = [...new Map(allAmps.map((a) => [a.ampConfig.key, a.ampConfig])).values()];
+        const maxPowerRank = Math.max(...ampConfigsUsed.map((c) => c.powerRank), 0);
+
+        solution = {
+          success: solverResult?.success ?? true,
+          errorMessage: solverResult?.errorMessage,
+          ampInstances: allAmps,
+          summary: {
+            totalAmplifiers: allAmps.length,
+            totalEnclosuresAllocated,
+            ampConfigsUsed,
+            maxPowerRank,
+          },
+        };
+      }
+
       return { zone, solution, enabledAmpConfigs };
     });
   }, [state, zones]);
@@ -310,6 +361,20 @@ export default function App() {
   // Get active zone's enabled amp configs for the EnclosureSelector
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeEnabledAmpConfigs = activeZoneSolution?.enabledAmpConfigs ?? [];
+
+  // Calculate locked enclosure counts for the active zone
+  const activeLockedEnclosureCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const lockedAmp of activeZone.lockedAmpInstances) {
+      for (const output of lockedAmp.outputs) {
+        for (const entry of output.enclosures) {
+          const name = entry.enclosure.enclosure;
+          counts.set(name, (counts.get(name) ?? 0) + entry.count);
+        }
+      }
+    }
+    return counts;
+  }, [activeZone.lockedAmpInstances]);
 
   // Get unique amp models for the footer toggle
   const ampModels = useMemo<string[]>(() => {
@@ -424,6 +489,7 @@ export default function App() {
               requests={activeZone.requests}
               onRequestsChange={(reqs) => updateZone(activeZoneId, (z) => ({ ...z, requests: reqs }))}
               salesMode={salesMode}
+              lockedEnclosureCounts={activeLockedEnclosureCounts}
             />
           </div>
         </section>
@@ -446,6 +512,18 @@ export default function App() {
                 newRequests[idx] = { ...newRequests[idx], quantity: newQuantity };
                 return { ...zone, requests: newRequests };
               });
+            }}
+            onLockAmpInstance={(ampInstance: AmpInstance) => {
+              updateZone(activeZoneId, (zone) => ({
+                ...zone,
+                lockedAmpInstances: [...zone.lockedAmpInstances, ampInstance],
+              }));
+            }}
+            onUnlockAmpInstance={(ampInstanceId: string) => {
+              updateZone(activeZoneId, (zone) => ({
+                ...zone,
+                lockedAmpInstances: zone.lockedAmpInstances.filter((a) => a.id !== ampInstanceId),
+              }));
             }}
           />
         </section>

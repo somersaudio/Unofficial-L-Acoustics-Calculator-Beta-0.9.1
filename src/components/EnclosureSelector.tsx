@@ -10,6 +10,8 @@ interface EnclosureSelectorProps {
   onRequestsChange: (requests: EnclosureRequest[]) => void;
   salesMode?: boolean;
   onBump?: () => void;
+  /** Map of enclosure name -> count of locked enclosures */
+  lockedEnclosureCounts?: Map<string, number>;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -54,6 +56,7 @@ export default function EnclosureSelector({
   onRequestsChange,
   salesMode = false,
   onBump,
+  lockedEnclosureCounts = new Map(),
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -304,14 +307,32 @@ export default function EnclosureSelector({
               const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
               const showBumpMessage = bumpedIndices.has(index);
               const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
+              const lockedCount = lockedEnclosureCounts.get(request.enclosure.enclosure) ?? 0;
+              const isFullyLocked = lockedCount >= request.quantity;
+              // Gold color for locked state
+              const goldColor = '#b59e5f';
+              const goldColorLight = '#b59e5f33'; // 20% opacity
               return (
                 <div
                   key={`${request.enclosure.enclosure}-${index}`}
-                  className="flex items-center gap-3 rounded-lg border border-gray-300 bg-gray-100 py-0.5 px-3 dark:border-neutral-700 dark:bg-neutral-800"
+                  className={`relative flex items-center gap-3 rounded-lg border py-0.5 px-3 ${
+                    lockedCount > 0
+                      ? ""
+                      : "border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
+                  }`}
+                  style={lockedCount > 0 ? { borderColor: goldColor, backgroundColor: goldColorLight } : undefined}
                 >
+                  {/* Lock icon for locked enclosures */}
+                  {lockedCount > 0 && (
+                    <div className="flex-shrink-0" style={{ color: goldColor }} title={`${lockedCount} locked to amplifier`}>
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
                   {/* Enclosure Image */}
                   {imageUrl && (
-                    <div className="h-[50px] w-[50px] flex-shrink-0 overflow-hidden rounded">
+                    <div className={`h-[50px] w-[50px] flex-shrink-0 overflow-hidden rounded ${isFullyLocked ? "opacity-60" : ""}`}>
                       <img
                         src={imageUrl}
                         alt={request.enclosure.enclosure}
@@ -319,11 +340,16 @@ export default function EnclosureSelector({
                       />
                     </div>
                   )}
-                  <div className="flex-1">
+                  <div className={`flex-1 ${isFullyLocked ? "opacity-60" : ""}`}>
                     <div className="flex items-center">
                       <span className="font-medium text-gray-900 dark:text-gray-200">
                         {request.enclosure.enclosure}
                       </span>
+                      {lockedCount > 0 && (
+                        <span className="ml-2 text-xs" style={{ color: goldColor }}>
+                          ({lockedCount} locked)
+                        </span>
+                      )}
                       <MinCountMessage
                         show={showBumpMessage}
                         key={showBumpMessage ? Date.now() : "stable"}
@@ -341,42 +367,61 @@ export default function EnclosureSelector({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        handleQuantityChange(index, request.quantity - 1)
-                      }
-                      disabled={request.quantity <= minCount}
-                      className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      min={minCount}
-                      value={request.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          index,
-                          parseInt(e.target.value) || minCount
-                        )
-                      }
-                      className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"
-                    />
-                    <button
-                      onClick={() =>
-                        handleQuantityChange(index, request.quantity + 1)
-                      }
-                      className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                    >
-                      +
-                    </button>
-                  </div>
+                  {isFullyLocked ? (
+                    /* Fully locked - show static count, no controls */
+                    <div className="flex items-center gap-2 opacity-60">
+                      <span
+                        className="w-16 rounded border px-2 py-1 text-center text-sm"
+                        style={{ borderColor: goldColor, backgroundColor: goldColorLight, color: goldColor }}
+                      >
+                        {request.quantity}
+                      </span>
+                    </div>
+                  ) : (
+                    /* Not fully locked - show controls */
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          handleQuantityChange(index, request.quantity - 1)
+                        }
+                        disabled={request.quantity <= Math.max(minCount, lockedCount)}
+                        className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min={Math.max(minCount, lockedCount)}
+                        value={request.quantity}
+                        onChange={(e) =>
+                          handleQuantityChange(
+                            index,
+                            parseInt(e.target.value) || Math.max(minCount, lockedCount)
+                          )
+                        }
+                        className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"
+                      />
+                      <button
+                        onClick={() =>
+                          handleQuantityChange(index, request.quantity + 1)
+                        }
+                        className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
 
-                  <button
-                    onClick={() => handleRemoveRequest(index)}
-                    className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
-                    title="Remove"
+                  {!isFullyLocked && (
+                    <button
+                      onClick={() => handleRemoveRequest(index)}
+                      disabled={lockedCount > 0}
+                      className={`rounded p-1 ${
+                        lockedCount > 0
+                          ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
+                          : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
+                      }`}
+                      title={lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
                   >
                     <svg
                       className="h-5 w-5"
@@ -392,6 +437,7 @@ export default function EnclosureSelector({
                       />
                     </svg>
                   </button>
+                  )}
                 </div>
               );
             })}

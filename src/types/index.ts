@@ -307,6 +307,8 @@ export interface Zone {
   name: string;
   requests: EnclosureRequest[];
   disabledAmps: Set<string>;
+  /** Amp instances that are locked and won't be modified by the solver */
+  lockedAmpInstances: AmpInstance[];
 }
 
 /** Zone paired with its computed solver result */
@@ -316,12 +318,23 @@ export interface ZoneWithSolution {
   enabledAmpConfigs: AmpConfig[];
 }
 
+/** Serializable form of an amp instance for JSON persistence */
+export interface AmpInstanceSerialized {
+  id: string;
+  ampConfigKey: string;
+  outputs: Array<{
+    outputIndex: number;
+    enclosures: Array<{ enclosureName: string; count: number }>;
+  }>;
+}
+
 /** Serializable form of a Zone for JSON persistence */
 export interface ZoneSerialized {
   id: string;
   name: string;
   requests: Array<{ enclosureName: string; quantity: number }>;
   disabledAmps: string[];
+  lockedAmpInstances?: AmpInstanceSerialized[];
 }
 
 /** Project file format for save/load */
