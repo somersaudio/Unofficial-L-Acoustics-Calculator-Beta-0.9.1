@@ -166,7 +166,6 @@
     {
       "amplifier": "LA4X",
       "outputs": 4,
-      "channelFillOrder": [0, 2, 1, 3],
       "powerRank": 2,
       "operatingModes": [],
       "maxOutputPower_W": {

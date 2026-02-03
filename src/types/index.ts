@@ -30,7 +30,7 @@ export interface Amplifier {
   operatingModes: OperatingMode[];
   maxOutputPower_W: MaxOutputPower;
   channelTypes?: ChannelTypes; // Optional: for multi-channel amps like LA7.16(i)
-  channelFillOrder?: number[]; // Optional: custom output fill order (0-indexed), e.g., [0, 2, 1, 3] for LA4X
+  channelFillOrder?: number[]; // Optional: custom output fill order (0-indexed); defaults to ascending [0, 1, 2, ...]
 }
 
 export interface AmplifiersData {

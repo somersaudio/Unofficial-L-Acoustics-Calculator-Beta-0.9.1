@@ -285,17 +285,29 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
     (o) => o.impedanceOhms < (o.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && o.impedanceOhms !== Infinity
   );
 
+  // Check if ALL channels in this physical output are secondary multi-channel channels
+  // If so, hide the output header since the enclosure info is shown on the primary channel's output
+  const allSecondary = hasLoad && outputs.every((output) => {
+    const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+    if (!isMultiChannel) return false;
+    const channelsPerUnit = output.enclosures[0]?.enclosure.signal_channels.length ?? 1;
+    return (output.outputIndex % channelsPerUnit) > 0;
+  });
+
   return (
     <div
       className={`rounded border p-2 text-xs ${
         hasImpedanceError
           ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
           : hasLoad
-          ? "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
+          ? allSecondary
+            ? "border-blue-200/60 bg-blue-100/40 dark:border-neutral-700 dark:bg-neutral-800/60"
+            : "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
           : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
+      style={allSecondary && !hasImpedanceError ? { backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' } : undefined}
     >
-      <div className="mb-1 font-medium text-gray-700 dark:text-neutral-400">
+      <div className={`mb-1 font-medium text-gray-700 dark:text-neutral-400 ${allSecondary ? "invisible" : ""}`}>
         Output {physicalIndex + 1}
         {outputs.length >= 2 && outputs.filter(o => o.totalEnclosures > 0).length >= 2 ? (
           <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
@@ -315,20 +327,45 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                   ? getEnclosureTypeBackground(output.enclosures[0].enclosure.enclosure, enclosureTypeMap)
                   : undefined;
                 const hasChannelError = output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && output.impedanceOhms !== Infinity;
+                const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                const isSecondaryMultiChannel = isMultiChannel && output.enclosures[0] &&
+                  (output.outputIndex % output.enclosures[0].enclosure.signal_channels.length) > 0;
+                const signalLabel = output.enclosures[0]?.enclosure.signal_channels?.length > 1
+                  ? output.enclosures[0].enclosure.signal_channels[output.outputIndex % output.enclosures[0].enclosure.signal_channels.length]
+                  : null;
+
+                // Secondary multi-channel outputs: simplified display (just "Ch N" and signal label)
+                // Match the height of primary channel boxes
+                if (isSecondaryMultiChannel) {
+                  return (
+                    <div
+                      key={output.outputIndex}
+                      className={`flex flex-col justify-between rounded -mx-1 px-1 min-h-[72px] ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                      style={channelTypeBg && !hasChannelError ? { backgroundColor: channelTypeBg, backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' } : { backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' }}
+                    >
+                      <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                        Ch {output.outputIndex + 1}
+                      </div>
+                      {signalLabel && (
+                        <div className="text-[10px] text-gray-400 dark:text-neutral-500">{signalLabel}</div>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     key={output.outputIndex}
                     className={`rounded -mx-1 px-1 ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                     style={channelTypeBg && !hasChannelError ? { backgroundColor: channelTypeBg } : undefined}
                   >
-                    <div className={getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)} style={!getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride) ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}>
-                      Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-                      {output.impedanceOhms !== Infinity && output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && (
-                        <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
+                    <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                      Ch {output.outputIndex + 1}
+                      {hasChannelError && (
+                        <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                       )}
                     </div>
                     {(() => {
-                      const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
                       const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
                       return output.enclosures.map((entry, i) => (
                         <div key={i}>
@@ -351,14 +388,20 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                               </>
                             )}
                           </div>
-                          {entry.enclosure.signal_channels?.length > 1 && (
-                            <div className="text-[10px] text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}</div>
-                          )}
                         </div>
                       ));
                     })()}
                     {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && (
                       <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                    )}
+                    {/* Signal label at bottom left, impedance at bottom right */}
+                    {signalLabel && (
+                      <div className="flex items-center justify-between pt-0.5 text-[10px]">
+                        <span className="text-gray-400 dark:text-neutral-500">{signalLabel}</span>
+                        <span className={`ml-4 ${hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}`}>
+                          {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                        </span>
+                      </div>
                     )}
                   </div>
                 );
@@ -445,12 +488,16 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
+    console.log(`[AmpCard useMemo] ${rawInstance.id}: packed=${packed}, spread=${spread}`);
     if (packed && spread) {
       // Prioritize Channels: pack first, then spread
+      console.log(`[AmpCard useMemo] ${rawInstance.id}: Applying spread(repack(...))`);
       return spreadAmpInstance(repackAmpInstance(rawInstance));
     } else if (packed) {
+      console.log(`[AmpCard useMemo] ${rawInstance.id}: Applying repack only`);
       return repackAmpInstance(rawInstance);
     }
+    console.log(`[AmpCard useMemo] ${rawInstance.id}: Using rawInstance (balanced)`);
     return rawInstance;
   }, [packed, spread, rawInstance]);
 
@@ -788,15 +835,25 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
                 packed={packed}
                 spread={spread}
                 onTogglePacked={() => {
+                  console.log(`[Toggle Packed] Amp index: ${index}, instance: ${instance.id}, was packed: ${getPacked(index)}`);
                   setPackedMap(prev => {
                     const wasPacked = getPacked(index);
                     if (wasPacked) {
                       setSpreadMap(s => ({ ...s, [index]: false }));
                     }
-                    return { ...prev, [index]: !wasPacked };
+                    const newMap = { ...prev, [index]: !wasPacked };
+                    console.log(`[Toggle Packed] New packedMap:`, newMap);
+                    return newMap;
                   });
                 }}
-                onToggleSpread={() => setSpreadMap(prev => ({ ...prev, [index]: !getSpread(index) }))}
+                onToggleSpread={() => {
+                  console.log(`[Toggle Spread] Amp index: ${index}, was spread: ${getSpread(index)}`);
+                  setSpreadMap(prev => {
+                    const newMap = { ...prev, [index]: !getSpread(index) };
+                    console.log(`[Toggle Spread] New spreadMap:`, newMap);
+                    return newMap;
+                  });
+                }}
               />
             );
           })
