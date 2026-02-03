@@ -204,6 +204,7 @@ export interface CableGaugeSpec {
 export interface CableLengthLimit {
   meters: number | null; // null = not rated for this impedance
   feet: number | null;
+  estimated?: boolean; // true if this is an extrapolated estimate for low impedances
 }
 
 /** Impedance thresholds for cable length lookup (use the bracket at or below the actual impedance) */
@@ -248,7 +249,8 @@ export const CABLE_LENGTH_TABLE: Record<number, Record<number, CableLengthLimit>
 /**
  * Get the max cable length for a given impedance and cable gauge.
  * Uses the impedance bracket at or below the actual impedance (conservative).
- * Returns null if impedance is too low or infinite (no load).
+ * For impedances below 2.7Ω, estimates based on linear extrapolation from 2.7Ω values.
+ * Returns null if impedance is invalid or infinite (no load).
  */
 export function getMaxCableLength(impedanceOhms: number, gaugeMm2: number): CableLengthLimit | null {
   if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
@@ -263,8 +265,18 @@ export function getMaxCableLength(impedanceOhms: number, gaugeMm2: number): Cabl
     }
   }
 
-  // Below 2.7Ω — not rated
-  return { meters: null, feet: null };
+  // Below 2.7Ω — estimate based on linear relationship from 2.7Ω values
+  // Cable length is roughly proportional to impedance
+  const baseLimit = gaugeTable[2.7];
+  if (!baseLimit || baseLimit.meters === null) {
+    return { meters: null, feet: null };
+  }
+
+  const ratio = impedanceOhms / 2.7;
+  const estimatedMeters = Math.round(baseLimit.meters * ratio);
+  const estimatedFeet = Math.round(baseLimit.feet! * ratio);
+
+  return { meters: estimatedMeters, feet: estimatedFeet, estimated: true };
 }
 
 /** Impedance validation result for an output */

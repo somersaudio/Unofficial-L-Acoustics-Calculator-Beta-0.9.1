@@ -83,17 +83,21 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
 
   const limit = getMaxCableLength(impedanceOhms, gaugeMm2);
-  if (!limit) return null;
+  if (!limit || limit.meters === null) return null;
 
-  const hasLimit = limit.meters !== null;
+  const lengthDisplay = useFeet ? `${limit.feet}ft` : `${limit.meters}m`;
+
+  if (limit.estimated) {
+    return (
+      <div className="text-[10px] text-gray-500 dark:text-neutral-500">
+        <span><span style={{ color: "#D4A017" }}>Estimated</span> max cable: <span className="font-medium text-gray-700 dark:text-neutral-300">{lengthDisplay}</span></span>
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-1 text-[10px] text-gray-500 dark:text-neutral-500">
-      {hasLimit ? (
-        <span>Max cable: <span className="font-medium text-gray-700 dark:text-neutral-300">{useFeet ? `${limit.feet}ft` : `${limit.meters}m`}</span></span>
-      ) : (
-        <span className="text-amber-500">Not rated for {gaugeMm2}mm² cable</span>
-      )}
+    <div className="text-[10px] text-gray-500 dark:text-neutral-500">
+      <span>Max cable: <span className="font-medium text-gray-700 dark:text-neutral-300">{lengthDisplay}</span></span>
     </div>
   );
 }
@@ -118,7 +122,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
     ? output.enclosures[0].enclosure.signal_channels[output.outputIndex % output.enclosures[0].enclosure.signal_channels.length]
     : null;
 
-  // Secondary channel: shaded appearance, only show "Ch N: ZΩ" and signal label
+  // Secondary channel: shaded appearance, show grayed-out enclosure name and signal type
   // Match primary card structure for vertical alignment
   if (isSecondaryChannel && hasLoad) {
     return (
@@ -135,32 +139,55 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
           <div className="mb-1 font-medium invisible" aria-hidden="true">X</div>
         )}
         {!salesMode ? (
-          <>
-            <div className={`${is16Channel ? "" : "mb-1"} font-medium`} style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
-              Ch {output.outputIndex + 1}
+          <div className="flex-1 flex flex-col">
+            {/* Channel header - matches primary's pt-1 font-medium */}
+            {!is16Channel && (
+              <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                Ch {output.outputIndex + 1}
+              </div>
+            )}
+            {is16Channel && (
+              <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                Ch {output.outputIndex + 1}
+              </div>
+            )}
+            <div className="flex-1">
+              {/* Show grayed-out enclosure name and signal type */}
+              {output.enclosures.map((entry, i) => (
+                <div key={i}>
+                  <div className="text-gray-400 dark:text-neutral-600">
+                    {entry.count}x {entry.enclosure.enclosure}
+                  </div>
+                  <div className="text-[10px] text-gray-400 dark:text-neutral-600">
+                    {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className={`flex-1 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`}>
-              {/* Spacer to push content to bottom */}
-            </div>
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
-              <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
-                {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-              </span>
-            </div>
-          </>
-        ) : (
-          signalLabel && (
-            <div className="text-gray-400 dark:text-neutral-500">{signalLabel}</div>
-          )
-        )}
+            {/* Bottom row - matches primary's text-[10px] */}
+            {!is16Channel && (
+              <div className="flex items-end justify-end pt-0.5 text-[10px]">
+                <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                  {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                </span>
+              </div>
+            )}
+            {is16Channel && (
+              <div className="flex items-center justify-end pt-0.5">
+                <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                  {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     );
   }
 
   return (
     <div
-      className={`rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
+      className={`flex flex-col rounded border ${is16Channel ? "p-1 text-[10px]" : "p-2 text-xs"} ${
         hasImpedanceError
           ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
           : hasLoad
@@ -181,7 +208,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
       {hasLoad ? (
         <>
           {!salesMode && (
-            <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+            <div className={`flex-1 flex flex-col border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
               {/* Only show "Ch N" label for non-16-channel amps (16ch already shows it as outputLabel above) */}
               {!is16Channel && (
                 <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
@@ -194,44 +221,48 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               {is16Channel && hasImpedanceError && (
                 <div className="pt-1 font-medium text-red-600 dark:text-red-500">ERROR</div>
               )}
-              {(() => {
-                const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
-                const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
-                const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                return output.enclosures.map((entry, i) => (
-                  <div key={i}>
-                    {/* Hide enclosure name when shown as header above (L2/L2D on 16ch) */}
-                    {!hideEnclosureName && (
-                      <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
-                        {entry.count}x {entry.enclosure.enclosure}
-                        {impedanceAboveRated && (
-                          <>
-                            <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                            </svg>
-                            {onAdjustEnclosure && (
-                              <button
-                                onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                title="Add 1 more for recommended load"
-                              >
-                                + 1
-                              </button>
+              <div className="flex-1">
+                {(() => {
+                  const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
+                  const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                  const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                  return output.enclosures.map((entry, i) => (
+                    <div key={i}>
+                      {/* Hide enclosure name when shown as header above (L2/L2D on 16ch) */}
+                      {!hideEnclosureName && (
+                        <>
+                          <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                            {entry.count}x {entry.enclosure.enclosure}
+                            {impedanceAboveRated && (
+                              <>
+                                <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                </svg>
+                                {onAdjustEnclosure && (
+                                  <button
+                                    onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                    className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                    title="Add 1 more for recommended load"
+                                  >
+                                    + 1
+                                  </button>
+                                )}
+                              </>
                             )}
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ));
-              })()}
+                          </div>
+                          <div className="text-[10px] text-gray-500 dark:text-neutral-500">
+                            {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
+              {/* Bottom row: cable length at left, impedance at right */}
               {!is16Channel && (
-                <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
-              )}
-              {/* Show signal label (if any) at bottom left, impedance at bottom right */}
-              {!is16Channel && (
-                <div className="flex items-center justify-between pt-0.5 text-[10px]">
-                  <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                  <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
                   <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                     {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                   </span>
@@ -249,7 +280,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
             </div>
           )}
           {salesMode && (
-            <div className="space-y-1">
+            <div className="flex-1 space-y-1">
               {output.enclosures.map((entry, i) => (
                 <div key={i} className="text-gray-900 dark:text-gray-200">
                   {entry.count}x {entry.enclosure.enclosure}
@@ -261,7 +292,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
       ) : (
         // For non-16-channel amps, show "Empty" label
         !is16Channel ? (
-          <div className="text-gray-400 dark:text-neutral-600 italic">Empty</div>
+          <div className="flex-1 text-gray-400 dark:text-neutral-600 italic">Empty</div>
         ) : null
       )}
     </div>
@@ -339,25 +370,43 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                 const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
                 const isSecondaryMultiChannel = isMultiChannel && output.enclosures[0] &&
                   (output.outputIndex % output.enclosures[0].enclosure.signal_channels.length) > 0;
-                const signalLabel = output.enclosures[0]?.enclosure.signal_channels?.length > 1
-                  ? output.enclosures[0].enclosure.signal_channels[output.outputIndex % output.enclosures[0].enclosure.signal_channels.length]
-                  : null;
 
-                // Secondary multi-channel outputs: simplified display (just "Ch N" and signal label)
-                // Match the height of primary channel boxes
+                // Secondary multi-channel outputs: show grayed-out enclosure name and signal type
+                // Structure matches primary channel for vertical alignment
                 if (isSecondaryMultiChannel) {
                   return (
                     <div
                       key={output.outputIndex}
-                      className={`flex flex-col justify-between rounded -mx-1 px-1 min-h-[72px] ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                      className={`flex flex-col rounded -mx-1 px-1 ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                       style={channelTypeBg && !hasChannelError ? { backgroundColor: channelTypeBg, backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' } : { backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' }}
                     >
                       <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
                         Ch {output.outputIndex + 1}
                       </div>
-                      {signalLabel && (
-                        <div className="text-[10px] text-gray-400 dark:text-neutral-500">{signalLabel}</div>
-                      )}
+                      {/* Show grayed-out enclosure name and signal type */}
+                      <div className="flex-1">
+                        {output.enclosures.map((entry, i) => (
+                          <div key={i}>
+                            <div className="text-gray-400 dark:text-neutral-600">
+                              {entry.count}x {entry.enclosure.enclosure}
+                            </div>
+                            <div className="text-[10px] text-gray-400 dark:text-neutral-600">
+                              {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Bottom row: cable length at left, impedance at right */}
+                      <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                        {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 ? (
+                          <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                        ) : (
+                          <span />
+                        )}
+                        <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                          {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                        </span>
+                      </div>
                     </div>
                   );
                 }
@@ -365,7 +414,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                 return (
                   <div
                     key={output.outputIndex}
-                    className={`rounded -mx-1 px-1 ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                    className={`flex flex-col rounded -mx-1 px-1 ${output.outputIndex > outputs[0].outputIndex ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                     style={channelTypeBg && !hasChannelError ? { backgroundColor: channelTypeBg } : undefined}
                   >
                     <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
@@ -374,38 +423,44 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                         <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                       )}
                     </div>
-                    {(() => {
-                      const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                      return output.enclosures.map((entry, i) => (
-                        <div key={i}>
-                          <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
-                            {entry.count}x {entry.enclosure.enclosure}
-                            {impedanceAboveRated && (
-                              <>
-                                <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                                </svg>
-                                {onAdjustEnclosure && (
-                                  <button
-                                    onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                    className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                    title="Add 1 more for recommended load"
-                                  >
-                                    + 1
-                                  </button>
-                                )}
-                              </>
-                            )}
+                    <div className="flex-1">
+                      {(() => {
+                        const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
+                        return output.enclosures.map((entry, i) => (
+                          <div key={i}>
+                            <div className="flex items-center gap-1 text-gray-900 dark:text-gray-200">
+                              {entry.count}x {entry.enclosure.enclosure}
+                              {impedanceAboveRated && (
+                                <>
+                                  <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                  </svg>
+                                  {onAdjustEnclosure && (
+                                    <button
+                                      onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                      className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                      title="Add 1 more for recommended load"
+                                    >
+                                      + 1
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-gray-500 dark:text-neutral-500">
+                              {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                            </div>
                           </div>
-                        </div>
-                      ));
-                    })()}
-                    {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && (
-                      <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
-                    )}
-                    {/* Signal label (if any) at bottom left, impedance at bottom right */}
-                    <div className="flex items-center justify-between pt-0.5 text-[10px]">
-                      <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+                        ));
+                      })()}
+                    </div>
+                    {/* Bottom row: cable length at left, impedance at right */}
+                    <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                      {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 ? (
+                        <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                      ) : (
+                        <span />
+                      )}
                       <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                         {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                       </span>
