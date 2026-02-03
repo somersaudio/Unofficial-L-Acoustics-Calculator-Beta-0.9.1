@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from "react"; // eslint-disable-line
+import React, { useState, useMemo, useEffect, useRef } from "react"; // eslint-disable-line
 import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { generatePDFReport } from "../utils/pdfExport";
+import { getEnclosureImage } from "../utils/enclosureImages";
 
 interface SolverResultsProps {
   zoneSolutions: ZoneWithSolution[];
@@ -11,14 +12,6 @@ interface SolverResultsProps {
   cableGaugeMm2?: number;
   useFeet?: boolean;
   onAdjustEnclosure?: (enclosureName: string, delta: number) => void;
-}
-
-function getImpedanceColor(impedance: number, minImpedanceOverride?: number): string {
-  if (impedance === Infinity) return "text-gray-400 dark:text-neutral-600";
-  const minAllowed = minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
-  if (impedance < minAllowed) return "text-red-600 dark:text-red-500 font-bold";
-  if (impedance < MIN_IMPEDANCE_OHMS) return "text-amber-500 dark:text-amber-500";
-  return ""; // valid — purple color applied via inline style
 }
 
 /** Returns inline style for purple channel color that darkens as channel index increases */
@@ -147,11 +140,14 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               Ch {output.outputIndex + 1}
             </div>
             <div className={`flex-1 border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`}>
-              {/* Spacer to push signal label to bottom */}
+              {/* Spacer to push content to bottom */}
             </div>
-            {signalLabel && (
-              <div className="pt-0.5 text-gray-400 dark:text-neutral-500">{signalLabel}</div>
-            )}
+            <div className="flex items-center justify-between pt-0.5">
+              <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+              <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+              </span>
+            </div>
           </>
         ) : (
           signalLabel && (
@@ -186,15 +182,18 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
         <>
           {!salesMode && (
             <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
-              <div className={`pt-1 ${getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride)}`} style={!getImpedanceColor(output.impedanceOhms, output.minImpedanceOverride) ? getChannelPurpleStyle(output.outputIndex, ampOutputCount) : undefined}>
-                {is16Channel
-                  ? (output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`)
-                  : <>Ch {output.outputIndex + 1}: {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}</>
-                }
-                {hasImpedanceError && (
-                  <span className="ml-1 text-red-600 dark:text-red-500">ERROR</span>
-                )}
-              </div>
+              {/* Only show "Ch N" label for non-16-channel amps (16ch already shows it as outputLabel above) */}
+              {!is16Channel && (
+                <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                  Ch {output.outputIndex + 1}
+                  {hasImpedanceError && (
+                    <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
+                  )}
+                </div>
+              )}
+              {is16Channel && hasImpedanceError && (
+                <div className="pt-1 font-medium text-red-600 dark:text-red-500">ERROR</div>
+              )}
               {(() => {
                 const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
                 const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
@@ -223,19 +222,29 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                         )}
                       </div>
                     )}
-                    {/* For non-16ch amps, show signal label inline with enclosure */}
-                    {!is16Channel && entry.enclosure.signal_channels?.length > 1 && (
-                      <div className="text-[10px] text-gray-400 dark:text-neutral-500">{entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}</div>
-                    )}
                   </div>
                 ));
               })()}
               {!is16Channel && (
                 <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
               )}
-              {/* For 16ch amps, show signal label at bottom of card for uniform positioning */}
-              {is16Channel && signalLabel && (
-                <div className="pt-0.5 text-gray-400 dark:text-neutral-500">{signalLabel}</div>
+              {/* Show signal label (if any) at bottom left, impedance at bottom right */}
+              {!is16Channel && (
+                <div className="flex items-center justify-between pt-0.5 text-[10px]">
+                  <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+                  <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                    {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                  </span>
+                </div>
+              )}
+              {/* For 16-channel amps: show signal label and impedance */}
+              {is16Channel && (
+                <div className="flex items-center justify-between pt-0.5">
+                  <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+                  <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                    {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                  </span>
+                </div>
               )}
             </div>
           )}
@@ -394,26 +403,30 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                     {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && (
                       <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
                     )}
-                    {/* Signal label at bottom left, impedance at bottom right */}
-                    {signalLabel && (
-                      <div className="flex items-center justify-between pt-0.5 text-[10px]">
-                        <span className="text-gray-400 dark:text-neutral-500">{signalLabel}</span>
-                        <span className={`ml-4 ${hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}`}>
-                          {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-                        </span>
-                      </div>
-                    )}
+                    {/* Signal label (if any) at bottom left, impedance at bottom right */}
+                    <div className="flex items-center justify-between pt-0.5 text-[10px]">
+                      <span className="text-gray-400 dark:text-neutral-500">{signalLabel ?? ""}</span>
+                      <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
+                        {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
             </div>
           ) : (
             <div className="space-y-1">
-              {Array.from(enclosureTotals.values()).map((entry, i) => (
-                <div key={i} className="text-gray-900 dark:text-gray-200">
-                  {entry.count}x {entry.enclosure.enclosure}
-                </div>
-              ))}
+              {Array.from(enclosureTotals.values()).map((entry, i) => {
+                const imageUrl = getEnclosureImage(entry.enclosure.enclosure, entry.count);
+                return (
+                  <div key={i} className="flex items-center gap-2 text-gray-900 dark:text-gray-200">
+                    {imageUrl && (
+                      <img src={imageUrl} alt={entry.enclosure.enclosure} className="h-6 w-6 object-contain" />
+                    )}
+                    <span>{entry.count}x {entry.enclosure.enclosure}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </>
@@ -474,9 +487,17 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
       {enclosureTotals.size > 0 && (
         <div className="px-4 py-3">
           <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
-            {Array.from(enclosureTotals.entries()).map(([name, total]) => (
-              <div key={name}>{total}x {name}</div>
-            ))}
+            {Array.from(enclosureTotals.entries()).map(([name, total]) => {
+              const imageUrl = getEnclosureImage(name, total);
+              return (
+                <div key={name} className="flex items-center gap-2">
+                  {imageUrl && (
+                    <img src={imageUrl} alt={name} className="h-6 w-6 object-contain" />
+                  )}
+                  <span>{total}x {name}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -714,9 +735,37 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 
 /** Renders a single zone's solver results */
 function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
-  // Track packed/spread state per amp index (persists when amps change)
+  // Track packed/spread state per amp index (independent per amp)
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
+
+  // Track which amp indices have been initialized
+  const initializedIndicesRef = useRef<Set<number>>(new Set());
+
+  // Initialize settings for new amps (copy from previous amp, then become independent)
+  useEffect(() => {
+    const ampCount = solution.ampInstances.length;
+    const newPackedEntries: Record<number, boolean> = {};
+    const newSpreadEntries: Record<number, boolean> = {};
+    let hasNewEntries = false;
+
+    for (let i = 0; i < ampCount; i++) {
+      if (!initializedIndicesRef.current.has(i)) {
+        // New amp - copy settings from previous amp (or default to false for first)
+        const prevPacked = i > 0 ? (packedMap[i - 1] ?? false) : false;
+        const prevSpread = i > 0 ? (spreadMap[i - 1] ?? false) : false;
+        newPackedEntries[i] = prevPacked;
+        newSpreadEntries[i] = prevSpread;
+        initializedIndicesRef.current.add(i);
+        hasNewEntries = true;
+      }
+    }
+
+    if (hasNewEntries) {
+      setPackedMap(prev => ({ ...prev, ...newPackedEntries }));
+      setSpreadMap(prev => ({ ...prev, ...newSpreadEntries }));
+    }
+  }, [solution.ampInstances.length, packedMap, spreadMap]);
 
   if (!solution.success) {
     return (
@@ -791,9 +840,6 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
 
       {/* Individual Amp Cards */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-neutral-400">
-          Amplifier Allocation Detail
-        </h3>
         {salesMode ? (
           (() => {
             const grouped = new Map<string, AmpInstance[]>();
@@ -810,19 +856,9 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
           })()
         ) : (
           solution.ampInstances.map((instance, index) => {
-            // Inherit settings from previous amp if not explicitly set
-            const getPacked = (idx: number): boolean => {
-              if (idx in packedMap) return packedMap[idx];
-              if (idx > 0) return getPacked(idx - 1);
-              return false;
-            };
-            const getSpread = (idx: number): boolean => {
-              if (idx in spreadMap) return spreadMap[idx];
-              if (idx > 0) return getSpread(idx - 1);
-              return false;
-            };
-            const packed = getPacked(index);
-            const spread = getSpread(index);
+            // Use map values directly (each amp has independent state after initialization)
+            const packed = packedMap[index] ?? false;
+            const spread = spreadMap[index] ?? false;
 
             return (
               <AmpCard
@@ -835,24 +871,17 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
                 packed={packed}
                 spread={spread}
                 onTogglePacked={() => {
-                  console.log(`[Toggle Packed] Amp index: ${index}, instance: ${instance.id}, was packed: ${getPacked(index)}`);
                   setPackedMap(prev => {
-                    const wasPacked = getPacked(index);
+                    const wasPacked = prev[index] ?? false;
                     if (wasPacked) {
+                      // When turning off packed, also turn off spread
                       setSpreadMap(s => ({ ...s, [index]: false }));
                     }
-                    const newMap = { ...prev, [index]: !wasPacked };
-                    console.log(`[Toggle Packed] New packedMap:`, newMap);
-                    return newMap;
+                    return { ...prev, [index]: !wasPacked };
                   });
                 }}
                 onToggleSpread={() => {
-                  console.log(`[Toggle Spread] Amp index: ${index}, was spread: ${getSpread(index)}`);
-                  setSpreadMap(prev => {
-                    const newMap = { ...prev, [index]: !getSpread(index) };
-                    console.log(`[Toggle Spread] New spreadMap:`, newMap);
-                    return newMap;
-                  });
+                  setSpreadMap(prev => ({ ...prev, [index]: !(prev[index] ?? false) }));
                 }}
               />
             );

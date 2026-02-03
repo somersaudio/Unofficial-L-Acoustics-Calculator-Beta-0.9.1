@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility } from "../types";
 import { getEnclosureCompatibility, getMinimumEnclosureCount } from "../solver/ampSolver";
+import { getEnclosureImage } from "../utils/enclosureImages";
 
 interface EnclosureSelectorProps {
   enclosures: Enclosure[];
@@ -82,6 +83,26 @@ export default function EnclosureSelector({
     ? compatibilityMap.get(selectedEnclosure)
     : null;
 
+  // Subwoofer enclosures
+  const subwooferEnclosureNames = new Set([
+    "SB6i",
+    "SB6r",
+    "SB10i",
+    "SB10r",
+    "SB15m",
+    "SB18",
+    "SB18m",
+    "SB18 IIi",
+    "SB21",
+    "SB28",
+    "KS21",
+    "KS21i",
+    "KS28",
+    "K1-SB",
+    "Syva Low",
+    "Syva Sub",
+  ]);
+
   // LA4-only enclosures (Legacy category)
   const legacyEnclosureNames = new Set([
     "8XT",
@@ -104,17 +125,20 @@ export default function EnclosureSelector({
   // Categorize enclosures
   const categorizedEnclosures = useMemo(() => {
     const current: Enclosure[] = [];
+    const subwoofers: Enclosure[] = [];
     const legacy: Enclosure[] = [];
 
     for (const enc of enclosures) {
       if (legacyEnclosureNames.has(enc.enclosure)) {
         legacy.push(enc);
+      } else if (subwooferEnclosureNames.has(enc.enclosure)) {
+        subwoofers.push(enc);
       } else {
         current.push(enc);
       }
     }
 
-    return { current, legacy };
+    return { current, subwoofers, legacy };
   }, [enclosures]);
 
   const handleAddEnclosure = () => {
@@ -180,7 +204,7 @@ export default function EnclosureSelector({
   return (
     <div className="space-y-6">
       {/* Add Enclosure Form */}
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
+      <div className="rounded-lg border border-gray-300 bg-gray-200 p-4 dark:border-neutral-700 dark:bg-neutral-800">
         <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
           Add Enclosures
         </h3>
@@ -198,6 +222,16 @@ export default function EnclosureSelector({
                   {enc.enclosure}
                 </option>
               ))}
+              {categorizedEnclosures.subwoofers.length > 0 && (
+                <>
+                  <option disabled>── Subwoofers ──</option>
+                  {categorizedEnclosures.subwoofers.map((enc) => (
+                    <option key={enc.enclosure} value={enc.enclosure}>
+                      {enc.enclosure}
+                    </option>
+                  ))}
+                </>
+              )}
               {categorizedEnclosures.legacy.length > 0 && (
                 <>
                   <option disabled>── Legacy ──</option>
@@ -264,20 +298,27 @@ export default function EnclosureSelector({
       {/* Current Requests List */}
       {requests.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Enclosures to Power
-          </h3>
-
           <div className="space-y-2">
             {requests.map((request, index) => {
               const compat = compatibilityMap.get(request.enclosure.enclosure);
               const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
               const showBumpMessage = bumpedIndices.has(index);
+              const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
               return (
                 <div
                   key={`${request.enclosure.enclosure}-${index}`}
-                  className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+                  className="flex items-center gap-3 rounded-lg border border-gray-300 bg-gray-100 py-0.5 px-3 dark:border-neutral-700 dark:bg-neutral-800"
                 >
+                  {/* Enclosure Image */}
+                  {imageUrl && (
+                    <div className="h-[50px] w-[50px] flex-shrink-0 overflow-hidden rounded">
+                      <img
+                        src={imageUrl}
+                        alt={request.enclosure.enclosure}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center">
                       <span className="font-medium text-gray-900 dark:text-gray-200">

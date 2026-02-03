@@ -6,7 +6,9 @@ import SolverResults from "./SolverResults";
 import ZoneTabBar from "./ZoneTabBar";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
 import { serializeZones, deserializeZones } from "../utils/zoneSerializer";
+import { getLowestFrequency } from "../utils/frequencyData";
 import lacousticsLogo from "../assets/lacoustics-logo.png";
+import subHemisphere from "../assets/sub-hemisphere.png";
 
 type AppState =
   | { status: "loading" }
@@ -37,6 +39,36 @@ function MoonIcon({ className }: { className?: string }) {
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
     </svg>
+  );
+}
+
+/** Frequency Hemisphere visual - shows lowest frequency in the zone (flipped, for footer) */
+function FrequencyHemisphere({ frequency }: { frequency: number | null }) {
+  if (frequency === null) return null;
+
+  return (
+    <div className="relative flex flex-col items-center">
+      {/* Hemisphere image - flipped upside down */}
+      <div className="relative" style={{ width: 80, height: 40 }}>
+        <img
+          src={subHemisphere}
+          alt="Frequency indicator"
+          className="w-full h-full object-cover object-top"
+          style={{ mixBlendMode: "lighten", transform: "scaleY(-1)" }}
+        />
+        {/* Frequency text overlay */}
+        <span
+          className="absolute inset-x-0 flex justify-center font-bold"
+          style={{
+            fontSize: 14,
+            color: "#000000",
+            top: -4,
+          }}
+        >
+          {frequency}Hz
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -326,7 +358,7 @@ export default function App() {
   return (
     <div className="flex h-screen flex-col bg-gray-100 dark:bg-black">
       {/* Header */}
-      <header className="flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:bg-neutral-900 dark:border-b dark:border-neutral-800">
+      <header className="relative flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:bg-neutral-900 dark:border-b dark:border-neutral-800">
         <img
           src={lacousticsLogo}
           alt="L-Acoustics"
@@ -420,10 +452,16 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-300 bg-white px-6 py-3 dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="flex items-center justify-between">
+      <footer className="relative border-t border-gray-300 bg-white px-6 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+        {/* Frequency Hemisphere - absolutely centered in app, behind other elements */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <FrequencyHemisphere
+            frequency={getLowestFrequency(activeZone.requests.map((r) => r.enclosure.enclosure))}
+          />
+        </div>
+        <div className="relative z-10 flex items-center justify-between">
           {/* Amplifier Toggles */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-white dark:bg-neutral-900">
             <span className="text-xs font-medium text-gray-600 dark:text-neutral-500">
               Amps{zones.length > 1 ? ` (${activeZone.name})` : ""}:
             </span>
@@ -450,7 +488,7 @@ export default function App() {
           </div>
 
           {/* Unit Toggle + Cable Gauge Selector + Bug Report */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 bg-white dark:bg-neutral-900">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setUseFeet(true)}
