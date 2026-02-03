@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react"; // eslint-disable-line
-import type { AmpInstance, OutputAllocation, ChannelTypes, ZoneWithSolution, SolverSolution } from "../types";
+import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { generatePDFReport } from "../utils/pdfExport";
@@ -70,18 +70,13 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; channelTypes?: ChannelTypes; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
     : `Output ${output.outputIndex + 1}`;
   const minAllowed = output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE;
   const hasImpedanceError = !salesMode && output.impedanceOhms < minAllowed && output.impedanceOhms !== Infinity;
-
-  // Get nominal impedance for empty 16-channel outputs (use first value from nominalImpedance map)
-  const nominalImpedance = channelTypes?.nominalImpedance
-    ? Object.values(channelTypes.nominalImpedance)[0] ?? null
-    : null;
 
   const is16Channel = ampOutputCount === 16;
 
@@ -214,14 +209,8 @@ function OutputCard({ output, ampOutputCount, salesMode = false, channelTypes, c
           )}
         </>
       ) : (
-        // For 16-channel amps, show nominal impedance; for 4-output amps, show "Empty"
-        is16Channel && nominalImpedance && !salesMode ? (
-          <div className="border-t border-gray-200 dark:border-neutral-700">
-            <div className="pt-0.5" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
-              {nominalImpedance}Ω
-            </div>
-          </div>
-        ) : !is16Channel ? (
+        // For non-16-channel amps, show "Empty" label
+        !is16Channel ? (
           <div className="text-gray-400 dark:text-neutral-600 italic">Empty</div>
         ) : null
       )}
@@ -403,9 +392,7 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
-  const [packed, setPacked] = useState(false);
-  const [spread, setSpread] = useState(false);
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void }) {
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
@@ -507,7 +494,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
             {showPackToggle && (
               <>
                 <button
-                  onClick={() => { setPacked(!packed); if (packed) setSpread(false); }}
+                  onClick={onTogglePacked}
                   className={`ml-1 flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
                     packed
                       ? "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
@@ -526,7 +513,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 </button>
                 {packed && (
                   <button
-                    onClick={() => setSpread(!spread)}
+                    onClick={onToggleSpread}
                     className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
                       spread
                         ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/60"
@@ -600,7 +587,6 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   output={output}
                   ampOutputCount={ampOutputCount}
                   salesMode={salesMode}
-                  channelTypes={instance.ampConfig.channelTypes}
                   cableGaugeMm2={cableGaugeMm2}
                   useFeet={useFeet}
                   ratedImpedances={instance.ampConfig.ratedImpedances}
@@ -627,6 +613,10 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 
 /** Renders a single zone's solver results */
 function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void }) {
+  // Track packed/spread state per amp index (persists when amps change)
+  const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
+  const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
+
   if (!solution.success) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/40">
@@ -718,9 +708,44 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
             ));
           })()
         ) : (
-          solution.ampInstances.map((instance) => (
-            <AmpCard key={instance.id} instance={instance} salesMode={salesMode} cableGaugeMm2={cableGaugeMm2} useFeet={useFeet} onAdjustEnclosure={onAdjustEnclosure} />
-          ))
+          solution.ampInstances.map((instance, index) => {
+            // Inherit settings from previous amp if not explicitly set
+            const getPacked = (idx: number): boolean => {
+              if (idx in packedMap) return packedMap[idx];
+              if (idx > 0) return getPacked(idx - 1);
+              return false;
+            };
+            const getSpread = (idx: number): boolean => {
+              if (idx in spreadMap) return spreadMap[idx];
+              if (idx > 0) return getSpread(idx - 1);
+              return false;
+            };
+            const packed = getPacked(index);
+            const spread = getSpread(index);
+
+            return (
+              <AmpCard
+                key={instance.id}
+                instance={instance}
+                salesMode={salesMode}
+                cableGaugeMm2={cableGaugeMm2}
+                useFeet={useFeet}
+                onAdjustEnclosure={onAdjustEnclosure}
+                packed={packed}
+                spread={spread}
+                onTogglePacked={() => {
+                  setPackedMap(prev => {
+                    const wasPacked = getPacked(index);
+                    if (wasPacked) {
+                      setSpreadMap(s => ({ ...s, [index]: false }));
+                    }
+                    return { ...prev, [index]: !wasPacked };
+                  });
+                }}
+                onToggleSpread={() => setSpreadMap(prev => ({ ...prev, [index]: !getSpread(index) }))}
+              />
+            );
+          })
         )}
       </div>
     </div>

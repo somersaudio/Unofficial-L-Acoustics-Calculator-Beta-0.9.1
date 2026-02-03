@@ -437,8 +437,9 @@ export default function App() {
                     className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                       isDisabled
                         ? "bg-gray-200 text-gray-400 line-through dark:bg-neutral-800 dark:text-neutral-600"
-                        : "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60"
+                        : "text-white hover:brightness-110"
                     }`}
+                    style={!isDisabled ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
                     title={isDisabled ? `Enable ${model}` : `Disable ${model}`}
                   >
                     {model}
@@ -455,9 +456,10 @@ export default function App() {
                 onClick={() => setUseFeet(true)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   useFeet
-                    ? "bg-amber-500 text-white dark:bg-amber-600"
+                    ? "text-white hover:brightness-110"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
+                style={useFeet ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
               >
                 ft
               </button>
@@ -465,9 +467,10 @@ export default function App() {
                 onClick={() => setUseFeet(false)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   !useFeet
-                    ? "bg-amber-500 text-white dark:bg-amber-600"
+                    ? "text-white hover:brightness-110"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
+                style={!useFeet ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
               >
                 m
               </button>
@@ -481,9 +484,10 @@ export default function App() {
                     onClick={() => setCableGaugeMm2(gauge.mm2)}
                     className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                       cableGaugeMm2 === gauge.mm2
-                        ? "bg-amber-500 text-white dark:bg-amber-600"
+                        ? "text-white hover:brightness-110"
                         : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                     }`}
+                    style={cableGaugeMm2 === gauge.mm2 ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
                     title={`${gauge.mm2}mm² / ${gauge.awg} AWG / ${gauge.swg} SWG`}
                   >
                     {gauge.mm2}mm²
