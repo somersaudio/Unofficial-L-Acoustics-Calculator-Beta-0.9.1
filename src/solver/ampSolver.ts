@@ -1900,6 +1900,21 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
     });
   }
 
+  // Calculate how many channels single-channel enclosures need
+  // This helps us not over-allocate multi-channel enclosures when single-channel enclosures need space
+  const singleChannelTypes = collected.filter(c => getChannelsPerUnit(c.enclosure) === 1);
+
+  // Count how many individual channels are needed by single-channel enclosures
+  const singleChannelChannelsNeeded = singleChannelTypes.reduce((sum, c) => {
+    const limits = c.enclosure.max_enclosures[ampConfig.key];
+    const perOutput = limits?.per_output ?? 1;
+    // At minimum, need ceil(totalCount / per_output) channels
+    return sum + Math.ceil(c.totalCount / perOutput);
+  }, 0);
+
+  // For multi-channel enclosures, calculate groups to reserve for single-channel types
+  const groupsToReserveForSingleChannel = Math.ceil(singleChannelChannelsNeeded / 2); // Each group has 2 channels
+
   // Spread each enclosure type with minimum count to avoid warnings
   for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
     const limits = enclosure.max_enclosures[ampConfig.key];
@@ -1915,8 +1930,17 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
       // Calculate minimum per group to avoid warning
       const minPerGroup = getMinimumForRatedImpedance(enclosure, ampConfig, limits.per_output);
 
-      // Phase 1: Allocate minimum per group to each empty group
-      for (let gi = 0; gi < groups.length && remaining >= minPerGroup; gi++) {
+      // Calculate how many groups this enclosure type needs (minimum)
+      const groupsNeededForThisType = Math.ceil(totalCount / limits.per_output);
+
+      // Don't use more groups than needed if other types need space
+      const maxGroupsToUse = singleChannelTypes.length > 0
+        ? Math.min(groupsNeededForThisType, Math.max(1, groups.length - groupsToReserveForSingleChannel))
+        : groups.length;
+
+      // Phase 1: Allocate minimum per group to each empty group (up to maxGroupsToUse)
+      let groupsUsed = 0;
+      for (let gi = 0; gi < groups.length && remaining >= minPerGroup && groupsUsed < maxGroupsToUse; gi++) {
         const group = groups[gi];
         // Check if group is empty
         if (outputs[group[0]].totalEnclosures > 0) continue;
@@ -1933,9 +1957,10 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
           }
         }
         remaining -= toStack;
+        groupsUsed++;
       }
 
-      // Phase 2: If we still have remaining, pack them into existing groups
+      // Phase 2: If we still have remaining, pack them into existing groups (groups we already used)
       if (remaining > 0) {
         for (let gi = 0; gi < groups.length && remaining > 0; gi++) {
           const group = groups[gi];
