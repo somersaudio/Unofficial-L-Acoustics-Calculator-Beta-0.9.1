@@ -80,7 +80,7 @@ const createWindow = () => {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    title: "L-Acoustic Amp Calc",
+    title: "L-Acoustics Amplifier Calculator",
   });
 
   // Load the index.html of the app.

@@ -106,6 +106,14 @@ function getInputRoutingPattern(outputs: OutputAllocation[]): string {
 
 const MAX_ENCLOSURE_TYPES_PER_AMP = 3;
 
+/** Input routing options for each output channel */
+const ROUTING_OPTIONS = [
+  "A", "B", "A + B", "A - B",
+  "C", "D", "C + D", "C - D",
+  "A + B + C + D"
+] as const;
+type RoutingOption = typeof ROUTING_OPTIONS[number];
+
 /** Background colors for enclosure types (faint saturation) */
 const ENCLOSURE_TYPE_COLORS = [
   "rgba(189, 199, 124, 0.15)", // 1st type: #bdc77c - gold/olive
@@ -161,6 +169,56 @@ function countEnclosureTypes(instance: AmpInstance): number {
   return types.size;
 }
 
+/** Routing selector dropdown for input-to-output configuration */
+function RoutingSelector({ value, onChange }: { value: RoutingOption; onChange: (value: RoutingOption) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-800 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600 transition-colors"
+        title="Input routing configuration"
+      >
+        {value}
+      </button>
+      {isOpen && (
+        <div className="absolute bottom-full right-0 mb-1 z-50 rounded border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800 min-w-[90px]">
+          {ROUTING_OPTIONS.map((option) => (
+            <button
+              key={option}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              className={`block w-full px-2 py-1 text-left text-[10px] hover:bg-gray-100 dark:hover:bg-neutral-700 ${
+                option === value
+                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                  : "text-gray-700 dark:text-neutral-300"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Compact cable length display for a given impedance and selected gauge */
 function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: number; gaugeMm2: number; useFeet: boolean }) {
   if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
@@ -185,7 +243,7 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -225,7 +283,6 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
             {/* Channel header */}
             <div className={`font-medium truncate`} style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
               Ch {output.outputIndex + 1}
-              {inputLetter && <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">({inputLetter})</span>}
             </div>
 
             {/* Separator line for 16-channel uniformity */}
@@ -302,7 +359,6 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               {!is16Channel && (
                 <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
                   Ch {output.outputIndex + 1}
-                  {inputLetter && <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">({inputLetter})</span>}
                   {hasImpedanceError && (
                     <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                   )}
@@ -348,18 +404,26 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                   ));
                 })()}
               </div>
-              {/* Bottom row: cable length at left (non-16ch), impedance at right */}
+              {/* Bottom row: routing selector at left, cable length in middle (non-16ch), impedance at right */}
               {!is16Channel && (
                 <div className="flex items-end justify-between pt-0.5 text-[10px]">
-                  <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                  <div className="flex items-center gap-1">
+                    {onRoutingChange && (
+                      <RoutingSelector value={routing ?? "A"} onChange={onRoutingChange} />
+                    )}
+                    <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                  </div>
                   <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                     {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                   </span>
                 </div>
               )}
-              {/* For 16-channel amps: impedance only (signal type shown in content area above) */}
+              {/* For 16-channel amps: routing selector at left, impedance at right */}
               {is16Channel && (
-                <div className="flex items-center justify-end pt-0.5">
+                <div className="flex items-center justify-between pt-0.5">
+                  {onRoutingChange && (
+                    <RoutingSelector value={routing ?? "A"} onChange={onRoutingChange} />
+                  )}
                   <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                     {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                   </span>
@@ -388,7 +452,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 }
 
 /** Card that groups multiple channels used by a single multi-channel enclosure (e.g., L2/L2D using Ch 1 & 2) */
-function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[] }) {
+function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters, routings, onRoutingChange }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[]; routings?: RoutingOption[]; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void }) {
   const channelCount = outputs.length;
   const primaryOutput = outputs[0];
   const is16Channel = ampOutputCount === 16;
@@ -421,25 +485,27 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
         </div>
       )}
 
-      {/* Content area with all channels side by side */}
+      {/* Content area with all channels - 16ch uses 8 cols x 2 rows, others side by side */}
       {!salesMode && (
         <div className={`flex-1 flex flex-col ${!is16Channel ? "border-t" : ""} ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
-          <div className={`flex-1 ${channelCount > 1 ? `grid ${is16Channel ? "gap-1" : "gap-2"}` : ""}`} style={channelCount > 1 ? { gridTemplateColumns: `repeat(${channelCount}, minmax(0, 1fr))` } : undefined}>
+          <div className={`flex-1 ${channelCount > 1 ? `grid ${is16Channel ? "gap-1" : "gap-2"}` : ""}`} style={channelCount > 1 ? { gridTemplateColumns: `repeat(${is16Channel && channelCount > 8 ? 8 : channelCount}, minmax(0, 1fr))` } : undefined}>
             {outputs.map((output, idx) => {
               const isSecondary = idx > 0;
               const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
               const hasChannelError = output.impedanceOhms < (output.minImpedanceOverride ?? HARD_FLOOR_IMPEDANCE) && output.impedanceOhms !== Infinity;
 
+              // For 16-channel amps (8 columns), don't add left border at start of row 2 (idx 8)
+              const showLeftBorder = idx > 0 && (!is16Channel || idx % 8 !== 0);
+
               return (
                 <div
                   key={output.outputIndex}
-                  className={`flex flex-col min-w-0 ${idx > 0 ? "border-l border-blue-200 dark:border-neutral-700 pl-2" : ""}`}
+                  className={`flex flex-col min-w-0 ${showLeftBorder ? "border-l border-blue-200 dark:border-neutral-700 pl-2" : ""}`}
                   style={isSecondary ? { backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 4px)' } : undefined}
                 >
                   {/* Channel label - shown for all channels including 16-channel */}
                   <div className="font-medium truncate" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
                     Ch {output.outputIndex + 1}
-                    {inputLetters?.[idx] && <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">({inputLetters[idx]})</span>}
                     {hasChannelError && (
                       <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                     )}
@@ -468,8 +534,11 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
                     ))}
                   </div>
 
-                  {/* Bottom row: impedance */}
-                  <div className="flex items-center justify-end pt-0.5">
+                  {/* Bottom row: routing selector at left, impedance at right */}
+                  <div className="flex items-center justify-between pt-0.5">
+                    {onRoutingChange ? (
+                      <RoutingSelector value={routings?.[idx] ?? "A"} onChange={(value) => onRoutingChange(output.outputIndex, value)} />
+                    ) : <span />}
                     <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                       {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                     </span>
@@ -502,7 +571,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[] }) {
+function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap, routingMap, onRoutingChange }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[]; routingMap?: Record<number, RoutingOption>; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -631,7 +700,6 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                               >
                                 <div className="font-medium" style={getChannelPurpleStyle(grpOutput.outputIndex, ampOutputCount)}>
                                   Ch {grpOutput.outputIndex + 1}
-                                  {inputLettersMap?.[grpOutput.outputIndex] && <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">({inputLettersMap[grpOutput.outputIndex]})</span>}
                                   {hasChannelError && (
                                     <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                                   )}
@@ -651,8 +719,11 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                     </div>
                                   ))}
                                 </div>
-                                {/* Bottom row: impedance only (cable length shown once below) */}
-                                <div className="flex items-end justify-end pt-0.5 text-[10px]">
+                                {/* Bottom row: routing selector at left, impedance at right (cable length shown once below) */}
+                                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                  {onRoutingChange ? (
+                                    <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
+                                  ) : <span />}
                                   <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                                     {grpOutput.impedanceOhms === Infinity ? "" : `${grpOutput.impedanceOhms}Ω`}
                                   </span>
@@ -709,7 +780,6 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                               >
                                 <div className="font-medium" style={getChannelPurpleStyle(grpOutput.outputIndex, ampOutputCount)}>
                                   Ch {grpOutput.outputIndex + 1}
-                                  {inputLettersMap?.[grpOutput.outputIndex] && <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">({inputLettersMap[grpOutput.outputIndex]})</span>}
                                   {hasChannelError && (
                                     <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                                   )}
@@ -747,8 +817,11 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                         </div>
                                       ))}
                                     </div>
-                                    {/* Impedance at bottom right */}
-                                    <div className="flex items-end justify-end pt-0.5 text-[10px]">
+                                    {/* Routing selector at left, impedance at right */}
+                                    <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                      {onRoutingChange ? (
+                                        <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
+                                      ) : <span />}
                                       <span className={hasChannelError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                                         {grpOutput.impedanceOhms === Infinity ? "" : `${grpOutput.impedanceOhms}Ω`}
                                       </span>
@@ -885,6 +958,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   }, [packed, spread, rawInstance]);
 
   const ampOutputCount = instance.ampConfig.outputs;
+  const is16ChannelAmp = ampOutputCount === 16;
   const physicalOutputCount = instance.ampConfig.physicalOutputs;
   const usePhysicalGrouping = physicalOutputCount < ampOutputCount;
   const hasAnyImpedanceError = !salesMode && instance.outputs.some(
@@ -906,6 +980,21 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 
   // Compute input letters for each channel (A, B, C, D based on signal groups)
   const inputLettersMap = useMemo(() => instance.outputs.map((_, i) => getInputLetter(instance.outputs, i)), [instance.outputs]);
+
+  // Input routing state per channel (default: cycle A→B→C→D)
+  const [routingMap, setRoutingMap] = useState<Record<number, RoutingOption>>(() => {
+    const initial: Record<number, RoutingOption> = {};
+    const letters: RoutingOption[] = ["A", "B", "C", "D"];
+    for (let i = 0; i < instance.outputs.length; i++) {
+      initial[i] = letters[i % 4];
+    }
+    return initial;
+  });
+
+  // Handler to update routing for a specific channel
+  const handleRoutingChange = (channelIndex: number, value: RoutingOption) => {
+    setRoutingMap(prev => ({ ...prev, [channelIndex]: value }));
+  };
 
   // Check if any output has impedance at or above max rated (for annotation legend)
   // Skip multi-channel enclosure outputs — their per-section impedance is fixed by speaker design
@@ -1090,6 +1179,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   onAdjustEnclosure={packed ? undefined : onAdjustEnclosure}
                   enclosureTypeMap={enclosureTypeMap}
                   inputLettersMap={inputLettersMap}
+                  routingMap={routingMap}
+                  onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                 />
               ))}
             </div>
@@ -1107,6 +1198,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 hideEnclosureName={false}
                 enclosureTypeMap={enclosureTypeMap}
                 inputLetters={inputLettersMap}
+                routings={instance.outputs.map((_, i) => routingMap[i])}
+                onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
               />
             </div>
           ) : (
@@ -1155,6 +1248,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         hideEnclosureName={!!l2HeaderEnclosure}
                         enclosureTypeMap={enclosureTypeMap}
                         inputLetters={groupOutputs.map(o => inputLettersMap[o.outputIndex])}
+                        routings={groupOutputs.map(o => routingMap[o.outputIndex])}
+                        onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                       />
                     );
                   } else {
@@ -1174,6 +1269,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         hideEnclosureName={!!l2HeaderEnclosure}
                         enclosureTypeMap={enclosureTypeMap}
                         inputLetter={inputLettersMap[output.outputIndex]}
+                        routing={routingMap[output.outputIndex]}
+                        onRoutingChange={is16ChannelAmp ? undefined : (value) => handleRoutingChange(output.outputIndex, value)}
                       />
                     );
                   }
