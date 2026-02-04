@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react"; // eslint-disable-line
-import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution } from "../types";
+import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, Enclosure } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
@@ -52,6 +52,18 @@ function getLoadColor(loadPercent: number): string {
   return "text-green-600 dark:text-green-500";
 }
 
+/**
+ * Get the number of amp channels required per enclosure unit.
+ * Checks for amp-specific overrides (e.g., Syva Low Syva uses 1 channel on LA12X but 2 on other amps).
+ */
+function getChannelsPerUnit(enclosure: Enclosure | undefined, ampConfigKey?: string): number {
+  if (!enclosure) return 1;
+  if (ampConfigKey && enclosure.signal_channels_override?.[ampConfigKey] !== undefined) {
+    return enclosure.signal_channels_override[ampConfigKey];
+  }
+  return enclosure.signal_channels.length;
+}
+
 /** Input letters for routing (A, B, C, D for 4-channel, extends for 16-channel) */
 const INPUT_LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
 
@@ -60,7 +72,7 @@ const INPUT_LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L
  * For 4-channel amps: ABCD (4 separate), AABB (2 groups), AAAA (1 group), etc.
  * Groups are determined by multi-channel enclosures sharing the same input.
  */
-function getInputLetter(outputs: OutputAllocation[], channelIndex: number): string {
+function getInputLetter(outputs: OutputAllocation[], channelIndex: number, ampConfigKey?: string): string {
   // Find which signal group this channel belongs to
   let groupIndex = 0;
   let currentGroup = -1;
@@ -76,8 +88,8 @@ function getInputLetter(outputs: OutputAllocation[], channelIndex: number): stri
     }
 
     // Check if this is a primary channel (first in a multi-channel group)
-    const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
-    const channelsPerUnit = output.enclosures[0]?.enclosure.signal_channels.length ?? 1;
+    const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
+    const channelsPerUnit = getChannelsPerUnit(output.enclosures[0]?.enclosure, ampConfigKey);
     const isPrimary = !isMultiChannel || (output.outputIndex % channelsPerUnit) === 0;
 
     if (isPrimary && i > 0) {
@@ -243,7 +255,7 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange, ampConfigKey }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void; ampConfigKey?: string }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -293,8 +305,9 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
             <div className="flex-1">
               {/* Show grayed-out enclosure name and signal type */}
               {output.enclosures.map((entry, i) => {
-                const posInGroup = output.outputIndex % entry.enclosure.signal_channels.length;
-                const totalInGroup = entry.enclosure.signal_channels.length;
+                const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                const posInGroup = output.outputIndex % channelsPerUnit;
+                const totalInGroup = channelsPerUnit;
                 return (
                   <div key={i}>
                     {!is16Channel && (
@@ -306,7 +319,9 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                       className="text-[10px] font-medium"
                       style={getSignalTypeGoldStyle(posInGroup, totalInGroup)}
                     >
-                      {entry.enclosure.signal_channels[posInGroup]}
+                      {channelsPerUnit === 1
+                        ? entry.enclosure.signal_channels.join("+")
+                        : entry.enclosure.signal_channels[posInGroup]}
                     </div>
                   </div>
                 );
@@ -367,7 +382,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               <div className="flex-1">
                 {(() => {
                   const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
-                  const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                  const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
                   const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
                   return output.enclosures.map((entry, i) => (
                     <div key={i}>
@@ -398,7 +413,9 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                         className="text-[10px] font-medium"
                         style={getSignalTypeGoldStyle(0, 1)}
                       >
-                        {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                        {getChannelsPerUnit(entry.enclosure, ampConfigKey) === 1
+                          ? entry.enclosure.signal_channels.join("+")
+                          : entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
                       </div>
                     </div>
                   ));
@@ -452,7 +469,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 }
 
 /** Card that groups multiple channels used by a single multi-channel enclosure (e.g., L2/L2D using Ch 1 & 2) */
-function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters, routings, onRoutingChange }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[]; routings?: RoutingOption[]; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void }) {
+function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters, routings, onRoutingChange, ampConfigKey }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[]; routings?: RoutingOption[]; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string }) {
   const channelCount = outputs.length;
   const primaryOutput = outputs[0];
   const is16Channel = ampOutputCount === 16;
@@ -516,22 +533,27 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
 
                   {/* Enclosure info */}
                   <div className="flex-1">
-                    {output.enclosures.map((entry, i) => (
-                      <div key={i}>
-                        {!hideEnclosureName && (
-                          <div className={`flex items-center gap-1 text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
-                            {entry.count}x {entry.enclosure.enclosure}
+                    {output.enclosures.map((entry, i) => {
+                      const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                      return (
+                        <div key={i}>
+                          {!hideEnclosureName && (
+                            <div className={`flex items-center gap-1 text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
+                              {entry.count}x {entry.enclosure.enclosure}
+                            </div>
+                          )}
+                          {/* Signal type - always shown for uniform display */}
+                          <div
+                            className="text-[10px] font-medium"
+                            style={getSignalTypeGoldStyle(idx, channelCount)}
+                          >
+                            {channelsPerUnit === 1
+                              ? entry.enclosure.signal_channels.join("+")
+                              : entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
                           </div>
-                        )}
-                        {/* Signal type - always shown for uniform display */}
-                        <div
-                          className="text-[10px] font-medium"
-                          style={getSignalTypeGoldStyle(idx, channelCount)}
-                        >
-                          {entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   {/* Bottom row: routing selector at left, impedance at right */}
@@ -571,7 +593,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap, routingMap, onRoutingChange }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[]; routingMap?: Record<number, RoutingOption>; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void }) {
+function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap, routingMap, onRoutingChange, ampConfigKey }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[]; routingMap?: Record<number, RoutingOption>; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -599,9 +621,9 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
   // Check if ALL channels in this physical output are secondary multi-channel channels
   // If so, hide the output header since the enclosure info is shown on the primary channel's output
   const allSecondary = hasLoad && outputs.every((output) => {
-    const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+    const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
     if (!isMultiChannel) return false;
-    const channelsPerUnit = output.enclosures[0]?.enclosure.signal_channels.length ?? 1;
+    const channelsPerUnit = getChannelsPerUnit(output.enclosures[0]?.enclosure, ampConfigKey);
     return (output.outputIndex % channelsPerUnit) > 0;
   });
 
@@ -659,8 +681,8 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                   const output = outputs[outputIdx];
                   if (rendered.has(output.outputIndex)) continue;
 
-                  const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
-                  const channelsPerUnit = output.enclosures[0]?.enclosure.signal_channels.length ?? 1;
+                  const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
+                  const channelsPerUnit = getChannelsPerUnit(output.enclosures[0]?.enclosure, ampConfigKey);
 
                   if (isMultiChannel && channelsPerUnit > 1 && output.totalEnclosures > 0) {
                     // Find all channels in this physical output that belong to this multi-channel group
@@ -705,19 +727,24 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                   )}
                                 </div>
                                 <div className="flex-1">
-                                  {grpOutput.enclosures.map((entry, i) => (
-                                    <div key={i}>
-                                      <div className={`text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
-                                        {entry.count}x {entry.enclosure.enclosure}
+                                  {grpOutput.enclosures.map((entry, i) => {
+                                    const entryChannels = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                                    return (
+                                      <div key={i}>
+                                        <div className={`text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
+                                          {entry.count}x {entry.enclosure.enclosure}
+                                        </div>
+                                        <div
+                                          className="text-[10px] font-medium"
+                                          style={getSignalTypeGoldStyle(posInGroup, channelsPerUnit)}
+                                        >
+                                          {entryChannels === 1
+                                            ? entry.enclosure.signal_channels.join("+")
+                                            : entry.enclosure.signal_channels[posInGroup]}
+                                        </div>
                                       </div>
-                                      <div
-                                        className="text-[10px] font-medium"
-                                        style={getSignalTypeGoldStyle(posInGroup, channelsPerUnit)}
-                                      >
-                                        {entry.enclosure.signal_channels[posInGroup]}
-                                      </div>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                                 {/* Bottom row: routing selector at left, impedance at right (cable length shown once below) */}
                                 <div className="flex items-end justify-between pt-0.5 text-[10px]">
@@ -747,7 +774,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                     for (let i = outputIdx; i < outputs.length; i++) {
                       const o = outputs[i];
                       if (!rendered.has(o.outputIndex)) {
-                        const oIsMultiChannel = o.enclosures.some(e => e.enclosure.signal_channels.length > 1);
+                        const oIsMultiChannel = o.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
                         if (!oIsMultiChannel) {
                           groupOutputs.push(o);
                           rendered.add(o.outputIndex);
@@ -787,35 +814,40 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                 {hasLoad ? (
                                   <>
                                     <div className="flex-1">
-                                      {grpOutput.enclosures.map((entry, i) => (
-                                        <div key={i}>
-                                          <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
-                                            {entry.count}x {entry.enclosure.enclosure}
-                                            {impedanceAboveRated && (
-                                              <>
-                                                <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                                  <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                                                </svg>
-                                                {onAdjustEnclosure && (
-                                                  <button
-                                                    onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                                    className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                                    title="Add 1 more for recommended load"
-                                                  >
-                                                    + 1
-                                                  </button>
-                                                )}
-                                              </>
-                                            )}
+                                      {grpOutput.enclosures.map((entry, i) => {
+                                        const entryChannels = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                                        return (
+                                          <div key={i}>
+                                            <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
+                                              {entry.count}x {entry.enclosure.enclosure}
+                                              {impedanceAboveRated && (
+                                                <>
+                                                  <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+                                                  </svg>
+                                                  {onAdjustEnclosure && (
+                                                    <button
+                                                      onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
+                                                      className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+                                                      title="Add 1 more for recommended load"
+                                                    >
+                                                      + 1
+                                                    </button>
+                                                  )}
+                                                </>
+                                              )}
+                                            </div>
+                                            <div
+                                              className="text-[10px] font-medium"
+                                              style={getSignalTypeGoldStyle(0, 1)}
+                                            >
+                                              {entryChannels === 1
+                                                ? entry.enclosure.signal_channels.join("+")
+                                                : entry.enclosure.signal_channels[grpOutput.outputIndex % entry.enclosure.signal_channels.length]}
+                                            </div>
                                           </div>
-                                          <div
-                                            className="text-[10px] font-medium"
-                                            style={getSignalTypeGoldStyle(0, 1)}
-                                          >
-                                            {entry.enclosure.signal_channels[grpOutput.outputIndex % entry.enclosure.signal_channels.length]}
-                                          </div>
-                                        </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                     {/* Routing selector at left, impedance at right */}
                                     <div className="flex items-end justify-between pt-0.5 text-[10px]">
@@ -979,7 +1011,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   const enclosureTypeMap = useMemo(() => buildEnclosureTypeMap(instance), [instance]);
 
   // Compute input letters for each channel (A, B, C, D based on signal groups)
-  const inputLettersMap = useMemo(() => instance.outputs.map((_, i) => getInputLetter(instance.outputs, i)), [instance.outputs]);
+  const inputLettersMap = useMemo(() => instance.outputs.map((_, i) => getInputLetter(instance.outputs, i, instance.ampConfig.key)), [instance.outputs, instance.ampConfig.key]);
 
   // Input routing state per channel (default: cycle A→B→C→D)
   const [routingMap, setRoutingMap] = useState<Record<number, RoutingOption>>(() => {
@@ -1001,7 +1033,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   const maxRated = instance.ampConfig.ratedImpedances.length > 0 ? Math.max(...instance.ampConfig.ratedImpedances) : Infinity;
   const hasAboveRatedOutput = instance.outputs.some(
     (o) => o.totalEnclosures > 0 && o.impedanceOhms !== Infinity && o.impedanceOhms > maxRated
-      && !o.enclosures.some(e => e.enclosure.signal_channels.length > 1)
+      && !o.enclosures.some(e => getChannelsPerUnit(e.enclosure, instance.ampConfig.key) > 1)
   );
 
   // Check if this is a 16-channel amp with only L2 or L2D enclosures filling all channels
@@ -1051,12 +1083,12 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     // Check if it's a multi-channel enclosure that actually spans all channels
     // (e.g., K2 has 4 signal_channels and fills all 4 outputs of LA12X)
     // This prevents 2 Kara IIs (2 channels each) from being treated as a single spanning enclosure
-    const channelsPerUnit = firstEnclosure.signal_channels?.length ?? 1;
+    const channelsPerUnit = getChannelsPerUnit(firstEnclosure, instance.ampConfig.key);
     if (channelsPerUnit < 2) return null;
     if (channelsPerUnit < ampOutputCount) return null; // Must span ALL channels, not just fill them with multiple units
 
     return firstEnclosure;
-  }, [usePhysicalGrouping, instance.outputs, ampOutputCount]);
+  }, [usePhysicalGrouping, instance.outputs, ampOutputCount, instance.ampConfig.key]);
 
   return (
     <div className={`rounded-lg border shadow-sm ${
@@ -1184,6 +1216,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   inputLettersMap={inputLettersMap}
                   routingMap={routingMap}
                   onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
+                  ampConfigKey={instance.ampConfig.key}
                 />
               ))}
             </div>
@@ -1203,6 +1236,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 inputLetters={inputLettersMap}
                 routings={instance.outputs.map((_, i) => routingMap[i])}
                 onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
+                ampConfigKey={instance.ampConfig.key}
               />
             </div>
           ) : (
@@ -1219,8 +1253,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 for (const output of instance.outputs) {
                   if (rendered.has(output.outputIndex)) continue;
 
-                  const isMultiChannel = output.enclosures.some(e => e.enclosure.signal_channels.length > 1);
-                  const channelsPerUnit = output.enclosures[0]?.enclosure.signal_channels.length ?? 1;
+                  const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, instance.ampConfig.key) > 1);
+                  const channelsPerUnit = getChannelsPerUnit(output.enclosures[0]?.enclosure, instance.ampConfig.key);
 
                   if (isMultiChannel && channelsPerUnit > 1 && output.totalEnclosures > 0) {
                     // This is a primary channel of a multi-channel enclosure
@@ -1253,6 +1287,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         inputLetters={groupOutputs.map(o => inputLettersMap[o.outputIndex])}
                         routings={groupOutputs.map(o => routingMap[o.outputIndex])}
                         onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
+                        ampConfigKey={instance.ampConfig.key}
                       />
                     );
                   } else {
@@ -1274,6 +1309,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         inputLetter={inputLettersMap[output.outputIndex]}
                         routing={routingMap[output.outputIndex]}
                         onRoutingChange={is16ChannelAmp ? undefined : (value) => handleRoutingChange(output.outputIndex, value)}
+                        ampConfigKey={instance.ampConfig.key}
                       />
                     );
                   }

@@ -58,6 +58,7 @@ export interface Enclosure {
   parallelAllowed: boolean;
   preferredPerOutput: number; // Preferred count per output when spreading (default: 1)
   signal_channels: string[]; // Ordered amp channels needed: ["PA"], ["LF","HF"], ["LF","LF","MF","HF"], ["SB"], etc.
+  signal_channels_override?: Record<string, number>; // Optional: amp-specific channel count overrides, e.g., { "LA12X": 1 }
   impedance_sections_ohms?: Record<string, number>; // Optional, e.g., { "HF": 16 }
   impedance_notes?: string;
   parallel_notes?: string;

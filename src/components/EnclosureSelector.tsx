@@ -86,6 +86,11 @@ export default function EnclosureSelector({
     ? compatibilityMap.get(selectedEnclosure)
     : null;
 
+  // Hybrid enclosures (combined speaker systems)
+  const hybridEnclosureNames = new Set([
+    "Syva Low Syva",
+  ]);
+
   // Subwoofer enclosures
   const subwooferEnclosureNames = new Set([
     "SB6i",
@@ -127,12 +132,15 @@ export default function EnclosureSelector({
 
   // Categorize enclosures
   const categorizedEnclosures = useMemo(() => {
+    const hybrid: Enclosure[] = [];
     const current: Enclosure[] = [];
     const subwoofers: Enclosure[] = [];
     const legacy: Enclosure[] = [];
 
     for (const enc of enclosures) {
-      if (legacyEnclosureNames.has(enc.enclosure)) {
+      if (hybridEnclosureNames.has(enc.enclosure)) {
+        hybrid.push(enc);
+      } else if (legacyEnclosureNames.has(enc.enclosure)) {
         legacy.push(enc);
       } else if (subwooferEnclosureNames.has(enc.enclosure)) {
         subwoofers.push(enc);
@@ -141,7 +149,7 @@ export default function EnclosureSelector({
       }
     }
 
-    return { current, subwoofers, legacy };
+    return { hybrid, current, subwoofers, legacy };
   }, [enclosures]);
 
   const handleAddEnclosure = () => {
@@ -220,6 +228,19 @@ export default function EnclosureSelector({
               className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"
             >
               <option value="">Select enclosure...</option>
+              {categorizedEnclosures.hybrid.length > 0 && (
+                <>
+                  <option disabled>── Hybrid ──</option>
+                  {categorizedEnclosures.hybrid.map((enc) => (
+                    <option key={enc.enclosure} value={enc.enclosure}>
+                      {enc.enclosure}
+                    </option>
+                  ))}
+                </>
+              )}
+              {categorizedEnclosures.current.length > 0 && categorizedEnclosures.hybrid.length > 0 && (
+                <option disabled>── Full Range ──</option>
+              )}
               {categorizedEnclosures.current.map((enc) => (
                 <option key={enc.enclosure} value={enc.enclosure}>
                   {enc.enclosure}

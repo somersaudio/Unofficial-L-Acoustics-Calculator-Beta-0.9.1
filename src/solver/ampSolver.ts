@@ -85,7 +85,7 @@ function consolidateOutputs(
   for (const output of outputs) {
     for (const entry of output.enclosures) {
       const key = entry.enclosure.enclosure;
-      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
 
       if (channelsPerUnit > 1) {
         // For multi-channel, only count once per group
@@ -118,7 +118,7 @@ function consolidateOutputs(
     const limits = enclosure.max_enclosures[ampConfigKey];
     if (!limits) return null; // Not compatible
 
-    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfigKey);
     const groupsNeeded = Math.ceil(totalCount / limits.per_output);
     const outputsNeeded = groupsNeeded * channelsPerUnit;
     minOutputsNeeded += outputsNeeded;
@@ -149,7 +149,7 @@ function consolidateOutputs(
   let outputIdx = 0;
   for (const { enclosure, count, perOutput } of typeAllocations) {
     let remaining = count;
-    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfigKey);
     const limits = enclosure.max_enclosures[ampConfigKey];
 
     if (channelsPerUnit > 1) {
@@ -330,7 +330,11 @@ function calculateParallelImpedance(
 }
 
 /** Get the number of amp channels one unit of this enclosure requires */
-function getChannelsPerUnit(enclosure: Enclosure): number {
+function getChannelsPerUnit(enclosure: Enclosure, ampConfigKey?: string): number {
+  // Check for amp-specific override (e.g., Syva Low Syva uses 1 channel on LA12X, 2 on other amps)
+  if (ampConfigKey && enclosure.signal_channels_override?.[ampConfigKey] !== undefined) {
+    return enclosure.signal_channels_override[ampConfigKey];
+  }
   return enclosure.signal_channels.length;
 }
 
@@ -530,7 +534,7 @@ function allocateToOutputs(
     });
   }
 
-  const channelsPerUnit = getChannelsPerUnit(enclosure);
+  const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfig.key);
 
   // --- Multi-channel enclosure allocation ---
   if (channelsPerUnit > 1) {
@@ -766,7 +770,8 @@ function mergeIntoOutputs(
   enclosure: Enclosure,
   count: number,
   limits: { perOutput: number; perAmplifier: number; minImpedanceOverride?: number },
-  currentLoadPercent: number
+  currentLoadPercent: number,
+  ampConfigKey: string
 ): { outputs: OutputAllocation[]; allocated: number } {
   let remaining = count;
   const outputs = existingOutputs.map((o) => ({ ...o, enclosures: [...o.enclosures] }));
@@ -782,7 +787,7 @@ function mergeIntoOutputs(
     return { outputs, allocated: 0 };
   }
 
-  const channelsPerUnit = getChannelsPerUnit(enclosure);
+  const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfigKey);
 
   // --- Multi-channel merge ---
   if (channelsPerUnit > 1) {
@@ -1077,7 +1082,7 @@ function calculateTotalOutputsNeeded(
 
     // Calculate outputs needed for this enclosure type
     // Multi-channel enclosures occupy channelsPerUnit channels per group
-    const channelsPerUnit = getChannelsPerUnit(request.enclosure);
+    const channelsPerUnit = getChannelsPerUnit(request.enclosure, ampConfig.key);
     const groupsNeeded = Math.ceil(request.quantity / candidate.perOutput);
     totalOutputs += groupsNeeded * channelsPerUnit;
   }
@@ -1206,7 +1211,7 @@ function calculateMixedLoadPercent(
   for (const output of outputs) {
     for (const entry of output.enclosures) {
       const key = entry.enclosure.enclosure;
-      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
 
       if (channelsPerUnit > 1) {
         // For multi-channel, only count once per group
@@ -1301,7 +1306,8 @@ function buildSharedSolution(
         enclosure,
         remaining,
         { perOutput: candidate.perOutput, perAmplifier: candidate.perAmplifier, minImpedanceOverride: candidate.minImpedanceOverride },
-        currentLoad  // Pass current load percentage, not enclosure count
+        currentLoad,  // Pass current load percentage, not enclosure count
+        ampConfig.key
       );
 
       console.log(`[buildSharedSolution] Merge result: allocated=${allocated}`);
@@ -1321,7 +1327,8 @@ function buildSharedSolution(
             enclosure,
             remaining,
             { perOutput: candidate.perOutput, perAmplifier: candidate.perAmplifier, minImpedanceOverride: candidate.minImpedanceOverride },
-            currentLoad
+            currentLoad,
+            ampConfig.key
           );
           outputs = retryResult.outputs;
           allocated = retryResult.allocated;
@@ -1371,7 +1378,8 @@ function buildSharedSolution(
           enclosure,
           remaining,
           { perOutput: compatCandidate.perOutput, perAmplifier: compatCandidate.perAmplifier, minImpedanceOverride: compatCandidate.minImpedanceOverride },
-          currentLoad
+          currentLoad,
+          ampInstance.ampConfig.key
         );
 
         if (allocated > 0) {
@@ -1419,7 +1427,8 @@ function buildSharedSolution(
           enclosure,
           remaining,
           { perOutput: upgrade.candidate.perOutput, perAmplifier: upgrade.candidate.perAmplifier, minImpedanceOverride: upgrade.candidate.minImpedanceOverride },
-          currentLoad
+          currentLoad,
+          ampInstance.ampConfig.key
         );
 
         if (allocated > 0) {
@@ -1678,7 +1687,7 @@ export function repackAmpInstance(instance: AmpInstance): AmpInstance {
   const seenMultiChannel = new Set<string>();
   for (const output of instance.outputs) {
     for (const entry of output.enclosures) {
-      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfig.key);
       const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
       if (existing) {
         if (channelsPerUnit > 1) {
@@ -1725,7 +1734,7 @@ export function repackAmpInstance(instance: AmpInstance): AmpInstance {
       continue;
     }
 
-    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfig.key);
     console.log(`[repackAmpInstance] Packing ${totalCount}x ${enclosure.enclosure}, per_output=${limits.per_output}, channelsPerUnit=${channelsPerUnit}`);
 
     if (channelsPerUnit > 1) {
@@ -1784,7 +1793,7 @@ export function repackAmpInstance(instance: AmpInstance): AmpInstance {
   // Recalculate impedance for single-channel outputs
   for (const output of outputs) {
     // Skip multi-channel outputs (already calculated above)
-    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure) > 1) continue;
+    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure, ampConfig.key) > 1) continue;
 
     if (output.totalEnclosures > 0 && output.enclosures.length === 1) {
       output.impedanceOhms = calculateParallelImpedance(
@@ -1863,7 +1872,7 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
   const seenMultiChannel = new Set<string>();
   for (const output of instance.outputs) {
     for (const entry of output.enclosures) {
-      const channelsPerUnit = getChannelsPerUnit(entry.enclosure);
+      const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfig.key);
       const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
       if (existing) {
         if (channelsPerUnit > 1) {
@@ -1903,7 +1912,7 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
 
   // Calculate how many channels single-channel enclosures need
   // This helps us not over-allocate multi-channel enclosures when single-channel enclosures need space
-  const singleChannelTypes = collected.filter(c => getChannelsPerUnit(c.enclosure) === 1);
+  const singleChannelTypes = collected.filter(c => getChannelsPerUnit(c.enclosure, ampConfig.key) === 1);
 
   // Count how many individual channels are needed by single-channel enclosures
   const singleChannelChannelsNeeded = singleChannelTypes.reduce((sum, c) => {
@@ -1921,7 +1930,7 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
     const limits = enclosure.max_enclosures[ampConfig.key];
     if (!limits) continue;
 
-    const channelsPerUnit = getChannelsPerUnit(enclosure);
+    const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfig.key);
 
     if (channelsPerUnit > 1) {
       // Multi-channel: spread across channel groups
@@ -2057,7 +2066,7 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
 
   // Recalculate impedance for single-channel outputs
   for (const output of outputs) {
-    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure) > 1) continue;
+    if (output.enclosures.length > 0 && getChannelsPerUnit(output.enclosures[0].enclosure, ampConfig.key) > 1) continue;
 
     if (output.totalEnclosures > 0 && output.enclosures.length === 1) {
       output.impedanceOhms = calculateParallelImpedance(
