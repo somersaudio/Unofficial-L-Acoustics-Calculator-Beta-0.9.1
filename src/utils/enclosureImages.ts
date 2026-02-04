@@ -11,10 +11,21 @@ const imageModules = import.meta.glob('/Enclosure Images/*.png', { eager: true, 
 // Maps normalized enclosure name -> { solo: filename, multi: filename }
 // The values are normalized image base names (as they appear in imageMap)
 const imageAliases: Record<string, { solo?: string; multi?: string }> = {
+  // L2 / L2D
   'L2_L2D': {
-    solo: 'Single-L2D-front-800x400-1',  // "L2 / L2D" single enclosure
-    multi: 'L2',                          // "L2 / L2D" array (from "L2 Array.png")
+    solo: 'Single-L2D-front-800x400-1',
+    multi: 'L2',
   },
+  // A-series: enclosure names have "Wide/Focus" but images are separate Wide/Focus files
+  // Using Wide variant as default since images exist for both
+  'A10Wide_Focus': { solo: 'A10Wide', multi: 'A10Wide' },
+  'A10iWide_Focus': { solo: 'A10iWide', multi: 'A10iWide' },
+  'A15Wide_Focus': { solo: 'A15Wide', multi: 'A15Wide' },
+  'A15iWide_Focus': { solo: 'A15iWide', multi: 'A15iWide' },
+  // Kiva II: solo image is "Kiva II.png", array is "KIVAII Array.png" (different case)
+  'KivaII': { multi: 'KIVAII' },
+  // SB18 / SB18 IIi: enclosure combines both, images are separate
+  'SB18_SB18IIi': { solo: 'SB18', multi: 'SB18' },
 };
 
 // Build a map of normalized names to image URLs
