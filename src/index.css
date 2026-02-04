@@ -82,3 +82,62 @@ html.dark {
     color-scheme: dark;
   }
 }
+
+/* ============================================
+   Light Mode - Sleek Slate Theme
+   ============================================ */
+
+/* Base backgrounds - slate tones */
+html:not(.dark) .bg-gray-100 {
+  background-color: #94a3b8 !important; /* slate-400 - main app background */
+}
+
+html:not(.dark) .bg-gray-50 {
+  background-color: #a8b5c4 !important; /* lighter slate - right panel */
+}
+
+/* Cards and panels - clean white/off-white to pop */
+html:not(.dark) .bg-white {
+  background-color: #f8fafc !important; /* slate-50 - crisp cards */
+}
+
+/* Amp card headers */
+html:not(.dark) .bg-gray-100.border-b {
+  background-color: #e2e8f0 !important; /* slate-200 */
+}
+
+/* Output card backgrounds */
+html:not(.dark) .bg-blue-50 {
+  background-color: #f1f5f9 !important; /* slate-100 with hint of blue */
+}
+
+html:not(.dark) .bg-green-50 {
+  background-color: #ecfdf5 !important; /* emerald-50 */
+}
+
+/* Borders - visible against slate */
+html:not(.dark) .border-gray-200 {
+  border-color: #cbd5e1 !important; /* slate-300 */
+}
+
+html:not(.dark) .border-gray-300 {
+  border-color: #94a3b8 !important; /* slate-400 */
+}
+
+/* Buttons and interactive elements - Add box */
+html:not(.dark) .bg-gray-200 {
+  background-color: #94a3b8 !important; /* slate-400 - darker for visibility */
+}
+
+/* Zone "+" button text */
+html:not(.dark) .text-gray-400 {
+  color: #64748b !important; /* slate-500 - darker for visibility */
+}
+
+/* Form inputs */
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}

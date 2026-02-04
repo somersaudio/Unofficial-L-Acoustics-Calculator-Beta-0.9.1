@@ -6,7 +6,7 @@
       "max_enclosures": {
         "LA12X": {
           "per_output": 1,
-          "per_amplifier": 4,
+          "per_amplifier": 2,
           "min_impedance_override": 2
         },
         "LA4X": {
@@ -16,6 +16,10 @@
         "LA2Xi_SE": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA7.16(i)": {
+          "per_output": 1,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 2.7,
@@ -23,14 +27,11 @@
         "LF",
         "PA"
       ],
-      "signal_channels_override": {
-        "LA12X": 1
-      },
       "impedance_sections_ohms": {
         "LF": 4,
         "PA": 8
       },
-      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). On LA12X: single channel at 2.7Ω (4Ω||8Ω). On other amps: requires 2 channels.",
+      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω.",
       "parallelAllowed": false
     },
     {
