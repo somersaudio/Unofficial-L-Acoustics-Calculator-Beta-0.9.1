@@ -598,8 +598,8 @@ export default function App() {
             ~
           </button>
         )}
-        {/* Frequency Hemisphere - absolutely centered in app, behind other elements */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {/* Frequency Hemisphere - absolutely centered horizontally, top-aligned in footer */}
+        <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
           <FrequencyHemisphere
             frequency={getLowestFrequency(activeZone.requests.map((r) => r.enclosure.enclosure))}
           />

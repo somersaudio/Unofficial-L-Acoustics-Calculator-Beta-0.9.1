@@ -659,13 +659,35 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
     >
       <div className={`mb-1 font-medium ${allSecondary ? "invisible" : ""}`} style={getOutputTealStyle(physicalIndex, ampOutputCount / 2)}>
         Output {physicalIndex + 1}
-        {outputs.length >= 2 && outputs.filter(o => o.totalEnclosures > 0).length >= 2 ? (
-          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
-            NL4 <span className="mx-0.5">&rarr;</span> NL4/NL2_Y <span className="mx-0.5">&rarr;</span> NL2 ({outputs.length})
-          </span>
-        ) : (
-          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
-        )}
+        {(() => {
+          // Check if Y-cable is needed: only when there are multiple SEPARATE enclosures
+          // Multi-channel enclosures (like Syva Low Syva) use multiple channels but are 1 physical unit
+          const loadedOutputs = outputs.filter(o => o.totalEnclosures > 0);
+          if (outputs.length < 2 || loadedOutputs.length < 2) {
+            return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>;
+          }
+
+          // Check if all loaded outputs are part of the same multi-channel enclosure
+          const firstOutput = loadedOutputs[0];
+          const isMultiChannel = firstOutput.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
+          if (isMultiChannel) {
+            const channelsPerUnit = getChannelsPerUnit(firstOutput.enclosures[0]?.enclosure, ampConfigKey);
+            const firstEnclosureName = firstOutput.enclosures[0]?.enclosure.enclosure;
+            const allSameMultiChannel = loadedOutputs.every(o =>
+              o.enclosures.length > 0 && o.enclosures[0].enclosure.enclosure === firstEnclosureName
+            );
+            // If all channels belong to the same multi-channel enclosure, it's just 1 physical unit
+            if (allSameMultiChannel && loadedOutputs.length <= channelsPerUnit) {
+              return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>;
+            }
+          }
+
+          return (
+            <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
+              NL4 <span className="mx-0.5">&rarr;</span> NL4/NL2_Y <span className="mx-0.5">&rarr;</span> NL2 ({outputs.length})
+            </span>
+          );
+        })()}
       </div>
       {hasLoad ? (
         <>
