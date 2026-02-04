@@ -422,7 +422,7 @@ export default function EnclosureSelector({
                             const newUnlocked = parseInt(e.target.value) || 1;
                             handleQuantityChange(index, lockedCount + newUnlocked);
                           }}
-                          className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300"
+                          className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <button
                           onClick={() =>

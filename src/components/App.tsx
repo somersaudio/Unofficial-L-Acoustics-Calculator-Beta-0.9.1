@@ -4,12 +4,16 @@ import { CABLE_GAUGES } from "../types";
 import EnclosureSelector from "./EnclosureSelector";
 import SolverResults from "./SolverResults";
 import ZoneTabBar from "./ZoneTabBar";
+import MatrixRain from "./MatrixRain";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
 import { serializeZones, deserializeZones } from "../utils/zoneSerializer";
 import { getLowestFrequency } from "../utils/frequencyData";
 import { generatePDFReport } from "../utils/pdfExport";
 import lacousticsLogo from "../assets/lacoustics-logo.png";
 import subHemisphere from "../assets/sub-hemisphere.png";
+
+// Matrix rain text - extracted from L-Acoustics amplification reference
+const MATRIX_TEXT = "AMPLIFICATION REFERENCE LA12X LA7.16 LA4X LA2Xi IMPEDANCE OHMS WATTS POWER ENCLOSURE DRIVE CAPACITY SPL OUTPUT CHANNEL PRESET LOUDSPEAKER CONNECTION SPEAKON TERMINAL BLOCK CABLE GAUGE AWG SWG KARA KIVA K1 K2 K3 SYVA A10 A15 X4i X6i X8 X12 X15 KS28 KS21 SB18 SB15 SB10 SB6 SOKA L2 L2D BTL PBTL";
 
 type AppState =
   | { status: "loading" }
@@ -140,6 +144,10 @@ export default function App() {
     const saved = localStorage.getItem("useFeet");
     return saved ? JSON.parse(saved) : true;
   });
+  const [matrixEnabled, setMatrixEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem("matrixEnabled");
+    return saved ? JSON.parse(saved) : true;
+  });
   // Restore zones from localStorage once data is loaded
   const [zonesRestored, setZonesRestored] = useState(false);
 
@@ -163,6 +171,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("useFeet", JSON.stringify(useFeet));
   }, [useFeet]);
+
+  useEffect(() => {
+    localStorage.setItem("matrixEnabled", JSON.stringify(matrixEnabled));
+  }, [matrixEnabled]);
 
   useEffect(() => {
     async function loadData() {
@@ -447,9 +459,12 @@ export default function App() {
   const { data } = state;
 
   return (
-    <div className="flex h-screen flex-col bg-gray-100 dark:bg-black">
+    <div className="relative flex h-screen flex-col bg-gray-100 dark:bg-black">
+      {/* Matrix Rain Effect - dark mode only, toggleable */}
+      {darkMode && matrixEnabled && <MatrixRain text={MATRIX_TEXT} opacity={1} />}
+
       {/* Header */}
-      <header className="relative flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:bg-neutral-900 dark:border-b dark:border-neutral-800">
+      <header className={`relative z-10 flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:border-b dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
         <img
           src={lacousticsLogo}
           alt="L-Acoustics"
@@ -509,9 +524,9 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <main className="flex flex-1 overflow-hidden">
+      <main className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel - Enclosure Selection */}
-        <section className="w-1/2 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <section className="w-1/2 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-transparent">
           <ZoneTabBar
             zones={zones}
             activeZoneId={activeZoneId}
@@ -520,7 +535,7 @@ export default function App() {
             onRemoveZone={removeZone}
             onRenameZone={renameZone}
           />
-          <div className="flex-1 overflow-auto p-6">
+          <div className={`relative flex-1 overflow-auto p-6 bg-white ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
             <EnclosureSelector
               enclosures={data.enclosures.enclosures}
               ampConfigs={activeEnabledAmpConfigs}
@@ -533,7 +548,7 @@ export default function App() {
         </section>
 
         {/* Right Panel - Amplifier Recommendation */}
-        <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-neutral-950">
+        <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-black/70">
           <SolverResults
             zoneSolutions={zoneSolutions}
             activeZoneId={activeZoneId}
@@ -568,7 +583,21 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="relative border-t border-gray-300 bg-white px-6 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+      <footer className={`relative z-10 border-t border-gray-300 bg-white px-6 py-3 dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
+        {/* Matrix toggle - bottom left, dark mode only */}
+        {darkMode && (
+          <button
+            onClick={() => setMatrixEnabled(!matrixEnabled)}
+            className={`absolute bottom-1 left-1 text-lg font-mono leading-none transition-colors ${
+              matrixEnabled
+                ? "text-green-500 hover:text-green-400"
+                : "text-neutral-600 hover:text-neutral-500"
+            }`}
+            title={matrixEnabled ? "Disable Matrix effect" : "Enable Matrix effect"}
+          >
+            ~
+          </button>
+        )}
         {/* Frequency Hemisphere - absolutely centered in app, behind other elements */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <FrequencyHemisphere
@@ -577,7 +606,7 @@ export default function App() {
         </div>
         <div className="relative z-10 flex items-center justify-between">
           {/* Amplifier Toggles */}
-          <div className="flex items-center gap-2 bg-white dark:bg-neutral-900">
+          <div className="flex items-center gap-2 bg-white dark:bg-black/0">
             <span className="text-xs font-medium text-gray-600 dark:text-neutral-500">
               Amps{zones.length > 1 ? ` (${activeZone.name})` : ""}:
             </span>
@@ -604,7 +633,7 @@ export default function App() {
           </div>
 
           {/* Unit Toggle + Cable Gauge Selector + Bug Report */}
-          <div className="flex items-center gap-4 bg-white dark:bg-neutral-900">
+          <div className="flex items-center gap-4 bg-white dark:bg-black/0">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setUseFeet(true)}

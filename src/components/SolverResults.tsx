@@ -1048,9 +1048,12 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     );
     if (!allSameEnclosure) return null;
 
-    // Check if it's a multi-channel enclosure spanning all or most channels
+    // Check if it's a multi-channel enclosure that actually spans all channels
+    // (e.g., K2 has 4 signal_channels and fills all 4 outputs of LA12X)
+    // This prevents 2 Kara IIs (2 channels each) from being treated as a single spanning enclosure
     const channelsPerUnit = firstEnclosure.signal_channels?.length ?? 1;
     if (channelsPerUnit < 2) return null;
+    if (channelsPerUnit < ampOutputCount) return null; // Must span ALL channels, not just fill them with multiple units
 
     return firstEnclosure;
   }, [usePhysicalGrouping, instance.outputs, ampOutputCount]);

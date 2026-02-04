@@ -60,7 +60,7 @@ export default function ZoneTabBar({
   ];
 
   return (
-    <div className="flex items-center border-b border-gray-200 bg-gray-50 px-4 dark:border-neutral-800 dark:bg-neutral-950">
+    <div className="flex items-center border-b border-gray-200 bg-gray-50 px-4 dark:border-neutral-800 dark:bg-transparent">
       {zones.map((zone, zoneIndex) => {
         const isActive = zone.id === activeZoneId;
         const isEditing = editingId === zone.id;
