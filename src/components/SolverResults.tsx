@@ -856,7 +856,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                 return (
                   <div key={i} className="flex items-center gap-2 text-gray-900 dark:text-gray-200">
                     {imageUrl && (
-                      <img src={imageUrl} alt={entry.enclosure.enclosure} className="h-6 w-6 object-contain" />
+                      <img src={imageUrl} alt={entry.enclosure.enclosure} className="h-12 w-20 object-contain" />
                     )}
                     <span>{entry.count}x {entry.enclosure.enclosure}</span>
                   </div>
@@ -927,7 +927,7 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
               return (
                 <div key={name} className="flex items-center gap-2">
                   {imageUrl && (
-                    <img src={imageUrl} alt={name} className="h-6 w-6 object-contain" />
+                    <img src={imageUrl} alt={name} className="h-12 w-20 object-contain" />
                   )}
                   <span>{total}x {name}</span>
                 </div>

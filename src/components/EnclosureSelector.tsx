@@ -329,7 +329,7 @@ export default function EnclosureSelector({
                       </div>
                       {/* Enclosure Image */}
                       {imageUrl && (
-                        <div className="h-[50px] w-[50px] flex-shrink-0 overflow-hidden rounded opacity-60">
+                        <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded opacity-60">
                           <img
                             src={imageUrl}
                             alt={request.enclosure.enclosure}
@@ -373,7 +373,7 @@ export default function EnclosureSelector({
                       {lockedCount > 0 && <div className="w-4 flex-shrink-0" />}
                       {/* Enclosure Image */}
                       {imageUrl && (
-                        <div className="h-[50px] w-[50px] flex-shrink-0 overflow-hidden rounded">
+                        <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded">
                           <img
                             src={imageUrl}
                             alt={request.enclosure.enclosure}

@@ -7,26 +7,59 @@
 // Using Vite's import.meta.glob for dynamic imports
 const imageModules = import.meta.glob('/Enclosure Images/*.png', { eager: true, as: 'url' });
 
+// Manual aliases for images with non-standard filenames
+// Maps normalized enclosure name -> { solo: filename, multi: filename }
+// The values are normalized image base names (as they appear in imageMap)
+const imageAliases: Record<string, { solo?: string; multi?: string }> = {
+  'L2_L2D': {
+    solo: 'Single-L2D-front-800x400-1',  // "L2 / L2D" single enclosure
+    multi: 'L2',                          // "L2 / L2D" array (from "L2 Array.png")
+  },
+};
+
 // Build a map of normalized names to image URLs
 const imageMap = new Map<string, { solo?: string; multi?: string }>();
 
 for (const [path, url] of Object.entries(imageModules)) {
-  // Extract filename without extension: "/Enclosure Images/KivaII_Solo.png" -> "KivaII_Solo"
+  // Extract filename without extension: "/Enclosure Images/Kara II Array.png" -> "Kara II Array"
   const filename = path.split('/').pop()?.replace('.png', '') ?? '';
 
-  // Check if it's a solo image
+  // Check if it's an array/multi image (new convention: "Name Array")
+  const isArray = filename.endsWith(' Array');
+  // Check if it's a solo image (old convention: "Name_Solo")
   const isSolo = filename.endsWith('_Solo');
-  const baseName = isSolo ? filename.replace('_Solo', '') : filename;
 
-  if (!imageMap.has(baseName)) {
-    imageMap.set(baseName, {});
+  // Extract base name by removing the suffix
+  let baseName = filename;
+  if (isArray) {
+    baseName = filename.replace(' Array', '');
+  } else if (isSolo) {
+    baseName = filename.replace('_Solo', '');
   }
 
-  const entry = imageMap.get(baseName)!;
-  if (isSolo) {
+  // Normalize the base name (remove spaces, etc.) for consistent lookup
+  const normalizedBase = baseName
+    .replace(/\s+/g, '')      // Remove spaces: "Kara II" -> "KaraII"
+    .replace(/\//g, '_')       // Replace slashes: "Wide/Focus" -> "Wide_Focus"
+    .replace(/\(|\)/g, '');    // Remove parentheses
+
+  if (!imageMap.has(normalizedBase)) {
+    imageMap.set(normalizedBase, {});
+  }
+
+  const entry = imageMap.get(normalizedBase)!;
+  if (isArray) {
+    // Array images are for multiple enclosures
+    entry.multi = url as string;
+  } else if (isSolo) {
+    // Solo images are for single enclosure (old convention)
     entry.solo = url as string;
   } else {
-    entry.multi = url as string;
+    // Images without suffix are single enclosure images (new convention)
+    // Only set as solo if we don't already have a solo image
+    if (!entry.solo) {
+      entry.solo = url as string;
+    }
   }
 }
 
@@ -49,7 +82,24 @@ function normalizeEnclosureName(name: string): string {
  */
 export function getEnclosureImage(enclosureName: string, quantity: number = 1): string | undefined {
   const normalized = normalizeEnclosureName(enclosureName);
-  const entry = imageMap.get(normalized);
+
+  // Check for direct match first
+  let entry = imageMap.get(normalized);
+
+  // If no direct match, check for alias
+  if (!entry && imageAliases[normalized]) {
+    const alias = imageAliases[normalized];
+    // Build entry from aliased image names
+    const soloEntry = alias.solo ? imageMap.get(alias.solo) : undefined;
+    const multiEntry = alias.multi ? imageMap.get(alias.multi) : undefined;
+
+    if (soloEntry || multiEntry) {
+      entry = {
+        solo: soloEntry?.solo ?? soloEntry?.multi,
+        multi: multiEntry?.multi ?? multiEntry?.solo,
+      };
+    }
+  }
 
   if (!entry) return undefined;
 
