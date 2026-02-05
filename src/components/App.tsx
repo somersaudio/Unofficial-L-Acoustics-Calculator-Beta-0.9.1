@@ -12,8 +12,25 @@ import { generatePDFReport } from "../utils/pdfExport";
 import lacousticsLogo from "../assets/lacoustics-logo.png";
 import subHemisphere from "../assets/sub-hemisphere.png";
 
-// Matrix rain text - extracted from L-Acoustics amplification reference
-const MATRIX_TEXT = "AMPLIFICATION REFERENCE LA12X LA7.16 LA4X LA2Xi IMPEDANCE OHMS WATTS POWER ENCLOSURE DRIVE CAPACITY SPL OUTPUT CHANNEL PRESET LOUDSPEAKER CONNECTION SPEAKON TERMINAL BLOCK CABLE GAUGE AWG SWG KARA KIVA K1 K2 K3 SYVA A10 A15 X4i X6i X8 X12 X15 KS28 KS21 SB18 SB15 SB10 SB6 SOKA L2 L2D BTL PBTL";
+// Matrix rain sentences - L-Acoustics themed phrases
+const MATRIX_SENTENCES = [
+  "L-ACOUSTICS AMPLIFICATION",
+  "LA12X POWERING THE FUTURE",
+  "KARA II LINE SOURCE ARRAY",
+  "K2 LARGE FORMAT WST",
+  "SYVA COLINEAR SOURCE",
+  "IMPEDANCE MATTERS",
+  "PROFESSIONAL AUDIO",
+  "SOUND EXCELLENCE",
+  "DRIVEN BY INNOVATION",
+  "AMPLIFIED PERFECTION",
+  "KS28 SUBWOOFER POWER",
+  "A SERIES INSTALLATION",
+  "X SERIES COAXIAL",
+  "WAVEFRONT SCULPTURE",
+  "SOUNDVISION DESIGN",
+  "CONTOUR AMBIENT SYSTEM",
+];
 
 type AppState =
   | { status: "loading" }
@@ -461,7 +478,7 @@ export default function App() {
   return (
     <div className="relative flex h-screen flex-col bg-gray-100 dark:bg-black">
       {/* Matrix Rain Effect - dark mode only, toggleable */}
-      {darkMode && matrixEnabled && <MatrixRain text={MATRIX_TEXT} opacity={1} />}
+      {darkMode && matrixEnabled && <MatrixRain sentences={MATRIX_SENTENCES} opacity={1} />}
 
       {/* Header */}
       <header className={`relative z-10 flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:border-b dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>

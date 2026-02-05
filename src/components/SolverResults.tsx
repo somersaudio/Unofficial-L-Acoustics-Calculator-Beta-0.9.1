@@ -208,7 +208,7 @@ function RoutingSelector({ value, onChange }: { value: RoutingOption; onChange: 
         {value}
       </button>
       {isOpen && (
-        <div className="absolute bottom-full right-0 mb-1 z-50 rounded border border-gray-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800 min-w-[90px]">
+        <div className="absolute bottom-full left-0 mb-1 z-[9999] rounded border border-gray-200 bg-white/30 shadow-lg dark:border-neutral-700 dark:bg-neutral-800/30 backdrop-blur-sm min-w-[90px]">
           {ROUTING_OPTIONS.map((option) => (
             <button
               key={option}
@@ -359,7 +359,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
           <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
         )}
         {!is16Channel && (
-          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>
         )}
       </div>
       {/* Separator line - explicitly shown for 16-channel below Ch header */}
@@ -372,12 +372,15 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
             <div className={`flex-1 flex flex-col ${!is16Channel ? "border-t" : ""} ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
               {/* Only show "Ch N" label for non-16-channel amps (16ch already shows it as outputLabel above) */}
               {!is16Channel && (
-                <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
-                  Ch {output.outputIndex + 1}
-                  {hasImpedanceError && (
-                    <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
-                  )}
-                </div>
+                <>
+                  <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                    Ch {output.outputIndex + 1}
+                    {hasImpedanceError && (
+                      <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
+                    )}
+                  </div>
+                  <div className={`border-t my-1 ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`} />
+                </>
               )}
               <div className="flex-1">
                 {(() => {
@@ -498,7 +501,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
       {!is16Channel && (
         <div className="mb-1 font-medium" style={getOutputTealStyle(primaryOutput.outputIndex, ampOutputCount)}>
           Output {primaryOutput.outputIndex + 1}
-          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>
+          <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>
         </div>
       )}
 
@@ -664,7 +667,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
           // Multi-channel enclosures (like Syva Low Syva) use multiple channels but are 1 physical unit
           const loadedOutputs = outputs.filter(o => o.totalEnclosures > 0);
           if (outputs.length < 2 || loadedOutputs.length < 2) {
-            return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>;
+            return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>;
           }
 
           // Check if all loaded outputs are part of the same multi-channel enclosure
@@ -676,9 +679,19 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
             const allSameMultiChannel = loadedOutputs.every(o =>
               o.enclosures.length > 0 && o.enclosures[0].enclosure.enclosure === firstEnclosureName
             );
-            // If all channels belong to the same multi-channel enclosure, it's just 1 physical unit
-            if (allSameMultiChannel && loadedOutputs.length <= channelsPerUnit) {
-              return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">NL4</span>;
+            // Check if stacked (count > 1 means multiple physical units on same channels)
+            const isStacked = loadedOutputs.some(o => o.enclosures.some(e => e.count > 1));
+            // If all channels belong to the same multi-channel enclosure and only 1 unit, no Y-cable
+            if (allSameMultiChannel && loadedOutputs.length <= channelsPerUnit && !isStacked) {
+              return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>;
+            }
+            // Stacked multi-channel: need Y-cable splitter
+            if (allSameMultiChannel && isStacked) {
+              return (
+                <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
+                  &rarr; NL4 <span className="mx-0.5">&rarr;</span> NL4/Y
+                </span>
+              );
             }
           }
 
@@ -748,6 +761,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                     <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                                   )}
                                 </div>
+                                <div className={`border-t my-1 ${hasChannelError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`} />
                                 <div className="flex-1">
                                   {grpOutput.enclosures.map((entry, i) => {
                                     const entryChannels = getChannelsPerUnit(entry.enclosure, ampConfigKey);
@@ -833,6 +847,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                     <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
                                   )}
                                 </div>
+                                <div className={`border-t my-1 ${hasChannelError ? "border-red-200 dark:border-red-800" : "border-blue-200/60 dark:border-neutral-700"}`} />
                                 {hasLoad ? (
                                   <>
                                     <div className="flex-1">
@@ -944,11 +959,23 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   const count = instances.length;
 
   // Aggregate enclosures across all instances
+  // For multi-channel enclosures, only count on primary channel to avoid double-counting
   const enclosureTotals = new Map<string, number>();
   for (const instance of instances) {
+    const seenMultiChannel = new Set<string>();
     for (const output of instance.outputs) {
       for (const entry of output.enclosures) {
         const name = entry.enclosure.enclosure;
+        const channelsPerUnit = getChannelsPerUnit(entry.enclosure, instance.ampConfig.key);
+
+        if (channelsPerUnit > 1) {
+          // Multi-channel enclosure: only count on primary channel (to avoid double-counting)
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          const groupKey = `${name}_${groupIdx}`;
+          if (seenMultiChannel.has(groupKey)) continue;
+          seenMultiChannel.add(groupKey);
+        }
+
         enclosureTotals.set(name, (enclosureTotals.get(name) || 0) + entry.count);
       }
     }
@@ -1035,17 +1062,47 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   // Compute input letters for each channel (A, B, C, D based on signal groups)
   const inputLettersMap = useMemo(() => instance.outputs.map((_, i) => getInputLetter(instance.outputs, i, instance.ampConfig.key)), [instance.outputs, instance.ampConfig.key]);
 
-  // Input routing state per channel (default: cycle A→B→C→D)
+  // Input routing state per channel (default: same letter for multi-channel enclosures)
   const [routingMap, setRoutingMap] = useState<Record<number, RoutingOption>>(() => {
     const initial: Record<number, RoutingOption> = {};
     const letters: RoutingOption[] = ["A", "B", "C", "D"];
-    for (let i = 0; i < instance.outputs.length; i++) {
-      initial[i] = letters[i % 4];
+    let letterIndex = 0;
+    let i = 0;
+
+    while (i < instance.outputs.length) {
+      const output = instance.outputs[i];
+      const hasLoad = output.totalEnclosures > 0;
+
+      if (!hasLoad) {
+        // Empty channel gets the current letter
+        initial[output.outputIndex] = letters[letterIndex % 4];
+        i++;
+        continue;
+      }
+
+      // Check if this is a multi-channel enclosure
+      const channelsPerUnit = getChannelsPerUnit(output.enclosures[0]?.enclosure, instance.ampConfig.key);
+
+      if (channelsPerUnit > 1) {
+        // Multi-channel enclosure: assign same letter to all its channels
+        const currentLetter = letters[letterIndex % 4];
+        for (let j = 0; j < channelsPerUnit && i + j < instance.outputs.length; j++) {
+          initial[instance.outputs[i + j].outputIndex] = currentLetter;
+        }
+        i += channelsPerUnit;
+        letterIndex++;
+      } else {
+        // Single-channel enclosure
+        initial[output.outputIndex] = letters[letterIndex % 4];
+        i++;
+        letterIndex++;
+      }
     }
+
     return initial;
   });
 
-  // Handler to update routing for a specific channel
+  // Handler to update routing for a specific channel (independent per channel)
   const handleRoutingChange = (channelIndex: number, value: RoutingOption) => {
     setRoutingMap(prev => ({ ...prev, [channelIndex]: value }));
   };

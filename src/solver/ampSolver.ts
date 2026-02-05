@@ -621,8 +621,8 @@ function allocateToOutputs(
     // Max rated impedance threshold - outputs at or above this show "add 1 more enclosure" warning
     const maxRated = ampConfig.ratedImpedances.length > 0 ? Math.max(...ampConfig.ratedImpedances) : Infinity;
 
-    // Phase 1: Spread enclosures across outputs (following fill order), but pack each output
-    // past the above-rated threshold before moving to the next.
+    // Phase 1: Spread enclosures across outputs (following fill order)
+    // In balanced mode, spread evenly first - don't pack to avoid warnings
     let orderIdx = 0;
     while (remaining >= effectiveMinPerOutput && orderIdx < order.length) {
       const oi = order[orderIdx];
@@ -640,40 +640,18 @@ function allocateToOutputs(
         outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
       }
       remaining -= initialAllocation;
-
-      // If this output is still at or above maxRated, keep adding enclosures to it
-      // before moving to the next output (resolves "add 1 more enclosure" warning)
-      while (
-        remaining > 0 &&
-        outputs[oi].impedanceOhms > maxRated &&
-        outputs[oi].totalEnclosures < limits.perOutput
-      ) {
-        const newCount = outputs[oi].totalEnclosures + 1;
-        outputs[oi].enclosures[0].count = newCount;
-        outputs[oi].totalEnclosures = newCount;
-        outputs[oi].impedanceOhms = calculateParallelImpedance(
-          enclosure.nominal_impedance_ohms,
-          newCount
-        );
-        remaining--;
-      }
-
       orderIdx++;
     }
 
-    // Phase 2: Pack additional enclosures into existing outputs (following fill order)
-    // Prioritize outputs that are still at or above maxRated (showing warning) first
+    // Phase 2: Pack additional enclosures into existing outputs using round-robin
+    // This keeps the distribution balanced across outputs
     while (remaining > 0) {
       let allocated = false;
 
-      // First pass: add to above-rated outputs (those showing "add 1 more" warning)
+      // Round-robin: add one to each output that has room, then repeat
       for (let idx = 0; idx < order.length && remaining > 0; idx++) {
         const oi = order[idx];
-        if (
-          outputs[oi].totalEnclosures > 0 &&
-          outputs[oi].totalEnclosures < limits.perOutput &&
-          outputs[oi].impedanceOhms > maxRated
-        ) {
+        if (outputs[oi].totalEnclosures > 0 && outputs[oi].totalEnclosures < limits.perOutput) {
           const newCount = outputs[oi].totalEnclosures + 1;
           outputs[oi].enclosures[0].count = newCount;
           outputs[oi].totalEnclosures = newCount;
@@ -683,24 +661,6 @@ function allocateToOutputs(
           );
           remaining--;
           allocated = true;
-        }
-      }
-
-      // Second pass: if no above-rated outputs remain, use round-robin on all outputs
-      if (!allocated) {
-        for (let idx = 0; idx < order.length && remaining > 0; idx++) {
-          const oi = order[idx];
-          if (outputs[oi].totalEnclosures > 0 && outputs[oi].totalEnclosures < limits.perOutput) {
-            const newCount = outputs[oi].totalEnclosures + 1;
-            outputs[oi].enclosures[0].count = newCount;
-            outputs[oi].totalEnclosures = newCount;
-            outputs[oi].impedanceOhms = calculateParallelImpedance(
-              enclosure.nominal_impedance_ohms,
-              newCount
-            );
-            remaining--;
-            allocated = true;
-          }
         }
       }
 

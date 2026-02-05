@@ -5,8 +5,8 @@
       "enclosure": "Syva Low Syva",
       "max_enclosures": {
         "LA12X": {
-          "per_output": 1,
-          "per_amplifier": 2,
+          "per_output": 2,
+          "per_amplifier": 4,
           "min_impedance_override": 2
         },
         "LA4X": {
@@ -31,8 +31,8 @@
         "LF": 4,
         "PA": 8
       },
-      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω.",
-      "parallelAllowed": false
+      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω. LA12X supports 2 per output pair (LF 2Ω, PA 4Ω parallel).",
+      "parallelAllowed": true
     },
     {
       "enclosure": "5XT",

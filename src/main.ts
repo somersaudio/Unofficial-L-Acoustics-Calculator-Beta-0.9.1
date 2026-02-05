@@ -92,10 +92,6 @@ const createWindow = () => {
     );
   }
 
-  // Open DevTools in development
-  if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
-  }
 };
 
 // Set up IPC handlers

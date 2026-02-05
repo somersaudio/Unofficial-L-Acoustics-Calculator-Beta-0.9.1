@@ -1,26 +1,38 @@
 import { useEffect, useRef } from 'react';
 
 interface MatrixRainProps {
-  /** Text content to use for falling characters */
-  text?: string;
+  /** Array of sentences to display as falling trails */
+  sentences?: string[];
   /** Opacity of the effect (0-1) */
   opacity?: number;
-  /** Number of characters in each trail */
-  trailLength?: number;
 }
 
 interface Drop {
   y: number;
   speed: number;
-  chars: string[]; // Characters for the trail
+  chars: string[]; // Characters for the trail (one sentence)
   greenShade: number;
 }
 
+// Default sentences for the Matrix effect
+const DEFAULT_SENTENCES = [
+  "L-ACOUSTICS AMPLIFICATION",
+  "LA12X POWERING THE FUTURE",
+  "KARA II LINE SOURCE",
+  "K2 LARGE FORMAT WST",
+  "SYVA COLINEAR SOURCE",
+  "IMPEDANCE MATTERS",
+  "PROFESSIONAL AUDIO",
+  "SOUND EXCELLENCE",
+  "DRIVEN BY INNOVATION",
+  "AMPLIFIED PERFECTION",
+];
+
 /**
  * Matrix-style falling text rain effect
- * Uses darkening text trails instead of fade overlay
+ * Uses sentences as falling trails
  */
-export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: MatrixRainProps) {
+export default function MatrixRain({ sentences = DEFAULT_SENTENCES, opacity = 0.15 }: MatrixRainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
 
@@ -31,10 +43,8 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Characters to use - either from provided text or default set
-    const chars = text
-      ? text.replace(/\s+/g, '').split('')
-      : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()+-=[]{}|;:,.<>?'.split('');
+    // Use provided sentences or defaults
+    const sentenceList = sentences.length > 0 ? sentences : DEFAULT_SENTENCES;
 
     // Configuration
     const fontSize = 14;
@@ -51,26 +61,22 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
     let columns = Math.floor(canvas.width / columnWidth);
     let drops: Drop[] = [];
 
-    // Generate a random character
-    const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
-
-    // Generate initial trail characters
-    const generateTrailChars = () => {
-      const trail: string[] = [];
-      for (let i = 0; i < trailLength; i++) {
-        trail.push(randomChar());
-      }
-      return trail;
+    // Get a random sentence and convert to reversed character array
+    // Reversed so when drawn bottom-to-top from the head, it reads top-to-bottom
+    const getRandomSentence = (): string[] => {
+      const sentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+      return sentence.split('').reverse();
     };
 
     const initDrops = () => {
       columns = Math.floor(canvas.width / columnWidth);
       drops = [];
       for (let i = 0; i < columns; i++) {
+        const chars = getRandomSentence();
         drops[i] = {
           y: Math.random() * -50, // Start above screen
           speed: (0.5 + Math.random() * 1.5) / 8, // 1/8 speed
-          chars: generateTrailChars(),
+          chars,
           greenShade: Math.floor(Math.random() * 6),
         };
       }
@@ -78,7 +84,7 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
     initDrops();
 
     // Green color variations - from bright to dark
-    const getGreenColor = (baseShade: number, trailIndex: number): string => {
+    const getGreenColor = (baseShade: number, trailIndex: number, trailLength: number): string => {
       // Base greens (brightest)
       const baseGreens = [
         [0, 255, 0],    // Bright green
@@ -110,8 +116,9 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
       for (let i = 0; i < drops.length; i++) {
         const drop = drops[i];
         const headY = drop.y * fontSize;
+        const trailLength = drop.chars.length;
 
-        // Draw each character in the trail
+        // Draw each character in the trail - head at bottom (brightest), trail going up
         for (let t = 0; t < trailLength; t++) {
           const charY = headY - (t * fontSize);
 
@@ -120,8 +127,8 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
           // Skip if below canvas
           if (charY > canvas.height + fontSize) continue;
 
-          // Get color based on trail position
-          const color = getGreenColor(drop.greenShade, t);
+          // Get color based on trail position (0 = head/bottom, brightest)
+          const color = getGreenColor(drop.greenShade, t, trailLength);
           ctx.fillStyle = color;
 
           // Draw character
@@ -137,16 +144,11 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
         // Move drop down
         drop.y += drop.speed;
 
-        // Occasionally change head character for variety
-        if (Math.random() > 0.95) {
-          drop.chars[0] = randomChar();
-        }
-
-        // Reset drop when trail is fully off screen
+        // Reset drop when entire trail is off screen (top of trail past bottom)
         if ((drop.y - trailLength) * fontSize > canvas.height && Math.random() > 0.975) {
           drop.y = Math.random() * -20;
           drop.speed = (0.5 + Math.random() * 1.5) / 8; // 1/8 speed
-          drop.chars = generateTrailChars();
+          drop.chars = getRandomSentence();
           drop.greenShade = Math.floor(Math.random() * 6);
         }
       }
@@ -170,7 +172,7 @@ export default function MatrixRain({ text, opacity = 0.15, trailLength = 20 }: M
       }
       window.removeEventListener('resize', handleResize);
     };
-  }, [text, trailLength]);
+  }, [sentences]);
 
   return (
     <canvas
