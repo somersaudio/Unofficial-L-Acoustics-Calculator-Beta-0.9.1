@@ -141,3 +141,12 @@ html:not(.dark) select {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
 }
+
+/* Lock transition animations */
+@keyframes lockSlideUp {
+  from { transform: translateY(50px); opacity: 0.5; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.lock-slide-up {
+  animation: lockSlideUp 0.4s ease-out;
+}

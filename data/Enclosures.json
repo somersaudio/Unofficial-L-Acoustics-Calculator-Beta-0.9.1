@@ -31,6 +31,10 @@
         "LF": 4,
         "PA": 8
       },
+      "signal_channel_names": {
+        "LF": "Syva Low",
+        "PA": "Syva"
+      },
       "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω. LA12X supports 2 per output pair (LF 2Ω, PA 4Ω parallel).",
       "parallelAllowed": true
     },

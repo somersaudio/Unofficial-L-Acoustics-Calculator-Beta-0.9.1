@@ -12,6 +12,7 @@ function serializeAmpInstance(instance: AmpInstance): AmpInstanceSerialized {
         count: e.count,
       })),
     })),
+    rackGroupId: instance.rackGroupId,
   };
 }
 
@@ -77,6 +78,7 @@ function deserializeAmpInstance(
     outputs,
     totalEnclosures,
     loadPercent,
+    rackGroupId: serialized.rackGroupId,
   };
 }
 

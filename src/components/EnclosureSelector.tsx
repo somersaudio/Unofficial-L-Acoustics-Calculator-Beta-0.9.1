@@ -3,6 +3,13 @@ import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility } f
 import { getEnclosureCompatibility, getMinimumEnclosureCount } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
 
+/** Info about locked enclosures per amplifier/rack */
+export interface LockedAmpEnclosureInfo {
+  ampLabel: string; // e.g., "LA-RAK #1" or "LA4X #2"
+  ampId: string;
+  enclosures: Map<string, number>; // enclosure name -> count
+}
+
 interface EnclosureSelectorProps {
   enclosures: Enclosure[];
   ampConfigs: AmpConfig[];
@@ -12,6 +19,8 @@ interface EnclosureSelectorProps {
   onBump?: () => void;
   /** Map of enclosure name -> count of locked enclosures */
   lockedEnclosureCounts?: Map<string, number>;
+  /** Detailed locked enclosure info per amp/rack for grouping display */
+  lockedAmpEnclosures?: LockedAmpEnclosureInfo[];
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -57,6 +66,7 @@ export default function EnclosureSelector({
   salesMode = false,
   onBump,
   lockedEnclosureCounts = new Map(),
+  lockedAmpEnclosures = [],
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -319,180 +329,190 @@ export default function EnclosureSelector({
         )}
       </div>
 
-      {/* Current Requests List */}
-      {requests.length > 0 && (
-        <div className="space-y-2">
-          <div className="space-y-2">
-            {requests.map((request, index) => {
-              const compat = compatibilityMap.get(request.enclosure.enclosure);
-              const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
-              const showBumpMessage = bumpedIndices.has(index);
-              const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
-              const lockedCount = lockedEnclosureCounts.get(request.enclosure.enclosure) ?? 0;
-              const unlockedCount = request.quantity - lockedCount;
-              // Gold color for locked state
-              const goldColor = '#b59e5f';
-              const goldColorLight = '#b59e5f33'; // 20% opacity
+      {/* Locked Enclosures - Grouped by Amplifier */}
+      {lockedAmpEnclosures.length > 0 && (
+        <div className="space-y-3">
+          {lockedAmpEnclosures.map((ampInfo) => {
+            // Get all enclosures for this amp
+            const enclosureEntries = Array.from(ampInfo.enclosures.entries()).filter(([, count]) => count > 0);
+            if (enclosureEntries.length === 0) return null;
 
-              return (
-                <div key={`${request.enclosure.enclosure}-${index}`} className="space-y-1">
-                  {/* Locked enclosures row (if any) */}
-                  {lockedCount > 0 && (
-                    <div
-                      className="relative flex items-center gap-3 rounded-lg border py-0.5 px-3"
-                      style={{ borderColor: goldColor, backgroundColor: goldColorLight }}
-                    >
-                      {/* Lock icon */}
-                      <div className="flex-shrink-0" style={{ color: goldColor }} title={`${lockedCount} locked to amplifier`}>
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      {/* Enclosure Image */}
-                      {imageUrl && (
-                        <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded opacity-60">
-                          <img
-                            src={imageUrl}
-                            alt={request.enclosure.enclosure}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 opacity-80">
-                        <div className="flex items-center">
-                          <span className="font-medium" style={{ color: goldColor }}>
-                            {request.enclosure.enclosure}
-                          </span>
-                          <span className="ml-2 text-xs" style={{ color: goldColor }}>
-                            (locked)
-                          </span>
-                        </div>
-                        {!salesMode && (
-                          <div className="text-xs" style={{ color: goldColor, opacity: 0.7 }}>
-                            {request.enclosure.nominal_impedance_ohms}Ω
+            const goldColor = '#b59e5f';
+            const goldColorLight = '#b59e5f33';
+
+            return (
+              <div
+                key={ampInfo.ampId}
+                className="rounded-lg border overflow-hidden"
+                style={{ borderColor: goldColor, backgroundColor: goldColorLight }}
+              >
+                {/* Amp label header */}
+                <div className="flex items-center gap-2 px-3 py-1.5 border-b" style={{ borderColor: goldColor }}>
+                  <svg className="h-4 w-4" fill={goldColor} viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-medium text-white dark:text-white text-sm">
+                    {ampInfo.ampLabel}
+                  </span>
+                </div>
+
+                {/* Enclosures list */}
+                <div className="divide-y" style={{ borderColor: `${goldColor}66` }}>
+                  {enclosureEntries.map(([encName, count]) => {
+                    const enclosure = enclosures.find(e => e.enclosure === encName);
+                    const imageUrl = getEnclosureImage(encName, count);
+
+                    return (
+                      <div
+                        key={encName}
+                        className="flex items-center gap-3 py-0.5 px-3"
+                      >
+                        {/* Enclosure Image */}
+                        {imageUrl && (
+                          <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded opacity-60">
+                            <img
+                              src={imageUrl}
+                              alt={encName}
+                              className="h-full w-full object-contain"
+                            />
                           </div>
                         )}
-                      </div>
-                      {/* Static locked count */}
-                      <div className="flex items-center gap-2">
+                        <div className="flex-1 opacity-80">
+                          <span className="font-medium" style={{ color: goldColor }}>
+                            {encName}
+                          </span>
+                          {!salesMode && enclosure && (
+                            <div className="text-xs" style={{ color: goldColor, opacity: 0.7 }}>
+                              {enclosure.nominal_impedance_ohms}Ω
+                            </div>
+                          )}
+                        </div>
+                        {/* Locked count */}
                         <span
                           className="w-16 rounded border px-2 py-1 text-center text-sm font-medium"
                           style={{ borderColor: goldColor, backgroundColor: goldColorLight, color: goldColor }}
                         >
-                          {lockedCount}
+                          {count}
                         </span>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-                  {/* Unlocked enclosures row (if any remaining) */}
-                  {unlockedCount > 0 && (
-                    <div
-                      className="relative flex items-center gap-3 rounded-lg border py-0.5 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
-                    >
-                      {/* Spacer to align with locked row's lock icon */}
-                      {lockedCount > 0 && <div className="w-4 flex-shrink-0" />}
-                      {/* Enclosure Image */}
-                      {imageUrl && (
-                        <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded">
-                          <img
-                            src={imageUrl}
-                            alt={request.enclosure.enclosure}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
+      {/* Unlocked Enclosures */}
+      {requests.length > 0 && (
+        <div className="space-y-2">
+          {requests.map((request, index) => {
+            const compat = compatibilityMap.get(request.enclosure.enclosure);
+            const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
+            const showBumpMessage = bumpedIndices.has(index);
+            const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
+            const lockedCount = lockedEnclosureCounts.get(request.enclosure.enclosure) ?? 0;
+            const unlockedCount = request.quantity - lockedCount;
+
+            // Skip if all are locked (they're shown in the locked section above)
+            if (unlockedCount <= 0) return null;
+
+            return (
+              <div
+                key={`${request.enclosure.enclosure}-${index}`}
+                className="relative flex items-center gap-3 rounded-lg border py-0.5 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                {/* Enclosure Image */}
+                {imageUrl && (
+                  <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded">
+                    <img
+                      src={imageUrl}
+                      alt={request.enclosure.enclosure}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex items-center">
+                    <span className="font-medium text-gray-900 dark:text-gray-200">
+                      {request.enclosure.enclosure}
+                    </span>
+                    <MinCountMessage
+                      show={showBumpMessage}
+                      key={showBumpMessage ? Date.now() : "stable"}
+                    />
+                  </div>
+                  {!salesMode && (
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">
+                      {request.enclosure.nominal_impedance_ohms}Ω
+                      {compat?.isLimitedCompatibility && (
+                        <span className="ml-2">
+                          ({compat.autoSelectedAmp?.model} only)
+                        </span>
                       )}
-                      <div className="flex-1">
-                        <div className="flex items-center">
-                          <span className="font-medium text-gray-900 dark:text-gray-200">
-                            {request.enclosure.enclosure}
-                          </span>
-                          <MinCountMessage
-                            show={showBumpMessage}
-                            key={showBumpMessage ? Date.now() : "stable"}
-                          />
-                        </div>
-                        {!salesMode && (
-                          <div className="text-xs text-gray-500 dark:text-neutral-500">
-                            {request.enclosure.nominal_impedance_ohms}Ω
-                            {compat?.isLimitedCompatibility && (
-                              <span className="ml-2">
-                                ({compat.autoSelectedAmp?.model} only)
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Quantity controls */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(index, request.quantity - 1)
-                          }
-                          disabled={unlockedCount <= Math.max(minCount - lockedCount, 1)}
-                          className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          min={1}
-                          value={unlockedCount}
-                          onChange={(e) => {
-                            const newUnlocked = parseInt(e.target.value) || 1;
-                            handleQuantityChange(index, lockedCount + newUnlocked);
-                          }}
-                          className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(index, request.quantity + 1)
-                          }
-                          className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => handleRemoveRequest(index)}
-                        disabled={lockedCount > 0}
-                        className={`rounded p-1 ${
-                          lockedCount > 0
-                            ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
-                            : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
-                        }`}
-                        title={lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
-                      >
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Fully locked case - only show locked row */}
-                  {lockedCount > 0 && unlockedCount <= 0 && (
-                    <div className="pl-7 text-xs text-gray-400 dark:text-neutral-600 italic">
-                      All enclosures locked
                     </div>
                   )}
                 </div>
-              );
-            })}
-          </div>
 
+                {/* Quantity controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      handleQuantityChange(index, request.quantity - 1)
+                    }
+                    disabled={unlockedCount <= Math.max(minCount - lockedCount, 1)}
+                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={unlockedCount}
+                    onChange={(e) => {
+                      const newUnlocked = parseInt(e.target.value) || 1;
+                      handleQuantityChange(index, lockedCount + newUnlocked);
+                    }}
+                    className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    onClick={() =>
+                      handleQuantityChange(index, request.quantity + 1)
+                    }
+                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => handleRemoveRequest(index)}
+                  disabled={lockedCount > 0}
+                  className={`rounded p-1 ${
+                    lockedCount > 0
+                      ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
+                      : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
+                  }`}
+                  title={lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 

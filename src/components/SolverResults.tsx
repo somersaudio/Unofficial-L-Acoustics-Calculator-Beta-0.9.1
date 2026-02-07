@@ -3,16 +3,29 @@ import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, E
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
+import {
+  EnclosureDragDropProvider,
+  useDraggableEnclosure,
+  useDroppableChannel,
+  useEnclosureDragState,
+  type EnclosureMoveResult,
+  type DraggableEnclosureData,
+  type DroppableChannelData,
+  type DropValidation,
+} from "./EnclosureDragDrop";
 
 interface SolverResultsProps {
   zoneSolutions: ZoneWithSolution[];
   activeZoneId: string;
   salesMode?: boolean;
+  rackMode?: boolean;
   cableGaugeMm2?: number;
   useFeet?: boolean;
   onAdjustEnclosure?: (enclosureName: string, delta: number) => void;
   onLockAmpInstance?: (ampInstance: AmpInstance) => void;
   onUnlockAmpInstance?: (ampInstanceId: string) => void;
+  onCombineLockedRacks?: (ampIds: string[]) => void;
+  onMoveEnclosure?: (move: EnclosureMoveResult) => void;
 }
 
 /** Returns inline style for teal output label color that darkens as output index increases */
@@ -255,7 +268,68 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange, ampConfigKey }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void; ampConfigKey?: string }) {
+/** Draggable enclosure count display - allows drag-and-drop between channels */
+function DraggableEnclosureItem({
+  enclosureName,
+  count,
+  ampId,
+  channelIndex,
+  impedanceOhms,
+  isLocked,
+  onAdjustEnclosure,
+  impedanceAboveRated,
+}: {
+  enclosureName: string;
+  count: number;
+  ampId: string;
+  channelIndex: number;
+  impedanceOhms: number;
+  isLocked: boolean;
+  onAdjustEnclosure?: (enclosureName: string, delta: number) => void;
+  impedanceAboveRated: boolean;
+}) {
+  const { ref, isDragging, dragProps, canDrag } = useDraggableEnclosure({
+    enclosureName,
+    ampId,
+    channelIndex,
+    impedanceOhms,
+    isLocked,
+    count,
+  });
+
+  return (
+    <div
+      ref={ref}
+      {...dragProps}
+      className={`flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200 ${
+        canDrag ? "cursor-grab active:cursor-grabbing" : ""
+      } ${isDragging ? "opacity-50" : ""}`}
+    >
+      <span className={isDragging ? "line-through" : ""}>{count}x</span> {enclosureName}
+      {impedanceAboveRated && (
+        <>
+          <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+          </svg>
+          {onAdjustEnclosure && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAdjustEnclosure(enclosureName, 1);
+              }}
+              className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
+              title="Add 1 more for recommended load"
+            >
+              + 1
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange, ampConfigKey, ampId, ampModel, isLocked = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void; ampConfigKey?: string; ampId?: string; ampModel?: string; isLocked?: boolean }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -270,6 +344,19 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
     ? getEnclosureTypeBackground(output.enclosures[0].enclosure.enclosure, enclosureTypeMap)
     : undefined;
 
+  // Drag-drop: make this channel a drop target
+  const currentEnclosures = output.enclosures.map(e => ({ name: e.enclosure.enclosure, count: e.count }));
+  const { ref: dropRef, isOver: isDropOver, isValidTarget } = useDroppableChannel({
+    ampId: ampId ?? "",
+    ampModel: ampModel ?? "",
+    channelIndex: output.outputIndex,
+    isLocked: isLocked,
+    currentEnclosures,
+  });
+
+  // Get global drag state to show visual feedback
+  const { isDragging, activeData } = useEnclosureDragState();
+  const showDropHighlight = isDragging && isValidTarget; // isValidTarget already checks isLocked
 
   // Secondary channel: shaded appearance, show grayed-out enclosure name and signal type
   // Match primary card structure for vertical alignment
@@ -308,20 +395,27 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                 const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
                 const posInGroup = output.outputIndex % channelsPerUnit;
                 const totalInGroup = channelsPerUnit;
+                const signalType = channelsPerUnit === 1
+                  ? entry.enclosure.signal_channels.join("+")
+                  : entry.enclosure.signal_channels[posInGroup];
+                const channelName = channelsPerUnit > 1
+                  ? entry.enclosure.signal_channel_names?.[signalType]
+                  : undefined;
                 return (
                   <div key={i}>
                     {!is16Channel && (
-                      <div className="text-sm text-gray-400 dark:text-neutral-600">
-                        {entry.count}x {entry.enclosure.enclosure}
+                      <div className="text-sm italic text-gray-400 dark:text-neutral-600">Channel allocated</div>
+                    )}
+                    {channelName && (
+                      <div className="text-[10px] text-gray-400 dark:text-neutral-500">
+                        {entry.count > 1 ? `(${entry.count})` : ""}  {channelName}
                       </div>
                     )}
                     <div
                       className="text-[10px] font-medium"
                       style={getSignalTypeGoldStyle(posInGroup, totalInGroup)}
                     >
-                      {channelsPerUnit === 1
-                        ? entry.enclosure.signal_channels.join("+")
-                        : entry.enclosure.signal_channels[posInGroup]}
+                      {signalType}
                     </div>
                   </div>
                 );
@@ -341,14 +435,19 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 
   return (
     <div
-      className={`flex flex-col rounded border p-2 text-xs min-w-0 ${
-        hasImpedanceError
+      ref={dropRef}
+      className={`flex flex-col rounded border p-2 text-xs min-w-0 transition-all ${
+        isDropOver && isValidTarget
+          ? "border-blue-500 ring-2 ring-blue-500/50 bg-blue-100 dark:bg-blue-900/30"
+          : showDropHighlight
+          ? "border-dashed border-blue-400 dark:border-blue-600"
+          : hasImpedanceError
           ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
           : hasLoad
           ? "border-blue-200 bg-blue-50 dark:border-neutral-600 dark:bg-neutral-800"
           : "border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
-      style={cardTypeBg && !hasImpedanceError ? { backgroundColor: cardTypeBg } : undefined}
+      style={cardTypeBg && !hasImpedanceError && !isDropOver ? { backgroundColor: cardTypeBg } : undefined}
     >
       <div
         className={`${is16Channel ? "truncate" : "mb-1"} font-medium`}
@@ -373,7 +472,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               {/* Only show "Ch N" label for non-16-channel amps (16ch already shows it as outputLabel above) */}
               {!is16Channel && (
                 <>
-                  <div className="pt-1 font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                  <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
                     Ch {output.outputIndex + 1}
                     {hasImpedanceError && (
                       <span className="ml-1 text-red-600 dark:text-red-500 font-bold">ERROR</span>
@@ -387,41 +486,46 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                   const maxRated = ratedImpedances.length > 0 ? Math.max(...ratedImpedances) : Infinity;
                   const isMultiChannel = output.enclosures.some(e => getChannelsPerUnit(e.enclosure, ampConfigKey) > 1);
                   const impedanceAboveRated = !isMultiChannel && output.impedanceOhms !== Infinity && output.impedanceOhms > maxRated;
-                  return output.enclosures.map((entry, i) => (
-                    <div key={i}>
-                      {/* Hide enclosure name when shown as header above (L2/L2D on 16ch) */}
-                      {!hideEnclosureName && (
-                        <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
-                          {entry.count}x {entry.enclosure.enclosure}
-                          {impedanceAboveRated && (
-                            <>
-                              <svg className="h-3 w-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-                              </svg>
-                              {onAdjustEnclosure && (
-                                <button
-                                  onClick={() => onAdjustEnclosure(entry.enclosure.enclosure, 1)}
-                                  className="ml-0.5 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-medium text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:bg-amber-900/60"
-                                  title="Add 1 more for recommended load"
-                                >
-                                  + 1
-                                </button>
-                              )}
-                            </>
-                          )}
+                  return output.enclosures.map((entry, i) => {
+                    const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                    const posInGroup = output.outputIndex % (channelsPerUnit || 1);
+                    const signalType = channelsPerUnit === 1
+                      ? entry.enclosure.signal_channels.join("+")
+                      : entry.enclosure.signal_channels[posInGroup];
+                    const channelName = channelsPerUnit > 1
+                      ? entry.enclosure.signal_channel_names?.[signalType]
+                      : undefined;
+                    return (
+                      <div key={i}>
+                        {/* Hide enclosure name when shown as header above (L2/L2D on 16ch) */}
+                        {!hideEnclosureName && (
+                          <DraggableEnclosureItem
+                            enclosureName={entry.enclosure.enclosure}
+                            count={entry.count}
+                            ampId={ampId ?? ""}
+                            channelIndex={output.outputIndex}
+                            impedanceOhms={output.impedanceOhms}
+                            isLocked={isLocked}
+                            onAdjustEnclosure={onAdjustEnclosure}
+                            impedanceAboveRated={impedanceAboveRated}
+                          />
+                        )}
+                        {/* Component name for hybrid/multi-channel enclosures */}
+                        {channelName && (
+                          <div className="text-[10px] text-gray-400 dark:text-neutral-500">
+                            {entry.count > 1 ? `(${entry.count})` : ""}  {channelName}
+                          </div>
+                        )}
+                        {/* Signal type - always shown for uniform display */}
+                        <div
+                          className="text-[10px] font-medium"
+                          style={getSignalTypeGoldStyle(0, 1)}
+                        >
+                          {signalType}
                         </div>
-                      )}
-                      {/* Signal type - always shown for uniform display */}
-                      <div
-                        className="text-[10px] font-medium"
-                        style={getSignalTypeGoldStyle(0, 1)}
-                      >
-                        {getChannelsPerUnit(entry.enclosure, ampConfigKey) === 1
-                          ? entry.enclosure.signal_channels.join("+")
-                          : entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
                       </div>
-                    </div>
-                  ));
+                    );
+                  });
                 })()}
               </div>
               {/* Bottom row: routing selector at left, cable length in middle (non-16ch), impedance at right */}
@@ -538,11 +642,27 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
                   <div className="flex-1">
                     {output.enclosures.map((entry, i) => {
                       const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                      const signalType = channelsPerUnit === 1
+                        ? entry.enclosure.signal_channels.join("+")
+                        : entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length];
+                      const channelName = channelsPerUnit > 1
+                        ? entry.enclosure.signal_channel_names?.[signalType]
+                        : undefined;
                       return (
                         <div key={i}>
                           {!hideEnclosureName && (
-                            <div className={`flex items-center gap-1 text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
-                              {entry.count}x {entry.enclosure.enclosure}
+                            isSecondary ? (
+                              <div className="text-sm italic text-gray-400 dark:text-neutral-600">Channel allocated</div>
+                            ) : (
+                              <div className="flex items-center gap-1 text-sm text-gray-900 dark:text-gray-200">
+                                {entry.count}x {entry.enclosure.enclosure}
+                              </div>
+                            )
+                          )}
+                          {/* Component name for hybrid/multi-channel enclosures */}
+                          {channelName && (
+                            <div className="text-[10px] text-gray-400 dark:text-neutral-500">
+                              {entry.count > 1 ? `(${entry.count})` : ""}  {channelName}
                             </div>
                           )}
                           {/* Signal type - always shown for uniform display */}
@@ -550,9 +670,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
                             className="text-[10px] font-medium"
                             style={getSignalTypeGoldStyle(idx, channelCount)}
                           >
-                            {channelsPerUnit === 1
-                              ? entry.enclosure.signal_channels.join("+")
-                              : entry.enclosure.signal_channels[output.outputIndex % entry.enclosure.signal_channels.length]}
+                            {signalType}
                           </div>
                         </div>
                       );
@@ -666,6 +784,9 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
           // Check if Y-cable is needed: only when there are multiple SEPARATE enclosures
           // Multi-channel enclosures (like Syva Low Syva) use multiple channels but are 1 physical unit
           const loadedOutputs = outputs.filter(o => o.totalEnclosures > 0);
+          if (loadedOutputs.length === 0) {
+            return null; // No speakers connected - no NL4 indicator
+          }
           if (outputs.length < 2 || loadedOutputs.length < 2) {
             return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>;
           }
@@ -695,11 +816,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
             }
           }
 
-          return (
-            <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">
-              NL4 <span className="mx-0.5">&rarr;</span> NL4/NL2_Y <span className="mx-0.5">&rarr;</span> NL2 ({outputs.length})
-            </span>
-          );
+          return <span className="ml-1 text-[10px] font-normal text-gray-400 dark:text-neutral-500">&rarr; NL4</span>;
         })()}
       </div>
       {hasLoad ? (
@@ -765,18 +882,31 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                 <div className="flex-1">
                                   {grpOutput.enclosures.map((entry, i) => {
                                     const entryChannels = getChannelsPerUnit(entry.enclosure, ampConfigKey);
+                                    const signalType = entryChannels === 1
+                                      ? entry.enclosure.signal_channels.join("+")
+                                      : entry.enclosure.signal_channels[posInGroup];
+                                    const channelName = entryChannels > 1
+                                      ? entry.enclosure.signal_channel_names?.[signalType]
+                                      : undefined;
                                     return (
                                       <div key={i}>
-                                        <div className={`text-sm ${isSecondary ? "text-gray-400 dark:text-neutral-600" : "text-gray-900 dark:text-gray-200"}`}>
-                                          {entry.count}x {entry.enclosure.enclosure}
-                                        </div>
+                                        {isSecondary ? (
+                                          <div className="text-sm italic text-gray-400 dark:text-neutral-600">Channel allocated</div>
+                                        ) : (
+                                          <div className="text-sm text-gray-900 dark:text-gray-200">
+                                            {entry.count}x {entry.enclosure.enclosure}
+                                          </div>
+                                        )}
+                                        {channelName && (
+                                          <div className="text-[10px] text-gray-400 dark:text-neutral-500">
+                                            {entry.count > 1 ? `(${entry.count})` : ""}  {channelName}
+                                          </div>
+                                        )}
                                         <div
                                           className="text-[10px] font-medium"
                                           style={getSignalTypeGoldStyle(posInGroup, channelsPerUnit)}
                                         >
-                                          {entryChannels === 1
-                                            ? entry.enclosure.signal_channels.join("+")
-                                            : entry.enclosure.signal_channels[posInGroup]}
+                                          {signalType}
                                         </div>
                                       </div>
                                     );
@@ -897,8 +1027,16 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                     </div>
                                   </>
                                 ) : (
-                                  /* Empty channel - just show the header */
-                                  <div className="flex-1" />
+                                  /* Empty channel - show routing selector for preparation */
+                                  <>
+                                    <div className="flex-1" />
+                                    <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                      {onRoutingChange ? (
+                                        <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
+                                      ) : <span />}
+                                      <span />
+                                    </div>
+                                  </>
                                 )}
                               </div>
                             );
@@ -935,7 +1073,29 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
           )}
         </>
       ) : (
-        <div className="text-gray-400 dark:text-neutral-600 italic">Empty</div>
+        /* Empty physical output - still show channel numbers and routing selectors */
+        <div className="border-t border-gray-200 dark:border-neutral-700">
+          <div className={`flex-1 ${outputs.length > 1 ? "grid gap-2" : ""}`} style={outputs.length > 1 ? { gridTemplateColumns: `repeat(${outputs.length}, 1fr)` } : undefined}>
+            {outputs.map((output, idx) => (
+              <div
+                key={output.outputIndex}
+                className={`flex flex-col pt-1 ${idx > 0 ? "border-l border-gray-200 dark:border-neutral-700 pl-2" : ""}`}
+              >
+                <div className="font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                  Ch {output.outputIndex + 1}
+                </div>
+                <div className="border-t my-1 border-gray-200/60 dark:border-neutral-700" />
+                <div className="flex-1" />
+                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                  {onRoutingChange ? (
+                    <RoutingSelector value={routingMap?.[output.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(output.outputIndex, value)} />
+                  ) : <span />}
+                  <span />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -1021,7 +1181,294 @@ function GroupedAmpCard({ instances }: { instances: AmpInstance[] }) {
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void }) {
+/** Sales mode card for LA-RAK: shows rack count instead of individual LA12X count */
+function GroupedRackCard({ rackCount, la12xInstances }: { rackCount: number; la12xInstances: AmpInstance[] }) {
+  // Aggregate enclosures across all LA12X instances
+  const enclosureTotals = new Map<string, number>();
+  for (const instance of la12xInstances) {
+    const seenMultiChannel = new Set<string>();
+    for (const output of instance.outputs) {
+      for (const entry of output.enclosures) {
+        const name = entry.enclosure.enclosure;
+        const channelsPerUnit = getChannelsPerUnit(entry.enclosure, instance.ampConfig.key);
+        if (channelsPerUnit > 1) {
+          const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+          const groupKey = `${name}_${groupIdx}`;
+          if (seenMultiChannel.has(groupKey)) continue;
+          seenMultiChannel.add(groupKey);
+        }
+        enclosureTotals.set(name, (enclosureTotals.get(name) || 0) + entry.count);
+      }
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-gray-300 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+      <div className="border-b border-gray-200 bg-gray-100 px-4 py-3 dark:border-neutral-700 dark:bg-neutral-800">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="font-bold text-gray-900 dark:text-gray-200">
+              LA-RAK
+            </span>
+            <span className="ml-1 text-xs text-gray-500 dark:text-neutral-500">
+              (3x LA12X)
+            </span>
+            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-neutral-400">
+              ({rackCount})
+            </span>
+          </div>
+        </div>
+      </div>
+      {enclosureTotals.size > 0 && (
+        <div className="px-4 py-3">
+          <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+            {Array.from(enclosureTotals.entries()).map(([name, total]) => {
+              const imageUrl = getEnclosureImage(name, total);
+              return (
+                <div key={name} className="flex items-center gap-2">
+                  {imageUrl && (
+                    <img src={imageUrl} alt={name} className="h-12 w-20 object-contain" />
+                  )}
+                  <span>{total}x {name}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** LA-RAK card: groups up to 3 LA12X amps into a rack frame */
+function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclosure, packedMap, spreadMap, onTogglePacked, onToggleSpread, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, globalIndices, canCombineWithOthers = false, onCombineRacks }: { rackIndex: number; instances: AmpInstance[]; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packedMap: Record<number, boolean>; spreadMap: Record<number, boolean>; onTogglePacked: (index: number) => void; onToggleSpread: (index: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; globalIndices: number[]; canCombineWithOthers?: boolean; onCombineRacks?: () => void }) {
+  const RACK_SLOTS = 3;
+  const emptySlots = RACK_SLOTS - instances.length;
+
+  // Rack is locked when ALL real instances are locked
+  const isRackLocked = instances.length > 0 && instances.every(
+    (inst) => lockedAmpIds?.has(inst.id) ?? false
+  );
+
+  return (
+    <div className={`rounded-lg border-2 p-3 ${
+      isRackLocked
+        ? "border-amber-400/60 dark:border-amber-600/40 bg-gray-50/50 dark:bg-neutral-950/50"
+        : "border-gray-400 dark:border-neutral-500 bg-gray-50/50 dark:bg-neutral-950/50"
+    }`}>
+      {/* Rack Header */}
+      <div className="mb-3 flex items-center gap-2">
+        {/* Rack-level lock/unlock button */}
+        {isRackLocked ? (
+          <button
+            onClick={() => {
+              for (const inst of instances) {
+                onUnlockAmpInstance?.(inst.id);
+              }
+            }}
+            className="rounded p-1 transition-colors"
+            style={{ backgroundColor: 'rgba(181, 158, 95, 0.2)', color: '#b59e5f' }}
+            title="Unlock all amplifiers in this rack"
+          >
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        ) : onLockAmpInstance && (
+          <button
+            onClick={() => {
+              // Generate a unique rackGroupId for all amps locked together
+              const rackGroupId = `rack-${crypto.randomUUID().split("-").pop()}`;
+              for (const inst of instances) {
+                if (!(lockedAmpIds?.has(inst.id))) {
+                  // Attach rackGroupId so they stay together when locked
+                  onLockAmpInstance?.({ ...inst, rackGroupId });
+                }
+              }
+            }}
+            className="rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 transition-colors"
+            title="Lock all amplifiers in this rack"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+            </svg>
+          </button>
+        )}
+        <span className="text-sm font-bold tracking-wider text-gray-700 dark:text-neutral-300">
+          LA-RAK #{rackIndex + 1}
+        </span>
+        <span className="text-xs text-gray-500 dark:text-neutral-500">
+          {instances.length}/{RACK_SLOTS} Amps in use
+        </span>
+        {/* Green button when this locked rack can be combined with others */}
+        {canCombineWithOthers && isRackLocked && onCombineRacks && (
+          <button
+            onClick={onCombineRacks}
+            className="ml-auto flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:text-green-400 dark:hover:bg-green-900/60 transition-colors"
+            title="Combine all locked LA-RAK units into one"
+          >
+            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+            </svg>
+            <span>Combine</span>
+          </button>
+        )}
+      </div>
+
+      {isRackLocked ? (
+        /* Condensed locked view - per-channel enclosure details */
+        <div className="space-y-1.5">
+          {instances.map((instance) => {
+            const ampOutputCount = instance.ampConfig.outputs;
+            return (
+              <div
+                key={instance.id}
+                className="rounded border border-gray-200 bg-white/80 dark:border-neutral-700 dark:bg-neutral-800/80"
+              >
+                {/* Compact header row */}
+                <div className="flex items-center justify-between px-2 py-1 border-b border-gray-100 dark:border-neutral-700">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-gray-900 dark:text-gray-200">
+                      {instance.ampConfig.model}
+                    </span>
+                    {instance.ampConfig.mode && (
+                      <span className="rounded bg-blue-100 px-1 py-0.5 text-[8px] font-medium text-blue-800 dark:bg-neutral-700 dark:text-gray-300">
+                        {instance.ampConfig.mode}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[10px] font-medium ${getLoadColor(instance.loadPercent)}`}>
+                    {instance.loadPercent}%
+                  </span>
+                </div>
+                {/* Output indicators row */}
+                {(() => {
+                  const physicalOutputCount = instance.ampConfig.physicalOutputs;
+                  return (
+                    <div className="grid gap-px px-1 pt-1" style={{ gridTemplateColumns: `repeat(${physicalOutputCount}, 1fr)` }}>
+                      {Array.from({ length: physicalOutputCount }).map((_, outputIdx) => (
+                        <div key={outputIdx} className="text-center">
+                          <span className="text-[8px] font-medium" style={getOutputTealStyle(outputIdx, physicalOutputCount)}>
+                            Output {outputIdx + 1}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+                {/* Channel grid */}
+                <div className="grid gap-px px-1 py-1" style={{ gridTemplateColumns: `repeat(${ampOutputCount}, 1fr)` }}>
+                  {instance.outputs.map((output) => {
+                    const hasLoad = output.totalEnclosures > 0;
+                    return (
+                      <div key={output.outputIndex} className="px-1 text-center">
+                        <div className="text-[9px] font-medium" style={getChannelPurpleStyle(output.outputIndex, ampOutputCount)}>
+                          Ch {output.outputIndex + 1}
+                        </div>
+                        {hasLoad ? (
+                          <div className="text-[9px] leading-tight">
+                            {output.enclosures.map((entry, i) => {
+                              const channelsPerUnit = getChannelsPerUnit(entry.enclosure, instance.ampConfig.key);
+                              const posInGroup = output.outputIndex % channelsPerUnit;
+                              const isPrimary = posInGroup === 0;
+                              const signalLabel = channelsPerUnit === 1
+                                ? entry.enclosure.signal_channels.join("+")
+                                : entry.enclosure.signal_channels[posInGroup];
+                              const channelName = channelsPerUnit > 1
+                                ? entry.enclosure.signal_channel_names?.[entry.enclosure.signal_channels[posInGroup]]
+                                : undefined;
+                              return (
+                                <div key={i}>
+                                  {isPrimary || channelsPerUnit === 1 ? (
+                                    <div className="text-gray-700 dark:text-gray-300">
+                                      {entry.count}x {entry.enclosure.enclosure}
+                                    </div>
+                                  ) : (
+                                    <div className="text-[7px] italic text-gray-400 dark:text-neutral-600">Allocated to</div>
+                                  )}
+                                  {channelName && (
+                                    <div className="text-[7px] text-gray-400 dark:text-neutral-500">
+                                      {entry.count > 1 ? `(${entry.count})` : ""}  {channelName}
+                                    </div>
+                                  )}
+                                  <div className="text-[8px] font-medium" style={getSignalTypeGoldStyle(posInGroup, channelsPerUnit)}>
+                                    {signalLabel}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="text-[9px] text-gray-300 dark:text-neutral-600">—</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Expanded view with full AmpCards */
+        <div className="space-y-3">
+          {instances.map((instance, localIdx) => {
+            const globalIdx = globalIndices[localIdx];
+            const packed = packedMap[globalIdx] ?? false;
+            const spread = spreadMap[globalIdx] ?? false;
+
+            return (
+              <AmpCard
+                key={instance.id}
+                instance={instance}
+                salesMode={false}
+                cableGaugeMm2={cableGaugeMm2}
+                useFeet={useFeet}
+                onAdjustEnclosure={onAdjustEnclosure}
+                packed={packed}
+                spread={spread}
+                onTogglePacked={() => onTogglePacked(globalIdx)}
+                onToggleSpread={() => onToggleSpread(globalIdx)}
+              />
+            );
+          })}
+
+          {/* Empty rack slots - render as empty LA12X amps */}
+          {Array.from({ length: emptySlots }).map((_, i) => {
+            const ampConfig = instances[0].ampConfig;
+            const emptyInstance: AmpInstance = {
+              id: `rack-${rackIndex}-empty-${i}`,
+              ampConfig,
+              outputs: Array.from({ length: ampConfig.outputs }, (_, oi) => ({
+                outputIndex: oi,
+                enclosures: [],
+                totalEnclosures: 0,
+                impedanceOhms: Infinity,
+              })),
+              totalEnclosures: 0,
+              loadPercent: 0,
+            };
+            return (
+              <AmpCard
+                key={`empty-${i}`}
+                instance={emptyInstance}
+                salesMode={false}
+                cableGaugeMm2={cableGaugeMm2}
+                useFeet={useFeet}
+                packed={false}
+                spread={false}
+                onTogglePacked={() => {}}
+                onToggleSpread={() => {}}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number }) {
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
@@ -1203,7 +1650,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
               </button>
             )}
             <span className="font-bold text-gray-900 dark:text-gray-200">
-              {instance.ampConfig.model}
+              {instance.ampConfig.model}{ampNumber !== undefined && ` #${ampNumber}`}
             </span>
             {instance.ampConfig.mode && (
               <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-neutral-700 dark:text-gray-300">
@@ -1389,6 +1836,9 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         routing={routingMap[output.outputIndex]}
                         onRoutingChange={is16ChannelAmp ? undefined : (value) => handleRoutingChange(output.outputIndex, value)}
                         ampConfigKey={instance.ampConfig.key}
+                        ampId={instance.id}
+                        ampModel={instance.ampConfig.model}
+                        isLocked={isLocked}
                       />
                     );
                   }
@@ -1413,7 +1863,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 }
 
 /** Renders a single zone's solver results */
-function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance }: { solution: SolverSolution; salesMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void }) {
+function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, onCombineLockedRacks }: { solution: SolverSolution; salesMode: boolean; rackMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; onCombineLockedRacks?: (ampIds: string[]) => void }) {
   // Track packed/spread state per amp index (independent per amp)
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
@@ -1445,6 +1895,48 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
       setSpreadMap(prev => ({ ...prev, ...newSpreadEntries }));
     }
   }, [solution.ampInstances.length, packedMap, spreadMap]);
+
+  const handleTogglePacked = (index: number) => {
+    setPackedMap(prev => {
+      const wasPacked = prev[index] ?? false;
+      if (wasPacked) {
+        setSpreadMap(s => ({ ...s, [index]: false }));
+      }
+      return { ...prev, [index]: !wasPacked };
+    });
+  };
+
+  const handleToggleSpread = (index: number) => {
+    setSpreadMap(prev => ({ ...prev, [index]: !(prev[index] ?? false) }));
+  };
+
+  // Track lock transitions for animation
+  const prevLockedRef = useRef<Set<string>>(new Set());
+  const [animatingLockIds, setAnimatingLockIds] = useState<Set<string>>(new Set());
+  const animTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Detect newly locked amps and trigger slide-up animation
+  useEffect(() => {
+    const curr = lockedAmpIds ?? new Set<string>();
+    const prev = prevLockedRef.current;
+
+    const newlyLocked = new Set<string>();
+    for (const id of curr) {
+      if (!prev.has(id)) newlyLocked.add(id);
+    }
+
+    prevLockedRef.current = new Set(curr);
+
+    if (newlyLocked.size > 0) {
+      setAnimatingLockIds(newlyLocked);
+      if (animTimerRef.current) clearTimeout(animTimerRef.current);
+      animTimerRef.current = setTimeout(() => setAnimatingLockIds(new Set()), 500);
+    }
+
+    return () => {
+      if (animTimerRef.current) clearTimeout(animTimerRef.current);
+    };
+  }, [lockedAmpIds]);
 
   if (!solution.success) {
     return (
@@ -1529,19 +2021,177 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
               }
               grouped.get(key)!.push(instance);
             }
+
+            // When rack mode is on, replace LA12X group with LA-RAK count
+            if (rackMode && grouped.has("LA12X")) {
+              const la12xInstances = grouped.get("LA12X")!;
+              const rackCount = Math.ceil(la12xInstances.length / 3);
+              grouped.delete("LA12X");
+
+              return (
+                <>
+                  <GroupedRackCard rackCount={rackCount} la12xInstances={la12xInstances} />
+                  {Array.from(grouped.entries()).map(([key, instances]) => (
+                    <GroupedAmpCard key={key} instances={instances} />
+                  ))}
+                </>
+              );
+            }
+
             return Array.from(grouped.entries()).map(([key, instances]) => (
               <GroupedAmpCard key={key} instances={instances} />
             ));
           })()
-        ) : (
-          solution.ampInstances.map((instance, index) => {
-            // Use map values directly (each amp has independent state after initialization)
-            const packed = packedMap[index] ?? false;
-            const spread = spreadMap[index] ?? false;
+        ) : rackMode ? (
+          (() => {
+            // Partition into LA12X and other amps, tracking global indices
+            const la12xEntries: { instance: AmpInstance; globalIndex: number }[] = [];
+            const otherEntries: { instance: AmpInstance; globalIndex: number }[] = [];
+            solution.ampInstances.forEach((instance, index) => {
+              if (instance.ampConfig.key === "LA12X") {
+                la12xEntries.push({ instance, globalIndex: index });
+              } else {
+                otherEntries.push({ instance, globalIndex: index });
+              }
+            });
 
-            const isLocked = lockedAmpIds?.has(instance.id) ?? false;
+            const RACK_SIZE = 3;
+
+            // Separate locked and unlocked LA12X BEFORE grouping into racks
+            // This prevents locked amps from being mixed with new solver results
+            const lockedLa12x = la12xEntries.filter(e => lockedAmpIds?.has(e.instance.id));
+            const unlockedLa12x = la12xEntries.filter(e => !(lockedAmpIds?.has(e.instance.id)));
+
+            // Group locked LA12X by their rackGroupId (amps locked together stay together)
+            // Amps without a rackGroupId get their own individual rack
+            const lockedRackGroups = new Map<string, { instance: AmpInstance; globalIndex: number }[]>();
+            for (const entry of lockedLa12x) {
+              const groupId = entry.instance.rackGroupId ?? entry.instance.id; // fallback to amp id if no group
+              if (!lockedRackGroups.has(groupId)) {
+                lockedRackGroups.set(groupId, []);
+              }
+              lockedRackGroups.get(groupId)!.push(entry);
+            }
+            const lockedRacks = Array.from(lockedRackGroups.values());
+
+            // Check if combining locked racks is possible (more than 1 locked rack, total <= RACK_SIZE)
+            const canCombineLockedRacks = lockedRacks.length > 1 && lockedLa12x.length <= RACK_SIZE;
+
+            // Group unlocked LA12X into their own racks
+            const unlockedRacks: { instance: AmpInstance; globalIndex: number }[][] = [];
+            for (let r = 0; r < Math.ceil(unlockedLa12x.length / RACK_SIZE); r++) {
+              unlockedRacks.push(unlockedLa12x.slice(r * RACK_SIZE, (r + 1) * RACK_SIZE));
+            }
+
+            // Separate locked and unlocked other amps
+            const lockedOther = otherEntries.filter(e => lockedAmpIds?.has(e.instance.id));
+            const unlockedOther = otherEntries.filter(e => !(lockedAmpIds?.has(e.instance.id)));
+
+            const hasLocked = lockedRacks.length > 0 || lockedOther.length > 0;
 
             return (
+              <>
+                {/* Locked items at top, side by side */}
+                {hasLocked && (
+                  <div className="flex flex-wrap gap-4 items-start">
+                    {lockedRacks.map((rackEntries, rackIdx) => {
+                      const isAnimating = rackEntries.some(e => animatingLockIds.has(e.instance.id));
+                      return (
+                      <div key={`locked-rack-${rackIdx}`} className={`w-[calc(50%-0.5rem)] ${isAnimating ? 'lock-slide-up' : ''}`}>
+                        <LaRakCard
+                          rackIndex={rackIdx}
+                          instances={rackEntries.map(e => e.instance)}
+                          cableGaugeMm2={cableGaugeMm2}
+                          useFeet={useFeet}
+                          onAdjustEnclosure={onAdjustEnclosure}
+                          packedMap={packedMap}
+                          spreadMap={spreadMap}
+                          onTogglePacked={handleTogglePacked}
+                          onToggleSpread={handleToggleSpread}
+                          lockedAmpIds={lockedAmpIds}
+                          onLockAmpInstance={onLockAmpInstance}
+                          onUnlockAmpInstance={onUnlockAmpInstance}
+                          globalIndices={rackEntries.map(e => e.globalIndex)}
+                          canCombineWithOthers={canCombineLockedRacks}
+                          onCombineRacks={() => {
+                            // Combine all locked LA12X amps into one rack
+                            const allLockedLa12xIds = lockedLa12x.map(e => e.instance.id);
+                            onCombineLockedRacks?.(allLockedLa12xIds);
+                          }}
+                        />
+                      </div>
+                      );
+                    })}
+                    {lockedOther.map(({ instance, globalIndex }, idx) => (
+                      <div key={instance.id} className={`w-[calc(50%-0.5rem)] ${animatingLockIds.has(instance.id) ? 'lock-slide-up' : ''}`}>
+                        <AmpCard
+                          instance={instance}
+                          salesMode={false}
+                          cableGaugeMm2={cableGaugeMm2}
+                          useFeet={useFeet}
+                          onAdjustEnclosure={onAdjustEnclosure}
+                          packed={packedMap[globalIndex] ?? false}
+                          spread={spreadMap[globalIndex] ?? false}
+                          onTogglePacked={() => handleTogglePacked(globalIndex)}
+                          onToggleSpread={() => handleToggleSpread(globalIndex)}
+                          isLocked={true}
+                          onLock={() => onLockAmpInstance?.(instance)}
+                          onUnlock={() => onUnlockAmpInstance?.(instance.id)}
+                          ampNumber={idx + 1}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Unlocked items below, full width */}
+                {unlockedRacks.map((rackEntries, rackIdx) => (
+                  <LaRakCard
+                    key={`rack-${rackIdx}`}
+                    rackIndex={lockedRacks.length + rackIdx}
+                    instances={rackEntries.map(e => e.instance)}
+                    cableGaugeMm2={cableGaugeMm2}
+                    useFeet={useFeet}
+                    onAdjustEnclosure={onAdjustEnclosure}
+                    packedMap={packedMap}
+                    spreadMap={spreadMap}
+                    onTogglePacked={handleTogglePacked}
+                    onToggleSpread={handleToggleSpread}
+                    lockedAmpIds={lockedAmpIds}
+                    onLockAmpInstance={onLockAmpInstance}
+                    onUnlockAmpInstance={onUnlockAmpInstance}
+                    globalIndices={rackEntries.map(e => e.globalIndex)}
+                  />
+                ))}
+                {unlockedOther.map(({ instance, globalIndex }, idx) => (
+                  <AmpCard
+                    key={instance.id}
+                    instance={instance}
+                    salesMode={false}
+                    cableGaugeMm2={cableGaugeMm2}
+                    useFeet={useFeet}
+                    onAdjustEnclosure={onAdjustEnclosure}
+                    packed={packedMap[globalIndex] ?? false}
+                    spread={spreadMap[globalIndex] ?? false}
+                    onTogglePacked={() => handleTogglePacked(globalIndex)}
+                    onToggleSpread={() => handleToggleSpread(globalIndex)}
+                    isLocked={false}
+                    onLock={() => onLockAmpInstance?.(instance)}
+                    onUnlock={() => onUnlockAmpInstance?.(instance.id)}
+                    ampNumber={lockedOther.length + idx + 1}
+                  />
+                ))}
+              </>
+            );
+          })()
+        ) : (
+          (() => {
+            // Sort locked amps to the top, unlocked below — all full width
+            const entries = solution.ampInstances.map((instance, index) => ({ instance, index }));
+            const locked = entries.filter(e => lockedAmpIds?.has(e.instance.id));
+            const unlocked = entries.filter(e => !(lockedAmpIds?.has(e.instance.id)));
+            const sorted = [...locked, ...unlocked];
+
+            return sorted.map(({ instance, index }, displayIndex) => (
               <AmpCard
                 key={instance.id}
                 instance={instance}
@@ -1549,37 +2199,45 @@ function ZoneSolutionSection({ solution, salesMode, cableGaugeMm2, useFeet, onAd
                 cableGaugeMm2={cableGaugeMm2}
                 useFeet={useFeet}
                 onAdjustEnclosure={onAdjustEnclosure}
-                packed={packed}
-                spread={spread}
-                onTogglePacked={() => {
-                  setPackedMap(prev => {
-                    const wasPacked = prev[index] ?? false;
-                    if (wasPacked) {
-                      // When turning off packed, also turn off spread
-                      setSpreadMap(s => ({ ...s, [index]: false }));
-                    }
-                    return { ...prev, [index]: !wasPacked };
-                  });
-                }}
-                onToggleSpread={() => {
-                  setSpreadMap(prev => ({ ...prev, [index]: !(prev[index] ?? false) }));
-                }}
-                isLocked={isLocked}
+                packed={packedMap[index] ?? false}
+                spread={spreadMap[index] ?? false}
+                onTogglePacked={() => handleTogglePacked(index)}
+                onToggleSpread={() => handleToggleSpread(index)}
+                isLocked={lockedAmpIds?.has(instance.id) ?? false}
                 onLock={() => onLockAmpInstance?.(instance)}
                 onUnlock={() => onUnlockAmpInstance?.(instance.id)}
+                ampNumber={displayIndex + 1}
               />
-            );
-          })
+            ));
+          })()
         )}
       </div>
     </div>
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onUnlockAmpInstance }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
+
+  // Validation function for drag-drop
+  const validateDrop = (
+    _source: DraggableEnclosureData,
+    _target: DroppableChannelData
+  ): DropValidation => {
+    // Only locked amps can have enclosures moved - no confirmation needed
+    // Future: check enclosure compatibility with target amp
+    return {
+      isValid: true,
+      requiresConfirmation: false,
+    };
+  };
+
+  // Handle the actual move
+  const handleMoveEnclosure = (result: EnclosureMoveResult) => {
+    onMoveEnclosure?.(result);
+  };
 
   if (!activeSolution) {
     return (
@@ -1590,18 +2248,25 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
   }
 
   return (
-    <div className="space-y-6">
-      {/* Active Zone Results */}
-      <ZoneSolutionSection
-        solution={activeSolution}
-        salesMode={salesMode}
-        cableGaugeMm2={cableGaugeMm2}
-        useFeet={useFeet}
-        onAdjustEnclosure={onAdjustEnclosure}
-        lockedAmpIds={new Set(activeZoneSolution?.zone.lockedAmpInstances.map(a => a.id) ?? [])}
-        onLockAmpInstance={onLockAmpInstance}
-        onUnlockAmpInstance={onUnlockAmpInstance}
-      />
-    </div>
+    <EnclosureDragDropProvider
+      onMoveEnclosure={handleMoveEnclosure}
+      validateDrop={validateDrop}
+    >
+      <div className="space-y-6">
+        {/* Active Zone Results */}
+        <ZoneSolutionSection
+          solution={activeSolution}
+          salesMode={salesMode}
+          rackMode={rackMode}
+          cableGaugeMm2={cableGaugeMm2}
+          useFeet={useFeet}
+          onAdjustEnclosure={onAdjustEnclosure}
+          lockedAmpIds={new Set(activeZoneSolution?.zone.lockedAmpInstances.map(a => a.id) ?? [])}
+          onLockAmpInstance={onLockAmpInstance}
+          onUnlockAmpInstance={onUnlockAmpInstance}
+          onCombineLockedRacks={onCombineLockedRacks}
+        />
+      </div>
+    </EnclosureDragDropProvider>
   );
 }

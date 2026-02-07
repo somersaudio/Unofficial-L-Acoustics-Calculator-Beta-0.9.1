@@ -60,6 +60,7 @@ export interface Enclosure {
   signal_channels: string[]; // Ordered amp channels needed: ["PA"], ["LF","HF"], ["LF","LF","MF","HF"], ["SB"], etc.
   signal_channels_override?: Record<string, number>; // Optional: amp-specific channel count overrides, e.g., { "LA12X": 1 }
   impedance_sections_ohms?: Record<string, number>; // Optional, e.g., { "HF": 16 }
+  signal_channel_names?: Record<string, string>; // Optional: human-readable names per channel, e.g., { "LF": "Syva Low", "PA": "Syva" }
   impedance_notes?: string;
   parallel_notes?: string;
   notes?: string[];
@@ -158,6 +159,7 @@ export interface AmpInstance {
   outputs: OutputAllocation[];
   totalEnclosures: number;
   loadPercent: number; // How much of the amp's capacity is used
+  rackGroupId?: string; // Optional: groups locked LA12X amps that belong to the same rack
 }
 
 /** Complete solution from the solver */
@@ -327,6 +329,7 @@ export interface AmpInstanceSerialized {
     outputIndex: number;
     enclosures: Array<{ enclosureName: string; count: number }>;
   }>;
+  rackGroupId?: string;
 }
 
 /** Serializable form of a Zone for JSON persistence */
@@ -345,6 +348,7 @@ export interface ProjectFile {
   settings: {
     darkMode: boolean;
     salesMode: boolean;
+    rackMode?: boolean;
     cableGaugeMm2: number;
     useFeet: boolean;
   };

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile, AmpInstance } from "../types";
 import { CABLE_GAUGES } from "../types";
-import EnclosureSelector from "./EnclosureSelector";
+import EnclosureSelector, { type LockedAmpEnclosureInfo } from "./EnclosureSelector";
 import SolverResults from "./SolverResults";
+import type { EnclosureMoveResult } from "./EnclosureDragDrop";
 import ZoneTabBar from "./ZoneTabBar";
 import MatrixRain from "./MatrixRain";
 import { solveAmplifierAllocation } from "../solver/ampSolver";
@@ -165,6 +166,10 @@ export default function App() {
     const saved = localStorage.getItem("matrixEnabled");
     return saved ? JSON.parse(saved) : true;
   });
+  const [rackMode, setRackMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem("rackMode");
+    return saved ? JSON.parse(saved) : false;
+  });
   // Restore zones from localStorage once data is loaded
   const [zonesRestored, setZonesRestored] = useState(false);
 
@@ -192,6 +197,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("matrixEnabled", JSON.stringify(matrixEnabled));
   }, [matrixEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem("rackMode", JSON.stringify(rackMode));
+  }, [rackMode]);
 
   useEffect(() => {
     async function loadData() {
@@ -294,10 +303,10 @@ export default function App() {
     const project: ProjectFile = {
       version: 1,
       zones: serializeZones(zones),
-      settings: { darkMode, salesMode, cableGaugeMm2, useFeet },
+      settings: { darkMode, salesMode, rackMode, cableGaugeMm2, useFeet },
     };
     await window.electronAPI.saveProject(JSON.stringify(project, null, 2));
-  }, [zones, darkMode, salesMode, cableGaugeMm2, useFeet]);
+  }, [zones, darkMode, salesMode, rackMode, cableGaugeMm2, useFeet]);
 
   const handleLoadProject = useCallback(async () => {
     if (state.status !== "ready") return;
@@ -313,6 +322,7 @@ export default function App() {
       if (project.settings) {
         setDarkMode(project.settings.darkMode);
         setSalesMode(project.settings.salesMode);
+        setRackMode(project.settings.rackMode ?? false);
         setCableGaugeMm2(project.settings.cableGaugeMm2);
         setUseFeet(project.settings.useFeet);
       }
@@ -430,6 +440,73 @@ export default function App() {
     }
     return counts;
   }, [activeZone.lockedAmpInstances]);
+
+  // Build detailed locked enclosure info per amp/rack for EnclosureSelector display
+  const activeLockedAmpEnclosures = useMemo<LockedAmpEnclosureInfo[]>(() => {
+    // Group locked amps by rackGroupId (for LA-RAK) or individual amp
+    const rackGroups = new Map<string, AmpInstance[]>();
+
+    for (const amp of activeZone.lockedAmpInstances) {
+      if (amp.ampConfig.key === "LA12X" && rackMode) {
+        // Group LA12X by rackGroupId
+        const groupId = amp.rackGroupId ?? amp.id;
+        if (!rackGroups.has(groupId)) {
+          rackGroups.set(groupId, []);
+        }
+        rackGroups.get(groupId)!.push(amp);
+      } else {
+        // Individual amp
+        rackGroups.set(amp.id, [amp]);
+      }
+    }
+
+    // Build the info array
+    const result: LockedAmpEnclosureInfo[] = [];
+    let rackNumber = 1;
+    const ampNumbers = new Map<string, number>(); // model -> next number
+
+    for (const [groupId, amps] of rackGroups) {
+      const enclosures = new Map<string, number>();
+
+      for (const amp of amps) {
+        const seenMultiChannel = new Set<string>();
+        for (const output of amp.outputs) {
+          for (const entry of output.enclosures) {
+            const name = entry.enclosure.enclosure;
+            const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
+
+            if (channelsPerUnit > 1) {
+              const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
+              const groupKey = `${name}_${groupIdx}`;
+              if (seenMultiChannel.has(groupKey)) continue;
+              seenMultiChannel.add(groupKey);
+            }
+
+            enclosures.set(name, (enclosures.get(name) ?? 0) + entry.count);
+          }
+        }
+      }
+
+      // Determine label
+      let label: string;
+      if (amps[0].ampConfig.key === "LA12X" && rackMode) {
+        label = `LA-RAK #${rackNumber++}`;
+      } else {
+        const model = amps[0].ampConfig.model;
+        const num = (ampNumbers.get(model) ?? 0) + 1;
+        ampNumbers.set(model, num);
+        label = `${model} #${num}`;
+      }
+
+      result.push({
+        ampLabel: label,
+        ampId: groupId,
+        enclosures,
+      });
+    }
+
+    return result;
+  }, [activeZone.lockedAmpInstances, rackMode]);
 
   // Get unique amp models for the footer toggle
   const ampModels = useMemo<string[]>(() => {
@@ -560,6 +637,7 @@ export default function App() {
               onRequestsChange={(reqs) => updateZone(activeZoneId, (z) => ({ ...z, requests: reqs }))}
               salesMode={salesMode}
               lockedEnclosureCounts={activeLockedEnclosureCounts}
+              lockedAmpEnclosures={activeLockedAmpEnclosures}
             />
           </div>
         </section>
@@ -570,6 +648,7 @@ export default function App() {
             zoneSolutions={zoneSolutions}
             activeZoneId={activeZoneId}
             salesMode={salesMode}
+            rackMode={rackMode}
             cableGaugeMm2={cableGaugeMm2}
             useFeet={useFeet}
             onAdjustEnclosure={(enclosureName, delta) => {
@@ -594,6 +673,107 @@ export default function App() {
                 ...zone,
                 lockedAmpInstances: zone.lockedAmpInstances.filter((a) => a.id !== ampInstanceId),
               }));
+            }}
+            onCombineLockedRacks={(ampIds: string[]) => {
+              // Assign the same rackGroupId to all specified amps so they appear in one rack
+              const newRackGroupId = `rack-${crypto.randomUUID().split("-").pop()}`;
+              updateZone(activeZoneId, (zone) => ({
+                ...zone,
+                lockedAmpInstances: zone.lockedAmpInstances.map((a) =>
+                  ampIds.includes(a.id) ? { ...a, rackGroupId: newRackGroupId } : a
+                ),
+              }));
+            }}
+            onMoveEnclosure={(move: EnclosureMoveResult) => {
+              // Find the active zone's current solution to get amp instances
+              const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
+              if (!activeZoneSolution?.solution) return;
+
+              const allInstances = [
+                ...activeZoneSolution.zone.lockedAmpInstances,
+                ...activeZoneSolution.solution.ampInstances,
+              ];
+
+              // Find source and target amp instances
+              const sourceAmp = allInstances.find((a) => a.id === move.sourceAmpId);
+              const targetAmp = allInstances.find((a) => a.id === move.targetAmpId);
+              if (!sourceAmp || !targetAmp) return;
+
+              // Find the enclosure in the source channel
+              const sourceOutput = sourceAmp.outputs[move.sourceChannelIndex];
+              const enclosureEntry = sourceOutput?.enclosures.find(
+                (e) => e.enclosure.enclosure === move.enclosureName
+              );
+              if (!enclosureEntry || enclosureEntry.count < 1) return;
+
+              // Create modified copies of source and target amps
+              const modifyAmpOutput = (
+                amp: AmpInstance,
+                channelIndex: number,
+                enclosureName: string,
+                delta: number
+              ): AmpInstance => {
+                const newOutputs = amp.outputs.map((output, i) => {
+                  if (i !== channelIndex) return output;
+                  const newEnclosures = output.enclosures
+                    .map((e) => {
+                      if (e.enclosure.enclosure !== enclosureName) return e;
+                      const newCount = e.count + delta;
+                      return newCount > 0 ? { ...e, count: newCount } : null;
+                    })
+                    .filter((e): e is NonNullable<typeof e> => e !== null);
+
+                  // If adding and enclosure doesn't exist yet, add it
+                  if (delta > 0 && !newEnclosures.some((e) => e.enclosure.enclosure === enclosureName)) {
+                    newEnclosures.push({ enclosure: enclosureEntry.enclosure, count: delta });
+                  }
+
+                  const newTotalEnclosures = newEnclosures.reduce((sum, e) => sum + e.count, 0);
+
+                  // Recalculate impedance using per-section impedance for multi-channel enclosures
+                  let newImpedance = Infinity;
+                  if (newTotalEnclosures > 0 && newEnclosures.length > 0) {
+                    let reciprocalSum = 0;
+                    for (const e of newEnclosures) {
+                      // For multi-channel enclosures, use section impedance for this channel
+                      const channelsPerUnit = e.enclosure.signal_channels?.length ?? 1;
+                      let sectionZ = e.enclosure.nominal_impedance_ohms;
+                      if (channelsPerUnit > 1 && e.enclosure.impedance_sections_ohms) {
+                        const posInGroup = output.outputIndex % channelsPerUnit;
+                        const signalType = e.enclosure.signal_channels[posInGroup];
+                        sectionZ = e.enclosure.impedance_sections_ohms[signalType] ?? sectionZ;
+                      }
+                      reciprocalSum += e.count / sectionZ;
+                    }
+                    newImpedance = reciprocalSum > 0 ? Math.round((1 / reciprocalSum) * 10) / 10 : Infinity;
+                  }
+
+                  return {
+                    ...output,
+                    enclosures: newEnclosures,
+                    totalEnclosures: newTotalEnclosures,
+                    impedanceOhms: newImpedance,
+                  };
+                });
+
+                const totalEnclosures = newOutputs.reduce((sum, o) => sum + o.totalEnclosures, 0);
+                return { ...amp, outputs: newOutputs, totalEnclosures };
+              };
+
+              // Remove from source, add to target
+              const modifiedSource = modifyAmpOutput(sourceAmp, move.sourceChannelIndex, move.enclosureName, -1);
+              const modifiedTarget = modifyAmpOutput(targetAmp, move.targetChannelIndex, move.enclosureName, 1);
+
+              // Update locked amps - drag-drop only works between locked amps
+              updateZone(activeZoneId, (zone) => {
+                const newLocked = zone.lockedAmpInstances.map((a) => {
+                  if (a.id === move.sourceAmpId) return modifiedSource;
+                  if (a.id === move.targetAmpId) return modifiedTarget;
+                  return a;
+                });
+
+                return { ...zone, lockedAmpInstances: newLocked };
+              });
             }}
           />
         </section>
@@ -647,6 +827,19 @@ export default function App() {
                 );
               })}
             </div>
+            <div className="mx-1 h-5 w-px bg-gray-300 dark:bg-neutral-700" />
+            <button
+              onClick={() => setRackMode(!rackMode)}
+              className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                rackMode
+                  ? "text-white hover:brightness-110"
+                  : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+              }`}
+              style={rackMode ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+              title={rackMode ? "Disable LA-RAK grouping" : "Enable LA-RAK rack grouping (LA12X only)"}
+            >
+              LA-RAK
+            </button>
           </div>
 
           {/* Unit Toggle + Cable Gauge Selector + Bug Report */}
