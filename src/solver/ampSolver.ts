@@ -610,19 +610,20 @@ function allocateToOutputs(
   const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
 
   if (enclosure.parallelAllowed) {
-    // Calculate minimum per output for valid impedance
+    // Calculate minimum per output for valid impedance (hard floor)
     const minPerOutputForImpedance = getMinimumPerOutputForImpedance(enclosure, limits, ampConfig.ratedImpedances);
 
-    // Effective minimum per output - use the higher of impedance requirement and preferredPerOutput
-    // But preferredPerOutput of 1 means "spread as much as possible when valid"
-    // So if impedance requires 2, use 2. If impedance allows 1 and preferred is 1, use 1.
-    const effectiveMinPerOutput = Math.max(minPerOutputForImpedance, enclosure.preferredPerOutput);
+    // Calculate minimum per output to reach rated impedance (avoids above-rated warnings)
+    // e.g., 5XT (16Ω) on LA12X (max rated 8Ω) → need 2 per output (16/2=8Ω)
+    const minPerOutputForRated = getMinimumForRatedImpedance(enclosure, ampConfig, limits.perOutput);
+
+    // Effective minimum: highest of hard-floor requirement, rated requirement, and preferred
+    const effectiveMinPerOutput = Math.max(minPerOutputForImpedance, minPerOutputForRated, enclosure.preferredPerOutput);
 
     // Max rated impedance threshold - outputs at or above this show "add 1 more enclosure" warning
     const maxRated = ampConfig.ratedImpedances.length > 0 ? Math.max(...ampConfig.ratedImpedances) : Infinity;
 
-    // Phase 1: Spread enclosures across outputs (following fill order)
-    // In balanced mode, spread evenly first - don't pack to avoid warnings
+    // Phase 1: Spread enclosures across outputs at the rated minimum per channel
     let orderIdx = 0;
     while (remaining >= effectiveMinPerOutput && orderIdx < order.length) {
       const oi = order[orderIdx];
@@ -643,8 +644,35 @@ function allocateToOutputs(
       orderIdx++;
     }
 
-    // Phase 2: Pack additional enclosures into existing outputs using round-robin
-    // This keeps the distribution balanced across outputs
+    // Phase 2: Spread remaining to empty outputs before packing existing ones
+    // e.g., 3x 5XT → ch0=2 (rated), ch1=1 (warning but on its own channel)
+    let overflowIdx = 0;
+    while (remaining > 0) {
+      // Find next empty output in fill order
+      while (overflowIdx < order.length && outputs[order[overflowIdx]].totalEnclosures > 0) {
+        overflowIdx++;
+      }
+      if (overflowIdx >= order.length) break;
+
+      const oi = order[overflowIdx];
+      const toAllocate = Math.min(remaining, limits.perOutput);
+      outputs[oi].enclosures.push({
+        enclosure,
+        count: toAllocate,
+      });
+      outputs[oi].totalEnclosures = toAllocate;
+      outputs[oi].impedanceOhms = calculateParallelImpedance(
+        enclosure.nominal_impedance_ohms,
+        toAllocate
+      );
+      if (limits.minImpedanceOverride !== undefined) {
+        outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
+      }
+      remaining -= toAllocate;
+      overflowIdx++;
+    }
+
+    // Phase 3: Pack additional enclosures into existing outputs using round-robin
     while (remaining > 0) {
       let allocated = false;
 
@@ -665,34 +693,6 @@ function allocateToOutputs(
       }
 
       if (!allocated) break;
-    }
-
-    // Phase 3: If there are still remaining enclosures and empty outputs,
-    // allocate to them (for cases where effectiveMinPerOutput > remaining initially)
-    orderIdx = 0;
-    while (remaining > 0) {
-      // Find next empty output in fill order
-      while (orderIdx < order.length && outputs[order[orderIdx]].totalEnclosures > 0) {
-        orderIdx++;
-      }
-      if (orderIdx >= order.length) break;
-
-      const oi = order[orderIdx];
-      const toAllocate = Math.min(remaining, limits.perOutput);
-      outputs[oi].enclosures.push({
-        enclosure,
-        count: toAllocate,
-      });
-      outputs[oi].totalEnclosures = toAllocate;
-      outputs[oi].impedanceOhms = calculateParallelImpedance(
-        enclosure.nominal_impedance_ohms,
-        toAllocate
-      );
-      if (limits.minImpedanceOverride !== undefined) {
-        outputs[oi].minImpedanceOverride = limits.minImpedanceOverride;
-      }
-      remaining -= toAllocate;
-      orderIdx++;
     }
   } else {
     // Spread 1 per output (no parallel) — follow fill order

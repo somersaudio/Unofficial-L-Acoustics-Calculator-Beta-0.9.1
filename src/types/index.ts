@@ -282,6 +282,52 @@ export function getMaxCableLength(impedanceOhms: number, gaugeMm2: number): Cabl
   return { meters: estimatedMeters, feet: estimatedFeet, estimated: true };
 }
 
+// =============================================================================
+// Cable Loss Calculation (copper resistance from HyperPhysics wire gauge table)
+// =============================================================================
+
+/** Copper cable resistance per meter per conductor at 20°C */
+export const CABLE_RESISTANCE_PER_METER: Record<number, number> = {
+  1.5: 0.01317, // AWG 16
+  2.5: 0.00828, // AWG 14
+  4:   0.00413, // AWG 11
+  6:   0.00260, // AWG 9
+};
+
+export interface CableLossResult {
+  cableResistanceOhms: number;
+  lossDb: number;
+  dampingFactor: number;
+}
+
+/**
+ * Calculate cable insertion loss (dB) and damping factor for a given cable run.
+ * R_cable = resistance_per_meter × length × 2 (both conductors)
+ * Loss = 20 × log10(Z_load / (Z_load + R_cable))
+ * DF = Z_load / R_cable
+ */
+export function calculateCableLoss(
+  impedanceOhms: number,
+  cableLengthMeters: number,
+  gaugeMm2: number
+): CableLossResult | null {
+  if (impedanceOhms === Infinity || impedanceOhms <= 0) return null;
+  if (cableLengthMeters <= 0) return null;
+
+  const resistancePerMeter = CABLE_RESISTANCE_PER_METER[gaugeMm2];
+  if (resistancePerMeter === undefined) return null;
+
+  const cableResistanceOhms = resistancePerMeter * cableLengthMeters * 2;
+  const lossDb = 20 * Math.log10(impedanceOhms / (impedanceOhms + cableResistanceOhms));
+  const dampingFactor = impedanceOhms / cableResistanceOhms;
+
+  return {
+    cableResistanceOhms: Math.round(cableResistanceOhms * 1000) / 1000,
+    lossDb: Math.round(lossDb * 100) / 100,
+    dampingFactor: Math.round(dampingFactor * 10) / 10,
+  };
+}
+
 /** Impedance validation result for an output */
 export interface ImpedanceValidation {
   impedanceOhms: number;

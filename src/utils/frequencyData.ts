@@ -23,6 +23,7 @@ export const ENCLOSURE_LOW_FREQUENCY: Record<string, number> = {
   "X4i": 120,
   "5XT": 95,
   "Syva": 87,
+  "Syva Low Syva": 40,
   "Soka": 52,
 
   // Subwoofers

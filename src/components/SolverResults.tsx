@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from "react"; // eslint-disable-line
 import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, Enclosure } from "../types";
-import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength } from "../types";
+import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength, calculateCableLoss } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
+import CableLossChart from "./CableLossChart";
 import {
   EnclosureDragDropProvider,
   useDraggableEnclosure,
@@ -268,6 +269,88 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
   );
 }
 
+const METERS_PER_FOOT = 0.3048;
+
+/** Compact cable length input for per-output cable run distance */
+function CableLengthInput({
+  lengthMeters,
+  onChange,
+  useFeet,
+}: {
+  lengthMeters: number;
+  onChange: (meters: number) => void;
+  useFeet: boolean;
+}) {
+  const displayValue = useFeet
+    ? Math.round(lengthMeters / METERS_PER_FOOT)
+    : Math.round(lengthMeters);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value) || 0;
+    const meters = useFeet ? val * METERS_PER_FOOT : val;
+    onChange(Math.max(0, meters));
+  };
+
+  return (
+    <div className="flex items-center gap-1 text-[10px]">
+      <span className="text-gray-500 dark:text-neutral-500">Cable:</span>
+      <input
+        type="number"
+        min="0"
+        step={useFeet ? "5" : "1"}
+        value={displayValue || ""}
+        onChange={handleChange}
+        placeholder="0"
+        className="w-12 rounded border border-gray-300 bg-white px-1 py-0.5 text-center text-[10px] text-gray-700 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200 focus:border-blue-500 focus:outline-none"
+      />
+      <span className="text-gray-400 dark:text-neutral-500">{useFeet ? "ft" : "m"}</span>
+    </div>
+  );
+}
+
+/** Displays cable insertion loss (dB) and effective damping factor with color coding */
+function CableLossDisplay({
+  impedanceOhms,
+  cableLengthMeters,
+  gaugeMm2,
+}: {
+  impedanceOhms: number;
+  cableLengthMeters: number;
+  gaugeMm2: number;
+}) {
+  if (impedanceOhms === Infinity || impedanceOhms <= 0 || cableLengthMeters <= 0) return null;
+
+  const result = calculateCableLoss(impedanceOhms, cableLengthMeters, gaugeMm2);
+  if (!result) return null;
+
+  const absLoss = Math.abs(result.lossDb);
+
+  const lossColor =
+    absLoss < 0.4
+      ? "text-green-600 dark:text-green-500"
+      : absLoss <= 1.0
+        ? "text-amber-600 dark:text-amber-500"
+        : "text-red-600 dark:text-red-500";
+
+  const dfColor =
+    result.dampingFactor > 20
+      ? "text-green-600 dark:text-green-500"
+      : result.dampingFactor >= 10
+        ? "text-amber-600 dark:text-amber-500"
+        : "text-red-600 dark:text-red-500";
+
+  return (
+    <div className="flex items-center gap-2 text-[10px]">
+      <span className={`font-medium ${lossColor}`}>
+        {result.lossDb.toFixed(1)} dB
+      </span>
+      <span className={`font-medium ${dfColor}`}>
+        DF {result.dampingFactor.toFixed(0)}
+      </span>
+    </div>
+  );
+}
+
 /** Draggable enclosure count display - allows drag-and-drop between channels */
 function DraggableEnclosureItem({
   enclosureName,
@@ -329,7 +412,7 @@ function DraggableEnclosureItem({
   );
 }
 
-function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange, ampConfigKey, ampId, ampModel, isLocked = false }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void; ampConfigKey?: string; ampId?: string; ampModel?: string; isLocked?: boolean }) {
+function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, isSecondaryChannel = false, hideEnclosureName = false, enclosureTypeMap, inputLetter, routing, onRoutingChange, ampConfigKey, ampId, ampModel, isLocked = false, cableLengthMeters = 0, onCableLengthChange }: { output: OutputAllocation; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; isSecondaryChannel?: boolean; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetter?: string; routing?: RoutingOption; onRoutingChange?: (value: RoutingOption) => void; ampConfigKey?: string; ampId?: string; ampModel?: string; isLocked?: boolean; cableLengthMeters?: number; onCableLengthChange?: (meters: number) => void }) {
   const hasLoad = output.totalEnclosures > 0;
   const outputLabel = ampOutputCount === 16
     ? `Ch ${output.outputIndex + 1}`
@@ -542,6 +625,13 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                   </span>
                 </div>
               )}
+              {/* Cable loss: per-output length input + dB loss / damping factor */}
+              {!is16Channel && output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && onCableLengthChange && (
+                <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} />
+                  <CableLossDisplay impedanceOhms={output.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
+                </div>
+              )}
               {/* For 16-channel amps: routing selector at left, impedance at right */}
               {is16Channel && (
                 <div className="flex items-center justify-between pt-0.5">
@@ -576,7 +666,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
 }
 
 /** Card that groups multiple channels used by a single multi-channel enclosure (e.g., L2/L2D using Ch 1 & 2) */
-function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters, routings, onRoutingChange, ampConfigKey }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[]; routings?: RoutingOption[]; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string }) {
+function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, hideEnclosureName = false, enclosureTypeMap, inputLetters, routings, onRoutingChange, ampConfigKey, cableLengthMeters = 0, onCableLengthChange }: { outputs: OutputAllocation[]; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; hideEnclosureName?: boolean; enclosureTypeMap?: Map<string, number>; inputLetters?: string[]; routings?: RoutingOption[]; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string; cableLengthMeters?: number; onCableLengthChange?: (meters: number) => void }) {
   const channelCount = outputs.length;
   const primaryOutput = outputs[0];
   const is16Channel = ampOutputCount === 16;
@@ -694,6 +784,12 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
           {!is16Channel && primaryOutput.impedanceOhms !== Infinity && primaryOutput.impedanceOhms > 0 && (
             <div className="pt-1 text-[10px]">
               <CableLengthInfo impedanceOhms={primaryOutput.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+              {onCableLengthChange && (
+                <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} />
+                  <CableLossDisplay impedanceOhms={primaryOutput.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -714,7 +810,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
 }
 
 /** Card for a physical output that groups multiple amp channels (e.g., LA12X NL4 carrying 2 channels) */
-function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap, routingMap, onRoutingChange, ampConfigKey }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[]; routingMap?: Record<number, RoutingOption>; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string }) {
+function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode = false, cableGaugeMm2, useFeet, ratedImpedances = [], onAdjustEnclosure, enclosureTypeMap, inputLettersMap, routingMap, onRoutingChange, ampConfigKey, cableLengths, ampId, onCableLengthChange }: { outputs: OutputAllocation[]; physicalIndex: number; ampOutputCount: number; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; ratedImpedances?: number[]; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; enclosureTypeMap?: Map<string, number>; inputLettersMap?: string[]; routingMap?: Record<number, RoutingOption>; onRoutingChange?: (channelIndex: number, value: RoutingOption) => void; ampConfigKey?: string; cableLengths?: Record<string, number>; ampId?: string; onCableLengthChange?: (outputIndex: number, meters: number) => void }) {
   // Aggregate enclosures across channels in this physical output
   const enclosureTotals = new Map<string, { enclosure: OutputAllocation["enclosures"][0]["enclosure"]; count: number }>();
   let totalEnclosures = 0;
@@ -929,6 +1025,12 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                         {groupOutputs[0].impedanceOhms !== Infinity && groupOutputs[0].impedanceOhms > 0 && (
                           <div className="pt-1 text-[10px]">
                             <CableLengthInfo impedanceOhms={groupOutputs[0].impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                            {onCableLengthChange && ampId && (
+                              <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} />
+                                <CableLossDisplay impedanceOhms={groupOutputs[0].impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1046,6 +1148,12 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                         {firstWithLoad && firstWithLoad.impedanceOhms !== Infinity && firstWithLoad.impedanceOhms > 0 && (
                           <div className="pt-1 text-[10px]">
                             <CableLengthInfo impedanceOhms={firstWithLoad.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+                            {onCableLengthChange && ampId && (
+                              <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} />
+                                <CableLossDisplay impedanceOhms={firstWithLoad.impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1241,7 +1349,7 @@ function GroupedRackCard({ rackCount, la12xInstances }: { rackCount: number; la1
 }
 
 /** LA-RAK card: groups up to 3 LA12X amps into a rack frame */
-function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclosure, packedMap, spreadMap, onTogglePacked, onToggleSpread, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, globalIndices, canCombineWithOthers = false, onCombineRacks }: { rackIndex: number; instances: AmpInstance[]; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packedMap: Record<number, boolean>; spreadMap: Record<number, boolean>; onTogglePacked: (index: number) => void; onToggleSpread: (index: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; globalIndices: number[]; canCombineWithOthers?: boolean; onCombineRacks?: () => void }) {
+function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclosure, packedMap, spreadMap, onTogglePacked, onToggleSpread, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, globalIndices, canCombineWithOthers = false, onCombineRacks, cableLengths, onCableLengthChange }: { rackIndex: number; instances: AmpInstance[]; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packedMap: Record<number, boolean>; spreadMap: Record<number, boolean>; onTogglePacked: (index: number) => void; onToggleSpread: (index: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; globalIndices: number[]; canCombineWithOthers?: boolean; onCombineRacks?: () => void; cableLengths?: Record<string, number>; onCableLengthChange?: (ampId: string, outputIndex: number, meters: number) => void }) {
   const RACK_SLOTS = 3;
   const emptySlots = RACK_SLOTS - instances.length;
 
@@ -1429,6 +1537,8 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
                 spread={spread}
                 onTogglePacked={() => onTogglePacked(globalIdx)}
                 onToggleSpread={() => onToggleSpread(globalIdx)}
+                cableLengths={cableLengths}
+                onCableLengthChange={(outputIndex, meters) => onCableLengthChange?.(instance.id, outputIndex, meters)}
               />
             );
           })}
@@ -1468,7 +1578,7 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, cableLengths, onCableLengthChange }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void }) {
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
@@ -1743,6 +1853,9 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   routingMap={routingMap}
                   onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                   ampConfigKey={instance.ampConfig.key}
+                  cableLengths={cableLengths}
+                  ampId={instance.id}
+                  onCableLengthChange={(outputIndex, meters) => onCableLengthChange?.(outputIndex, meters)}
                 />
               ))}
             </div>
@@ -1763,6 +1876,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 routings={instance.outputs.map((_, i) => routingMap[i])}
                 onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                 ampConfigKey={instance.ampConfig.key}
+                cableLengthMeters={cableLengths?.[`${instance.id}:${instance.outputs[0].outputIndex}`] ?? 0}
+                onCableLengthChange={(meters) => onCableLengthChange?.(instance.outputs[0].outputIndex, meters)}
               />
             </div>
           ) : (
@@ -1814,6 +1929,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         routings={groupOutputs.map(o => routingMap[o.outputIndex])}
                         onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                         ampConfigKey={instance.ampConfig.key}
+                        cableLengthMeters={cableLengths?.[`${instance.id}:${groupOutputs[0].outputIndex}`] ?? 0}
+                        onCableLengthChange={(meters) => onCableLengthChange?.(groupOutputs[0].outputIndex, meters)}
                       />
                     );
                   } else {
@@ -1839,6 +1956,8 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         ampId={instance.id}
                         ampModel={instance.ampConfig.model}
                         isLocked={isLocked}
+                        cableLengthMeters={cableLengths?.[`${instance.id}:${output.outputIndex}`] ?? 0}
+                        onCableLengthChange={(meters) => onCableLengthChange?.(output.outputIndex, meters)}
                       />
                     );
                   }
@@ -1856,6 +1975,22 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
               Add 1 more enclosure for minimum recommended load
             </div>
           )}
+          {/* Cable loss frequency chart — shows when any output has a cable length */}
+          {(() => {
+            const chartOutputs = instance.outputs
+              .filter(o => o.totalEnclosures > 0)
+              .map(o => ({
+                outputIndex: o.outputIndex,
+                enclosureName: o.enclosures[0]?.enclosure.enclosure ?? "",
+                nominalImpedance: o.enclosures[0]?.enclosure.nominal_impedance_ohms ?? 8,
+                signalChannels: o.enclosures[0]?.enclosure.signal_channels ?? [],
+                cableLengthMeters: cableLengths?.[`${instance.id}:${o.outputIndex}`] ?? 0,
+                impedanceOhms: o.impedanceOhms,
+              }));
+            return chartOutputs.some(o => o.cableLengthMeters > 0) ? (
+              <CableLossChart outputs={chartOutputs} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+            ) : null;
+          })()}
         </div>
       )}
     </div>
@@ -1867,6 +2002,12 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
   // Track packed/spread state per amp index (independent per amp)
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
+
+  // Per-output cable length in meters, keyed by "ampId:outputIndex"
+  const [cableLengths, setCableLengths] = useState<Record<string, number>>({});
+  const handleCableLengthChange = (ampId: string, outputIndex: number, meters: number) => {
+    setCableLengths(prev => ({ ...prev, [`${ampId}:${outputIndex}`]: meters }));
+  };
 
   // Track which amp indices have been initialized
   const initializedIndicesRef = useRef<Set<number>>(new Set());
@@ -2118,6 +2259,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                             const allLockedLa12xIds = lockedLa12x.map(e => e.instance.id);
                             onCombineLockedRacks?.(allLockedLa12xIds);
                           }}
+                          cableLengths={cableLengths}
+                          onCableLengthChange={handleCableLengthChange}
                         />
                       </div>
                       );
@@ -2138,6 +2281,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                           onLock={() => onLockAmpInstance?.(instance)}
                           onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                           ampNumber={idx + 1}
+                          cableLengths={cableLengths}
+                          onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
                         />
                       </div>
                     ))}
@@ -2160,6 +2305,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                     onLockAmpInstance={onLockAmpInstance}
                     onUnlockAmpInstance={onUnlockAmpInstance}
                     globalIndices={rackEntries.map(e => e.globalIndex)}
+                    cableLengths={cableLengths}
+                    onCableLengthChange={handleCableLengthChange}
                   />
                 ))}
                 {unlockedOther.map(({ instance, globalIndex }, idx) => (
@@ -2178,6 +2325,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                     onLock={() => onLockAmpInstance?.(instance)}
                     onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                     ampNumber={lockedOther.length + idx + 1}
+                    cableLengths={cableLengths}
+                    onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
                   />
                 ))}
               </>
@@ -2207,6 +2356,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                 onLock={() => onLockAmpInstance?.(instance)}
                 onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                 ampNumber={displayIndex + 1}
+                cableLengths={cableLengths}
+                onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
               />
             ));
           })()
