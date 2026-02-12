@@ -618,7 +618,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                     {onRoutingChange && (
                       <RoutingSelector value={routing ?? "A"} onChange={onRoutingChange} />
                     )}
-                    <CableLengthInfo impedanceOhms={output.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
+
                   </div>
                   <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                     {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
@@ -783,7 +783,6 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
           {/* Cable length on its own line at the bottom */}
           {!is16Channel && primaryOutput.impedanceOhms !== Infinity && primaryOutput.impedanceOhms > 0 && (
             <div className="pt-1 text-[10px]">
-              <CableLengthInfo impedanceOhms={primaryOutput.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
               {onCableLengthChange && (
                 <div className="flex items-center gap-2 flex-wrap pt-0.5">
                   <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} />
@@ -1024,7 +1023,6 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                         {/* Cable length on its own line at the bottom for combined card */}
                         {groupOutputs[0].impedanceOhms !== Infinity && groupOutputs[0].impedanceOhms > 0 && (
                           <div className="pt-1 text-[10px]">
-                            <CableLengthInfo impedanceOhms={groupOutputs[0].impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
                             {onCableLengthChange && ampId && (
                               <div className="flex items-center gap-2 flex-wrap pt-0.5">
                                 <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} />
@@ -1147,7 +1145,6 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                         {/* Cable length on its own line at the bottom for combined card */}
                         {firstWithLoad && firstWithLoad.impedanceOhms !== Infinity && firstWithLoad.impedanceOhms > 0 && (
                           <div className="pt-1 text-[10px]">
-                            <CableLengthInfo impedanceOhms={firstWithLoad.impedanceOhms} gaugeMm2={cableGaugeMm2} useFeet={useFeet} />
                             {onCableLengthChange && ampId && (
                               <div className="flex items-center gap-2 flex-wrap pt-0.5">
                                 <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} />
@@ -1349,7 +1346,7 @@ function GroupedRackCard({ rackCount, la12xInstances }: { rackCount: number; la1
 }
 
 /** LA-RAK card: groups up to 3 LA12X amps into a rack frame */
-function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclosure, packedMap, spreadMap, onTogglePacked, onToggleSpread, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, globalIndices, canCombineWithOthers = false, onCombineRacks, cableLengths, onCableLengthChange }: { rackIndex: number; instances: AmpInstance[]; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packedMap: Record<number, boolean>; spreadMap: Record<number, boolean>; onTogglePacked: (index: number) => void; onToggleSpread: (index: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; globalIndices: number[]; canCombineWithOthers?: boolean; onCombineRacks?: () => void; cableLengths?: Record<string, number>; onCableLengthChange?: (ampId: string, outputIndex: number, meters: number) => void }) {
+function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclosure, packedMap, spreadMap, onTogglePacked, onToggleSpread, lockedAmpIds, onLockAmpInstance, onUnlockAmpInstance, globalIndices, canCombineWithOthers = false, onCombineRacks, cableLengths, onCableLengthChange }: { rackIndex: number; instances: AmpInstance[]; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packedMap: Record<number, boolean>; spreadMap: Record<number, boolean>; onTogglePacked: (index: number) => void; onToggleSpread: (index: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; globalIndices: number[]; canCombineWithOthers?: boolean; onCombineRacks?: () => void; cableLengths?: Record<string, number>; onCableLengthChange?: (ampIndex: number, outputIndex: number, meters: number) => void }) {
   const RACK_SLOTS = 3;
   const emptySlots = RACK_SLOTS - instances.length;
 
@@ -1537,8 +1534,9 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
                 spread={spread}
                 onTogglePacked={() => onTogglePacked(globalIdx)}
                 onToggleSpread={() => onToggleSpread(globalIdx)}
+                ampIndex={globalIdx}
                 cableLengths={cableLengths}
-                onCableLengthChange={(outputIndex, meters) => onCableLengthChange?.(instance.id, outputIndex, meters)}
+                onCableLengthChange={(outputIndex, meters) => onCableLengthChange?.(globalIdx, outputIndex, meters)}
               />
             );
           })}
@@ -1578,7 +1576,7 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, cableLengths, onCableLengthChange }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, ampIndex, cableLengths, onCableLengthChange }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; ampIndex?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void }) {
 
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
@@ -1594,6 +1592,9 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     console.log(`[AmpCard useMemo] ${rawInstance.id}: Using rawInstance (balanced)`);
     return rawInstance;
   }, [packed, spread, rawInstance]);
+
+  // Stable key prefix for cable lengths — uses positional index when available
+  const cableKeyPrefix = ampIndex !== undefined ? String(ampIndex) : instance.id;
 
   const ampOutputCount = instance.ampConfig.outputs;
   const is16ChannelAmp = ampOutputCount === 16;
@@ -1854,7 +1855,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                   onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                   ampConfigKey={instance.ampConfig.key}
                   cableLengths={cableLengths}
-                  ampId={instance.id}
+                  ampId={ampIndex !== undefined ? String(ampIndex) : instance.id}
                   onCableLengthChange={(outputIndex, meters) => onCableLengthChange?.(outputIndex, meters)}
                 />
               ))}
@@ -1876,7 +1877,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 routings={instance.outputs.map((_, i) => routingMap[i])}
                 onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                 ampConfigKey={instance.ampConfig.key}
-                cableLengthMeters={cableLengths?.[`${instance.id}:${instance.outputs[0].outputIndex}`] ?? 0}
+                cableLengthMeters={cableLengths?.[`${cableKeyPrefix}:${instance.outputs[0].outputIndex}`] ?? 0}
                 onCableLengthChange={(meters) => onCableLengthChange?.(instance.outputs[0].outputIndex, meters)}
               />
             </div>
@@ -1929,7 +1930,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         routings={groupOutputs.map(o => routingMap[o.outputIndex])}
                         onRoutingChange={is16ChannelAmp ? undefined : handleRoutingChange}
                         ampConfigKey={instance.ampConfig.key}
-                        cableLengthMeters={cableLengths?.[`${instance.id}:${groupOutputs[0].outputIndex}`] ?? 0}
+                        cableLengthMeters={cableLengths?.[`${cableKeyPrefix}:${groupOutputs[0].outputIndex}`] ?? 0}
                         onCableLengthChange={(meters) => onCableLengthChange?.(groupOutputs[0].outputIndex, meters)}
                       />
                     );
@@ -1956,7 +1957,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                         ampId={instance.id}
                         ampModel={instance.ampConfig.model}
                         isLocked={isLocked}
-                        cableLengthMeters={cableLengths?.[`${instance.id}:${output.outputIndex}`] ?? 0}
+                        cableLengthMeters={cableLengths?.[`${cableKeyPrefix}:${output.outputIndex}`] ?? 0}
                         onCableLengthChange={(meters) => onCableLengthChange?.(output.outputIndex, meters)}
                       />
                     );
@@ -1984,7 +1985,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 enclosureName: o.enclosures[0]?.enclosure.enclosure ?? "",
                 nominalImpedance: o.enclosures[0]?.enclosure.nominal_impedance_ohms ?? 8,
                 signalChannels: o.enclosures[0]?.enclosure.signal_channels ?? [],
-                cableLengthMeters: cableLengths?.[`${instance.id}:${o.outputIndex}`] ?? 0,
+                cableLengthMeters: cableLengths?.[`${cableKeyPrefix}:${o.outputIndex}`] ?? 0,
                 impedanceOhms: o.impedanceOhms,
               }));
             return chartOutputs.some(o => o.cableLengthMeters > 0) ? (
@@ -2003,10 +2004,11 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
 
-  // Per-output cable length in meters, keyed by "ampId:outputIndex"
+  // Per-output cable length in meters, keyed by "ampIndex:outputIndex"
+  // Uses positional index (not volatile UUID) so values survive solver re-runs
   const [cableLengths, setCableLengths] = useState<Record<string, number>>({});
-  const handleCableLengthChange = (ampId: string, outputIndex: number, meters: number) => {
-    setCableLengths(prev => ({ ...prev, [`${ampId}:${outputIndex}`]: meters }));
+  const handleCableLengthChange = (ampIndex: number, outputIndex: number, meters: number) => {
+    setCableLengths(prev => ({ ...prev, [`${ampIndex}:${outputIndex}`]: meters }));
   };
 
   // Track which amp indices have been initialized
@@ -2281,8 +2283,9 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                           onLock={() => onLockAmpInstance?.(instance)}
                           onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                           ampNumber={idx + 1}
+                          ampIndex={globalIndex}
                           cableLengths={cableLengths}
-                          onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
+                          onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(globalIndex, outputIndex, meters)}
                         />
                       </div>
                     ))}
@@ -2325,8 +2328,9 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                     onLock={() => onLockAmpInstance?.(instance)}
                     onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                     ampNumber={lockedOther.length + idx + 1}
+                    ampIndex={globalIndex}
                     cableLengths={cableLengths}
-                    onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
+                    onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(globalIndex, outputIndex, meters)}
                   />
                 ))}
               </>
@@ -2356,8 +2360,9 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                 onLock={() => onLockAmpInstance?.(instance)}
                 onUnlock={() => onUnlockAmpInstance?.(instance.id)}
                 ampNumber={displayIndex + 1}
+                ampIndex={index}
                 cableLengths={cableLengths}
-                onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(instance.id, outputIndex, meters)}
+                onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(index, outputIndex, meters)}
               />
             ));
           })()
