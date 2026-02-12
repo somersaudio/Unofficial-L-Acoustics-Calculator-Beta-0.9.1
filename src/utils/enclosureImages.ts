@@ -97,17 +97,22 @@ export function getEnclosureImage(enclosureName: string, quantity: number = 1): 
   // Check for direct match first
   let entry = imageMap.get(normalized);
 
-  // If no direct match, check for alias
-  if (!entry && imageAliases[normalized]) {
+  // Check for alias and merge with direct match
+  if (imageAliases[normalized]) {
     const alias = imageAliases[normalized];
     // Build entry from aliased image names
     const soloEntry = alias.solo ? imageMap.get(alias.solo) : undefined;
     const multiEntry = alias.multi ? imageMap.get(alias.multi) : undefined;
 
     if (soloEntry || multiEntry) {
-      entry = {
+      const aliasedEntry = {
         solo: soloEntry?.solo ?? soloEntry?.multi,
         multi: multiEntry?.multi ?? multiEntry?.solo,
+      };
+      // Merge with existing entry (alias takes precedence for missing values)
+      entry = {
+        solo: entry?.solo ?? aliasedEntry.solo,
+        multi: entry?.multi ?? aliasedEntry.multi,
       };
     }
   }
