@@ -272,8 +272,8 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
 const METERS_PER_FOOT = 0.3048;
 
 // Output colors for cable loss chart (matches CableLossChart.tsx palette)
-const OUTPUT_COLORS_LIGHT = ["#4A9B9B", "#8B7FB8", "#7B9B7B", "#B87F8B", "#B89B7F"];
-const OUTPUT_COLORS_DARK = ["#5DBDBD", "#A599D4", "#96B896", "#D499A6", "#D4B899"];
+const OUTPUT_COLORS_LIGHT = ["#4A9B9B", "#8B7FB8", "#5DB572", "#B87F8B", "#B89B7F"];
+const OUTPUT_COLORS_DARK = ["#5DBDBD", "#A599D4", "#77D48F", "#D499A6", "#D4B899"];
 
 /** Compact cable length input for per-output cable run distance */
 function CableLengthInput({

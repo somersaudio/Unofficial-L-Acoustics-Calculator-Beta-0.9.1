@@ -49,7 +49,7 @@ const FREQ_LABELS: Record<number, string> = {
 const OUTPUT_COLORS = [
   { stroke: "#4A9B9B", fill: "rgba(74, 155, 155, 0.12)" },     // Teal
   { stroke: "#8B7FB8", fill: "rgba(139, 127, 184, 0.12)" },   // Soft Purple
-  { stroke: "#7B9B7B", fill: "rgba(123, 155, 123, 0.12)" },   // Sage Green
+  { stroke: "#5DB572", fill: "rgba(93, 181, 114, 0.12)" },    // Emerald Green
   { stroke: "#B87F8B", fill: "rgba(184, 127, 139, 0.12)" },   // Dusty Rose
   { stroke: "#B89B7F", fill: "rgba(184, 155, 127, 0.12)" },   // Warm Sand
 ];
@@ -57,7 +57,7 @@ const OUTPUT_COLORS = [
 const OUTPUT_COLORS_DARK = [
   { stroke: "#5DBDBD", fill: "rgba(93, 189, 189, 0.15)" },    // Teal (bright)
   { stroke: "#A599D4", fill: "rgba(165, 153, 212, 0.15)" },   // Soft Purple (bright)
-  { stroke: "#96B896", fill: "rgba(150, 184, 150, 0.15)" },   // Sage Green (bright)
+  { stroke: "#77D48F", fill: "rgba(119, 212, 143, 0.15)" },   // Emerald Green (bright)
   { stroke: "#D499A6", fill: "rgba(212, 153, 166, 0.15)" },   // Dusty Rose (bright)
   { stroke: "#D4B899", fill: "rgba(212, 184, 153, 0.15)" },   // Warm Sand (bright)
 ];
