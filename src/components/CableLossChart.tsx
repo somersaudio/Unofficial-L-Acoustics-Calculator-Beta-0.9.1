@@ -154,6 +154,46 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
     return { ...curve, linePath, fillPath };
   });
 
+  // Group overlapping curves (same loss data) for multi-color dashed rendering
+  const curveGroups: Array<{
+    curves: typeof curvePaths;
+    linePath: string;
+    fillPath: string;
+    isDuplicate: boolean;
+  }> = [];
+
+  const processed = new Set<number>();
+  for (let i = 0; i < curvePaths.length; i++) {
+    if (processed.has(i)) continue;
+    const curve = curvePaths[i];
+    const duplicates = [curve];
+
+    // Find all curves with identical loss data
+    for (let j = i + 1; j < curvePaths.length; j++) {
+      if (processed.has(j)) continue;
+      const other = curvePaths[j];
+
+      // Check if curves are identical (same loss values at each frequency)
+      if (curve.lossCurve.length === other.lossCurve.length) {
+        const identical = curve.lossCurve.every((pt, idx) =>
+          Math.abs(pt.lossDb - other.lossCurve[idx].lossDb) < 0.001
+        );
+        if (identical) {
+          duplicates.push(other);
+          processed.add(j);
+        }
+      }
+    }
+
+    processed.add(i);
+    curveGroups.push({
+      curves: duplicates,
+      linePath: curve.linePath,
+      fillPath: curve.fillPath,
+      isDuplicate: duplicates.length > 1,
+    });
+  }
+
   // Hover: find frequency at mouse X position
   const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -313,23 +353,41 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
         </text>
 
         {/* Loss curves — fill first, then stroke on top */}
-        {curvePaths.map(curve => (
-          <path
-            key={`fill-${curve.outputIndex}`}
-            d={curve.fillPath}
-            fill={curve.color.fill}
-            stroke="none"
-          />
-        ))}
-        {curvePaths.map(curve => (
-          <path
-            key={`line-${curve.outputIndex}`}
-            d={curve.linePath}
-            fill="none"
-            stroke={curve.color.stroke}
-            strokeWidth={1.5}
-          />
-        ))}
+        {curveGroups.flatMap(group =>
+          group.curves.map(curve => (
+            <path
+              key={`fill-${curve.outputIndex}`}
+              d={curve.fillPath}
+              fill={curve.color.fill}
+              stroke="none"
+            />
+          ))
+        )}
+        {curveGroups.map((group, groupIdx) =>
+          group.isDuplicate ? (
+            // Overlapping curves: render each with staggered dashed pattern
+            group.curves.map((curve, idx) => (
+              <path
+                key={`line-${curve.outputIndex}`}
+                d={group.linePath}
+                fill="none"
+                stroke={curve.color.stroke}
+                strokeWidth={1.5}
+                strokeDasharray="6 4"
+                strokeDashoffset={idx * 2}
+              />
+            ))
+          ) : (
+            // Single curve: solid line
+            <path
+              key={`line-${group.curves[0].outputIndex}`}
+              d={group.linePath}
+              fill="none"
+              stroke={group.curves[0].color.stroke}
+              strokeWidth={1.5}
+            />
+          )
+        )}
 
         {/* Legend labels at right edge */}
         {curvePaths.map((curve, i) => (

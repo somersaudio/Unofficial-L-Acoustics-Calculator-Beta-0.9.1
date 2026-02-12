@@ -627,38 +627,27 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
                   });
                 })()}
               </div>
-              {/* Bottom row: routing selector at left, cable length in middle (non-16ch), impedance at right */}
-              {!is16Channel && (
-                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+              {/* Bottom section: routing, impedance, and cable controls */}
+              <div className="mt-auto pt-1 space-y-1">
+                {/* Routing selector at left, impedance at right */}
+                <div className="flex items-end justify-between text-[10px]">
                   <div className="flex items-center gap-1">
                     {onRoutingChange && (
                       <RoutingSelector value={routing ?? "A"} onChange={onRoutingChange} />
                     )}
-
                   </div>
                   <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
                     {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
                   </span>
                 </div>
-              )}
-              {/* Cable loss: per-output length input + dB loss / damping factor */}
-              {!is16Channel && output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && onCableLengthChange && (
-                <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={output.outputIndex} />
-                  <CableLossDisplay impedanceOhms={output.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
-                </div>
-              )}
-              {/* For 16-channel amps: routing selector at left, impedance at right */}
-              {is16Channel && (
-                <div className="flex items-center justify-between pt-0.5">
-                  {onRoutingChange && (
-                    <RoutingSelector value={routing ?? "A"} onChange={onRoutingChange} />
-                  )}
-                  <span className={hasImpedanceError ? "text-red-600 dark:text-red-500 font-bold" : "text-gray-400 dark:text-neutral-500"}>
-                    {output.impedanceOhms === Infinity ? "" : `${output.impedanceOhms}Ω`}
-                  </span>
-                </div>
-              )}
+                {/* Cable controls */}
+                {output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && onCableLengthChange && (
+                  <div className="flex items-center gap-2 flex-wrap text-[10px]">
+                    <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={output.outputIndex} />
+                    <CableLossDisplay impedanceOhms={output.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
+                  </div>
+                )}
+              </div>
             </div>
           )}
           {salesMode && (
@@ -783,8 +772,8 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
                     })}
                   </div>
 
-                  {/* Bottom row: routing selector at left, impedance at right */}
-                  <div className="flex items-center justify-between pt-0.5">
+                  {/* Routing selector at left, impedance at right */}
+                  <div className="flex items-center justify-between pt-1 text-[10px] mt-auto">
                     {onRoutingChange ? (
                       <RoutingSelector value={routings?.[idx] ?? "A"} onChange={(value) => onRoutingChange(output.outputIndex, value)} />
                     ) : <span />}
@@ -796,15 +785,11 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
               );
             })}
           </div>
-          {/* Cable length on its own line at the bottom */}
-          {!is16Channel && primaryOutput.impedanceOhms !== Infinity && primaryOutput.impedanceOhms > 0 && (
-            <div className="pt-1 text-[10px]">
-              {onCableLengthChange && (
-                <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={primaryOutput.outputIndex} />
-                  <CableLossDisplay impedanceOhms={primaryOutput.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
-                </div>
-              )}
+          {/* Cable controls: fixed bottom-left position */}
+          {primaryOutput.impedanceOhms !== Infinity && primaryOutput.impedanceOhms > 0 && onCableLengthChange && (
+            <div className="flex items-center gap-2 flex-wrap pt-1 text-[10px]">
+              <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={primaryOutput.outputIndex} />
+              <CableLossDisplay impedanceOhms={primaryOutput.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
             </div>
           )}
         </div>
@@ -933,7 +918,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
       {hasLoad ? (
         <>
           {!salesMode ? (
-            <div className={`border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
+            <div className={`flex flex-col border-t ${hasImpedanceError ? "border-red-200 dark:border-red-800" : "border-blue-200 dark:border-neutral-700"}`}>
               {(() => {
                 // Group outputs by multi-channel enclosures within this physical output
                 const rendered = new Set<number>();
@@ -968,7 +953,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                     elements.push(
                       <div
                         key={output.outputIndex}
-                        className={`flex flex-col rounded -mx-1 px-1 ${!isFirstInPhysical ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                        className={`flex-1 flex flex-col rounded -mx-1 px-1 ${!isFirstInPhysical ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                       >
                         {/* Channel content side by side */}
                         <div className={`flex-1 ${groupOutputs.length > 1 ? "grid gap-2" : ""}`} style={groupOutputs.length > 1 ? { gridTemplateColumns: `repeat(${groupOutputs.length}, 1fr)` } : undefined}>
@@ -1023,8 +1008,8 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                     );
                                   })}
                                 </div>
-                                {/* Bottom row: routing selector at left, impedance at right (cable length shown once below) */}
-                                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                {/* Routing selector at left, impedance at right */}
+                                <div className="flex items-end justify-between pt-1 text-[10px] mt-auto">
                                   {onRoutingChange ? (
                                     <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
                                   ) : <span />}
@@ -1036,15 +1021,11 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                             );
                           })}
                         </div>
-                        {/* Cable length on its own line at the bottom for combined card */}
-                        {groupOutputs[0].impedanceOhms !== Infinity && groupOutputs[0].impedanceOhms > 0 && (
-                          <div className="pt-1 text-[10px]">
-                            {onCableLengthChange && ampId && (
-                              <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} outputIndex={groupOutputs[0].outputIndex} />
-                                <CableLossDisplay impedanceOhms={groupOutputs[0].impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
-                              </div>
-                            )}
+                        {/* Cable controls: fixed bottom-left position */}
+                        {groupOutputs[0].impedanceOhms !== Infinity && groupOutputs[0].impedanceOhms > 0 && onCableLengthChange && ampId && (
+                          <div className="flex items-center gap-2 flex-wrap pt-1 text-[10px]">
+                            <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} outputIndex={groupOutputs[0].outputIndex} />
+                            <CableLossDisplay impedanceOhms={groupOutputs[0].impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
                           </div>
                         )}
                       </div>
@@ -1073,7 +1054,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                     elements.push(
                       <div
                         key={output.outputIndex}
-                        className={`flex flex-col rounded -mx-1 px-1 ${!isFirstInPhysical ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
+                        className={`flex-1 flex flex-col rounded -mx-1 px-1 ${!isFirstInPhysical ? "mt-2 pt-1 border-t border-dashed border-gray-200 dark:border-neutral-700" : "pt-1"}`}
                       >
                         {/* Channel content side by side */}
                         <div className={`flex-1 ${groupOutputs.length > 1 ? "grid gap-2" : ""}`} style={groupOutputs.length > 1 ? { gridTemplateColumns: `repeat(${groupOutputs.length}, 1fr)` } : undefined}>
@@ -1133,7 +1114,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                       })}
                                     </div>
                                     {/* Routing selector at left, impedance at right */}
-                                    <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                    <div className="flex items-end justify-between pt-1 text-[10px] mt-auto">
                                       {onRoutingChange ? (
                                         <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
                                       ) : <span />}
@@ -1146,7 +1127,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                                   /* Empty channel - show routing selector for preparation */
                                   <>
                                     <div className="flex-1" />
-                                    <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                                    <div className="flex items-end justify-between pt-1 text-[10px] mt-auto">
                                       {onRoutingChange ? (
                                         <RoutingSelector value={routingMap?.[grpOutput.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(grpOutput.outputIndex, value)} />
                                       ) : <span />}
@@ -1158,15 +1139,11 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                             );
                           })}
                         </div>
-                        {/* Cable length on its own line at the bottom for combined card */}
-                        {firstWithLoad && firstWithLoad.impedanceOhms !== Infinity && firstWithLoad.impedanceOhms > 0 && (
-                          <div className="pt-1 text-[10px]">
-                            {onCableLengthChange && ampId && (
-                              <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} outputIndex={firstWithLoad.outputIndex} />
-                                <CableLossDisplay impedanceOhms={firstWithLoad.impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
-                              </div>
-                            )}
+                        {/* Cable controls: fixed bottom-left position */}
+                        {firstWithLoad && firstWithLoad.impedanceOhms !== Infinity && firstWithLoad.impedanceOhms > 0 && onCableLengthChange && ampId && (
+                          <div className="flex items-center gap-2 flex-wrap pt-1 text-[10px]">
+                            <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} outputIndex={firstWithLoad.outputIndex} />
+                            <CableLossDisplay impedanceOhms={firstWithLoad.impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
                           </div>
                         )}
                       </div>
@@ -1207,7 +1184,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                 </div>
                 <div className="border-t my-1 border-gray-200/60 dark:border-neutral-700" />
                 <div className="flex-1" />
-                <div className="flex items-end justify-between pt-0.5 text-[10px]">
+                <div className="flex items-end justify-between pt-1 text-[10px] mt-auto">
                   {onRoutingChange ? (
                     <RoutingSelector value={routingMap?.[output.outputIndex] ?? "A"} onChange={(value) => onRoutingChange(output.outputIndex, value)} />
                   ) : <span />}
