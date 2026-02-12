@@ -92,14 +92,14 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
   const curves = useMemo(() => {
     return outputs
       .filter(o => o.cableLengthMeters > 0 && o.impedanceOhms > 0 && o.impedanceOhms !== Infinity)
-      .map((o, i) => {
+      .map((o) => {
         const impedanceCurve = generateImpedanceCurve(o.enclosureName, o.nominalImpedance, o.signalChannels);
         const lossCurve = calculateFrequencyDependentLoss(impedanceCurve, o.cableLengthMeters, gaugeMm2);
         return {
           outputIndex: o.outputIndex,
           enclosureName: o.enclosureName,
           lossCurve,
-          color: colors[i % colors.length],
+          color: colors[o.outputIndex % colors.length], // Use outputIndex for consistent color assignment
           hasOverride: hasImpedanceCurveOverride(o.enclosureName),
         };
       });
