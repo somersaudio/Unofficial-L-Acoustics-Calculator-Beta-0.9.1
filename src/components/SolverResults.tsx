@@ -271,15 +271,21 @@ function CableLengthInfo({ impedanceOhms, gaugeMm2, useFeet }: { impedanceOhms: 
 
 const METERS_PER_FOOT = 0.3048;
 
+// Output colors for cable loss chart (matches CableLossChart.tsx palette)
+const OUTPUT_COLORS_LIGHT = ["#4A9B9B", "#8B7FB8", "#7B9B7B", "#B87F8B", "#B89B7F"];
+const OUTPUT_COLORS_DARK = ["#5DBDBD", "#A599D4", "#96B896", "#D499A6", "#D4B899"];
+
 /** Compact cable length input for per-output cable run distance */
 function CableLengthInput({
   lengthMeters,
   onChange,
   useFeet,
+  outputIndex,
 }: {
   lengthMeters: number;
   onChange: (meters: number) => void;
   useFeet: boolean;
+  outputIndex?: number;
 }) {
   const displayValue = useFeet
     ? Math.round(lengthMeters / METERS_PER_FOOT)
@@ -291,9 +297,19 @@ function CableLengthInput({
     onChange(Math.max(0, meters));
   };
 
+  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  const outputColor = outputIndex !== undefined
+    ? (isDark ? OUTPUT_COLORS_DARK : OUTPUT_COLORS_LIGHT)[outputIndex % OUTPUT_COLORS_LIGHT.length]
+    : undefined;
+
   return (
     <div className="flex items-center gap-1 text-[10px]">
-      <span className="text-gray-500 dark:text-neutral-500">Cable:</span>
+      <span
+        className={outputColor ? "" : "text-gray-500 dark:text-neutral-500"}
+        style={outputColor ? { color: outputColor } : undefined}
+      >
+        Cable:
+      </span>
       <input
         type="number"
         min="0"
@@ -628,7 +644,7 @@ function OutputCard({ output, ampOutputCount, salesMode = false, cableGaugeMm2, 
               {/* Cable loss: per-output length input + dB loss / damping factor */}
               {!is16Channel && output.impedanceOhms !== Infinity && output.impedanceOhms > 0 && onCableLengthChange && (
                 <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} />
+                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={output.outputIndex} />
                   <CableLossDisplay impedanceOhms={output.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
                 </div>
               )}
@@ -785,7 +801,7 @@ function MultiChannelOutputCard({ outputs, ampOutputCount, salesMode = false, ca
             <div className="pt-1 text-[10px]">
               {onCableLengthChange && (
                 <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} />
+                  <CableLengthInput lengthMeters={cableLengthMeters} onChange={onCableLengthChange} useFeet={useFeet} outputIndex={primaryOutput.outputIndex} />
                   <CableLossDisplay impedanceOhms={primaryOutput.impedanceOhms} cableLengthMeters={cableLengthMeters} gaugeMm2={cableGaugeMm2} />
                 </div>
               )}
@@ -1025,7 +1041,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                           <div className="pt-1 text-[10px]">
                             {onCableLengthChange && ampId && (
                               <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} />
+                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(groupOutputs[0].outputIndex, m)} useFeet={useFeet} outputIndex={groupOutputs[0].outputIndex} />
                                 <CableLossDisplay impedanceOhms={groupOutputs[0].impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${groupOutputs[0].outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
                               </div>
                             )}
@@ -1147,7 +1163,7 @@ function PhysicalOutputCard({ outputs, physicalIndex, ampOutputCount, salesMode 
                           <div className="pt-1 text-[10px]">
                             {onCableLengthChange && ampId && (
                               <div className="flex items-center gap-2 flex-wrap pt-0.5">
-                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} />
+                                <CableLengthInput lengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} onChange={(m) => onCableLengthChange(firstWithLoad.outputIndex, m)} useFeet={useFeet} outputIndex={firstWithLoad.outputIndex} />
                                 <CableLossDisplay impedanceOhms={firstWithLoad.impedanceOhms} cableLengthMeters={cableLengths?.[`${ampId}:${firstWithLoad.outputIndex}`] ?? 0} gaugeMm2={cableGaugeMm2} />
                               </div>
                             )}
