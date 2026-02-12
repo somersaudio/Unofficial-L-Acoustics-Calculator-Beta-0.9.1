@@ -115,7 +115,7 @@ export function generateImpedanceCurve(
 
   switch (category) {
     case "subwoofer":
-      Fs = lowFreq * 0.9;
+      Fs = lowFreq * 1.15; // Bass-reflex: resonance above -10dB point
       Q = 4;
       peakRatio = 3.5;
       crossoverFreq = 0;
@@ -124,7 +124,7 @@ export function generateImpedanceCurve(
       inductanceCoeff = 0.15;
       break;
     case "two_way":
-      Fs = lowFreq * 1.1;
+      Fs = lowFreq * 1.2; // Bass-reflex: resonance ~20% above -10dB point
       Q = 3.5;
       peakRatio = 3.0;
       crossoverFreq = 1800;
@@ -133,7 +133,7 @@ export function generateImpedanceCurve(
       inductanceCoeff = 0.25;
       break;
     case "three_way":
-      Fs = lowFreq * 1.1;
+      Fs = lowFreq * 1.2; // Bass-reflex: resonance ~20% above -10dB point
       Q = 3.5;
       peakRatio = 3.0;
       crossoverFreq = 1200;
