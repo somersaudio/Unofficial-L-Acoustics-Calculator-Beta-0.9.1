@@ -45,19 +45,21 @@ const FREQ_LABELS: Record<number, string> = {
   1000: "1k", 2000: "2k", 5000: "5k", 10000: "10k", 20000: "20k",
 };
 
-// Output colors — teal palette matching existing output label style
+// Output colors — Soft Tech palette (muted professional colors)
 const OUTPUT_COLORS = [
-  { stroke: "hsl(180, 60%, 40%)", fill: "hsla(180, 60%, 40%, 0.12)" },
-  { stroke: "hsl(180, 60%, 32%)", fill: "hsla(180, 60%, 32%, 0.12)" },
-  { stroke: "hsl(180, 60%, 25%)", fill: "hsla(180, 60%, 25%, 0.12)" },
-  { stroke: "hsl(200, 60%, 40%)", fill: "hsla(200, 60%, 40%, 0.12)" },
+  { stroke: "#4A9B9B", fill: "rgba(74, 155, 155, 0.12)" },     // Teal
+  { stroke: "#8B7FB8", fill: "rgba(139, 127, 184, 0.12)" },   // Soft Purple
+  { stroke: "#7B9B7B", fill: "rgba(123, 155, 123, 0.12)" },   // Sage Green
+  { stroke: "#B87F8B", fill: "rgba(184, 127, 139, 0.12)" },   // Dusty Rose
+  { stroke: "#B89B7F", fill: "rgba(184, 155, 127, 0.12)" },   // Warm Sand
 ];
 
 const OUTPUT_COLORS_DARK = [
-  { stroke: "hsl(180, 60%, 60%)", fill: "hsla(180, 60%, 60%, 0.15)" },
-  { stroke: "hsl(180, 60%, 52%)", fill: "hsla(180, 60%, 52%, 0.15)" },
-  { stroke: "hsl(180, 60%, 45%)", fill: "hsla(180, 60%, 45%, 0.15)" },
-  { stroke: "hsl(200, 60%, 55%)", fill: "hsla(200, 60%, 55%, 0.15)" },
+  { stroke: "#5DBDBD", fill: "rgba(93, 189, 189, 0.15)" },    // Teal (bright)
+  { stroke: "#A599D4", fill: "rgba(165, 153, 212, 0.15)" },   // Soft Purple (bright)
+  { stroke: "#96B896", fill: "rgba(150, 184, 150, 0.15)" },   // Sage Green (bright)
+  { stroke: "#D499A6", fill: "rgba(212, 153, 166, 0.15)" },   // Dusty Rose (bright)
+  { stroke: "#D4B899", fill: "rgba(212, 184, 153, 0.15)" },   // Warm Sand (bright)
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
