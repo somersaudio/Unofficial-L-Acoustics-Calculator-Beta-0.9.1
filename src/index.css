@@ -92,6 +92,11 @@ html:not(.dark) .bg-gray-100 {
   background-color: #94a3b8 !important; /* slate-400 - main app background */
 }
 
+/* Buttons with bg-gray-100 need to be lighter to stand out */
+html:not(.dark) button.bg-gray-100 {
+  background-color: #cbd5e1 !important; /* slate-300 - visible button fill */
+}
+
 html:not(.dark) .bg-gray-50 {
   background-color: #a8b5c4 !important; /* lighter slate - right panel */
 }
@@ -121,7 +126,7 @@ html:not(.dark) .border-gray-200 {
 }
 
 html:not(.dark) .border-gray-300 {
-  border-color: #94a3b8 !important; /* slate-400 */
+  border-color: #64748b !important; /* slate-500 - visible against slate backgrounds */
 }
 
 /* Buttons and interactive elements - Add box */
@@ -134,12 +139,45 @@ html:not(.dark) .text-gray-400 {
   color: #64748b !important; /* slate-500 - darker for visibility */
 }
 
-/* Form inputs */
+/* Light mode text legibility - darken all light grays */
+html:not(.dark) .text-gray-300 {
+  color: #64748b !important; /* slate-500 */
+}
+
+html:not(.dark) .text-gray-200 {
+  color: #475569 !important; /* slate-600 */
+}
+
+html:not(.dark) .text-gray-100 {
+  color: #475569 !important; /* slate-600 */
+}
+
+/* Keep white text on dark containers (header, gold buttons) */
+html:not(.dark) header .text-gray-200,
+html:not(.dark) header .text-gray-100 {
+  color: #ffffff !important;
+}
+
+html:not(.dark) .text-white {
+  /* Intentionally not overridden - text-white is used on dark backgrounds like header, gold buttons */
+}
+
+/* Darken neutral text variants in light mode */
+html:not(.dark) .text-neutral-400 {
+  color: #64748b !important; /* slate-500 */
+}
+
+html:not(.dark) .text-neutral-500 {
+  color: #475569 !important; /* slate-600 */
+}
+
+/* Form inputs - ensure dark text on white backgrounds */
 html:not(.dark) input,
 html:not(.dark) textarea,
 html:not(.dark) select {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
+  color: #1e293b !important; /* slate-800 */
 }
 
 /* Lock transition animations */

@@ -45,34 +45,58 @@ const FREQ_LABELS: Record<number, string> = {
   1000: "1k", 2000: "2k", 5000: "5k", 10000: "10k", 20000: "20k",
 };
 
-// Output colors — Soft Tech palette (muted professional colors)
 const OUTPUT_COLORS = [
-  { stroke: "#4A9B9B", fill: "rgba(74, 155, 155, 0.12)" },     // Teal
-  { stroke: "#8B7FB8", fill: "rgba(139, 127, 184, 0.12)" },   // Soft Purple
-  { stroke: "#5DB572", fill: "rgba(93, 181, 114, 0.12)" },    // Emerald Green
-  { stroke: "#B87F8B", fill: "rgba(184, 127, 139, 0.12)" },   // Dusty Rose
-  { stroke: "#B89B7F", fill: "rgba(184, 155, 127, 0.12)" },   // Warm Sand
+  { stroke: "#4A9B9B", fill: "rgba(74, 155, 155, 0.12)" },
+  { stroke: "#8B7FB8", fill: "rgba(139, 127, 184, 0.12)" },
+  { stroke: "#5DB572", fill: "rgba(93, 181, 114, 0.12)" },
+  { stroke: "#B87F8B", fill: "rgba(184, 127, 139, 0.12)" },
+  { stroke: "#B89B7F", fill: "rgba(184, 155, 127, 0.12)" },
 ];
 
 const OUTPUT_COLORS_DARK = [
-  { stroke: "#5DBDBD", fill: "rgba(93, 189, 189, 0.15)" },    // Teal (bright)
-  { stroke: "#A599D4", fill: "rgba(165, 153, 212, 0.15)" },   // Soft Purple (bright)
-  { stroke: "#77D48F", fill: "rgba(119, 212, 143, 0.15)" },   // Emerald Green (bright)
-  { stroke: "#D499A6", fill: "rgba(212, 153, 166, 0.15)" },   // Dusty Rose (bright)
-  { stroke: "#D4B899", fill: "rgba(212, 184, 153, 0.15)" },   // Warm Sand (bright)
+  { stroke: "#5DBDBD", fill: "rgba(93, 189, 189, 0.15)" },
+  { stroke: "#A599D4", fill: "rgba(165, 153, 212, 0.15)" },
+  { stroke: "#77D48F", fill: "rgba(119, 212, 143, 0.15)" },
+  { stroke: "#D499A6", fill: "rgba(212, 153, 166, 0.15)" },
+  { stroke: "#D4B899", fill: "rgba(212, 184, 153, 0.15)" },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+/**
+ * Piecewise log-scale: emphasize 100Hz–10kHz (80% of width),
+ * compress 20–100Hz and 10k–20kHz into 10% each.
+ */
 function freqToX(f: number): number {
-  const logMin = Math.log10(FREQ_MIN);
-  const logMax = Math.log10(FREQ_MAX);
-  return PADDING.left + ((Math.log10(f) - logMin) / (logMax - logMin)) * PLOT_W;
+  const log20   = Math.log10(20);
+  const log100  = Math.log10(100);
+  const log10k  = Math.log10(10000);
+  const log20k  = Math.log10(20000);
+
+  const lowBand  = 0.10; // 20–100 Hz gets 10% of width
+  const midBand  = 0.80; // 100–10k Hz gets 80% of width
+  const highBand = 0.10; // 10k–20k Hz gets 10% of width
+
+  const logF = Math.log10(Math.max(FREQ_MIN, Math.min(FREQ_MAX, f)));
+  let t: number;
+
+  if (logF <= log100) {
+    // 20–100 Hz band
+    t = ((logF - log20) / (log100 - log20)) * lowBand;
+  } else if (logF <= log10k) {
+    // 100–10k Hz band (emphasized)
+    t = lowBand + ((logF - log100) / (log10k - log100)) * midBand;
+  } else {
+    // 10k–20k Hz band
+    t = lowBand + midBand + ((logF - log10k) / (log20k - log10k)) * highBand;
+  }
+
+  return PADDING.left + t * PLOT_W;
 }
 
-function dbToY(db: number, dbMin: number): number {
-  // 0 dB at top, dbMin at bottom
-  return PADDING.top + ((-db) / (-dbMin)) * PLOT_H;
+function dbToY(db: number, dbMin: number, dbMax: number = 0): number {
+  // dbMax at top, dbMin at bottom
+  return PADDING.top + ((dbMax - db) / (dbMax - dbMin)) * PLOT_H;
 }
 
 function formatDb(db: number): string {
@@ -84,6 +108,7 @@ function formatDb(db: number): string {
 export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProps) {
   const [hoverX, setHoverX] = useState<number | null>(null);
   const [importKey, setImportKey] = useState(0); // force re-render after import
+  const [collapsed, setCollapsed] = useState(false);
 
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
   const colors = isDark ? OUTPUT_COLORS_DARK : OUTPUT_COLORS;
@@ -107,31 +132,54 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
 
   if (curves.length === 0) return null;
 
-  // Find dB range — auto-scale Y axis
+  // Find dB range — auto-scale Y axis (supports positive gain from phase effects)
   let globalMinDb = 0;
+  let globalMaxDb = 0;
   for (const curve of curves) {
     for (const pt of curve.lossCurve) {
       if (pt.lossDb < globalMinDb) globalMinDb = pt.lossDb;
+      if (pt.lossDb > globalMaxDb) globalMaxDb = pt.lossDb;
     }
   }
-  // Round down to next 0.5 dB and add padding
-  const dbMin = Math.floor(globalMinDb * 2 - 1) / 2;
+  // Round to next 0.5 dB with padding (raw bounds)
+  const rawDbMin = Math.floor(globalMinDb * 2 - 1) / 2;
+  const rawDbMax = globalMaxDb > 0.05 ? Math.ceil(globalMaxDb * 2 + 1) / 2 : 0;
+
+  // Choose step size so Y-axis never exceeds 7 ticks
+  const rawRange = rawDbMax - rawDbMin;
+  const STEP_OPTIONS = [0.5, 1, 2, 5, 10];
+  const dbStep = STEP_OPTIONS.find(s => Math.ceil(rawRange / s) + 1 <= 7) ?? 10;
+
+  // Align bounds to chosen step
+  const dbMin = Math.floor(rawDbMin / dbStep) * dbStep;
+  const dbMax = rawDbMax > 0 ? Math.ceil(rawDbMax / dbStep) * dbStep : 0;
+
   const dbTicks: number[] = [];
-  for (let db = 0; db >= dbMin; db -= 0.5) {
+  for (let db = dbMax; db >= dbMin - 0.001; db -= dbStep) {
     dbTicks.push(Math.round(db * 10) / 10);
   }
 
-  // Compute max frequency response deviation (spread) across all curves
+  // Compute worst-case average loss and max frequency response spread (100Hz–10kHz)
+  let worstAvgLoss = 0;
   let maxSpread = 0;
   for (const curve of curves) {
     if (curve.lossCurve.length === 0) continue;
-    let minLoss = 0, maxLoss = 0;
+    let sum = 0, count = 0, minLoss = 0, maxLoss = 0;
     for (const pt of curve.lossCurve) {
-      if (pt.lossDb < minLoss) minLoss = pt.lossDb;
-      if (pt.lossDb > maxLoss) maxLoss = pt.lossDb;
+      sum += pt.lossDb;
+      // Spread calculated over 100Hz–10kHz (the usable bandwidth per RS2015)
+      if (pt.frequency >= 100 && pt.frequency <= 10000) {
+        if (pt.lossDb < minLoss) minLoss = pt.lossDb;
+        if (pt.lossDb > maxLoss) maxLoss = pt.lossDb;
+        count++;
+      }
     }
-    const spread = maxLoss - minLoss;
-    if (spread > maxSpread) maxSpread = spread;
+    const avg = sum / curve.lossCurve.length;
+    if (avg < worstAvgLoss) worstAvgLoss = avg;
+    if (count > 0) {
+      const spread = maxLoss - minLoss;
+      if (spread > maxSpread) maxSpread = spread;
+    }
   }
 
   // Build SVG paths
@@ -140,13 +188,13 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
 
     const points = curve.lossCurve.map(pt => ({
       x: freqToX(pt.frequency),
-      y: dbToY(pt.lossDb, dbMin),
+      y: dbToY(pt.lossDb, dbMin, dbMax),
     }));
 
     const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
 
     // Fill path: curve + close along top (0 dB line)
-    const y0 = dbToY(0, dbMin);
+    const y0 = dbToY(0, dbMin, dbMax);
     const fillPath = linePath +
       ` L ${points[points.length - 1].x.toFixed(1)} ${y0.toFixed(1)}` +
       ` L ${points[0].x.toFixed(1)} ${y0.toFixed(1)} Z`;
@@ -256,20 +304,29 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
     <div className="mt-3 border-t border-gray-200 pt-2 dark:border-neutral-700">
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-500">
-          Cable Loss vs Frequency
+          Avg {formatDb(worstAvgLoss)} dB
           {maxSpread > 0 && (
             <span className={`ml-2 ${maxSpread > 0.5 ? "text-amber-600 dark:text-amber-500" : "text-gray-400 dark:text-neutral-500"}`}>
-              ({formatDb(maxSpread)} dB spread)
+              ({formatDb(maxSpread)} dB spread 100Hz–10kHz)
             </span>
           )}
         </span>
-        <label className="text-[9px] text-gray-400 hover:text-blue-500 dark:text-neutral-600 dark:hover:text-blue-400 cursor-pointer transition-colors">
-          Import .zma
-          <input type="file" accept=".zma,.txt" onChange={handleZmaImport} className="hidden" />
-        </label>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center gap-1.5 text-[9px] text-gray-400 hover:text-blue-500 dark:text-neutral-600 dark:hover:text-blue-400 cursor-pointer transition-colors ml-auto"
+        >
+          {collapsed ? (
+            <>
+              Show
+              <svg width="28" height="10" viewBox="0 0 28 10" className="inline-block" style={{ marginTop: -1 }}>
+                <polyline points="0,7 4,3 8,6 12,2 16,5 20,1 24,4 28,3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </>
+          ) : "Hide"}
+        </button>
       </div>
 
-      <svg
+      {!collapsed && <svg
         width="100%"
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         className="select-none"
@@ -281,9 +338,9 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
           <line
             key={db}
             x1={PADDING.left}
-            y1={dbToY(db, dbMin)}
+            y1={dbToY(db, dbMin, dbMax)}
             x2={PADDING.left + PLOT_W}
-            y2={dbToY(db, dbMin)}
+            y2={dbToY(db, dbMin, dbMax)}
             stroke={db === 0 ? refLineColor : gridColor}
             strokeWidth={db === 0 ? 1 : 0.5}
             strokeDasharray={db === 0 ? "4 2" : undefined}
@@ -308,7 +365,7 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
           <text
             key={db}
             x={PADDING.left - 4}
-            y={dbToY(db, dbMin) + 3}
+            y={dbToY(db, dbMin, dbMax) + 3}
             textAnchor="end"
             fontSize={8}
             fill={textColor}
@@ -429,7 +486,7 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
             {/* dB values per curve */}
             {hoverValues?.map((db, i) => {
               if (db === null) return null;
-              const y = dbToY(db, dbMin);
+              const y = dbToY(db, dbMin, dbMax);
               const color = curvePaths[i]?.color.stroke ?? textColor;
               return (
                 <g key={i}>
@@ -448,7 +505,7 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
             })}
           </>
         )}
-      </svg>
+      </svg>}
     </div>
   );
 }

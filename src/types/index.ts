@@ -138,6 +138,7 @@ export interface DataLoadResult {
 export interface EnclosureRequest {
   enclosure: Enclosure;
   quantity: number;
+  perOutput?: number; // ×N per channel in LA-RAK spread mode (default: 1)
 }
 
 /** Allocation of enclosures to a single amplifier output */

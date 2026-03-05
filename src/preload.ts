@@ -15,6 +15,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Load project file
   loadProject: (): Promise<{ success: boolean; data?: string; error?: string }> =>
     ipcRenderer.invoke("load-project"),
+
+  // Menu event listeners
+  onMenuOpenProject: (callback: () => void) => {
+    ipcRenderer.on("menu-open-project", callback);
+    return () => { ipcRenderer.removeListener("menu-open-project", callback); };
+  },
+  onMenuSaveProject: (callback: () => void) => {
+    ipcRenderer.on("menu-save-project", callback);
+    return () => { ipcRenderer.removeListener("menu-save-project", callback); };
+  },
 });
 
 // Type declaration for the exposed API
@@ -24,6 +34,8 @@ declare global {
       getAppData: () => Promise<DataLoadResult>;
       saveProject: (data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
       loadProject: () => Promise<{ success: boolean; data?: string; error?: string }>;
+      onMenuOpenProject: (callback: () => void) => () => void;
+      onMenuSaveProject: (callback: () => void) => () => void;
     };
   }
 }

@@ -2,11 +2,11 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile, AmpInstance } from "../types";
 import { CABLE_GAUGES } from "../types";
 import EnclosureSelector, { type LockedAmpEnclosureInfo } from "./EnclosureSelector";
-import SolverResults from "./SolverResults";
+import SolverResults, { RecommendedConfig } from "./SolverResults";
 import type { EnclosureMoveResult } from "./EnclosureDragDrop";
 import ZoneTabBar from "./ZoneTabBar";
 import MatrixRain from "./MatrixRain";
-import { solveAmplifierAllocation } from "../solver/ampSolver";
+import { solveAmplifierAllocation, getImpedanceErrors } from "../solver/ampSolver";
 import { serializeZones, deserializeZones } from "../utils/zoneSerializer";
 import { getLowestFrequency } from "../utils/frequencyData";
 import { generatePDFReport } from "../utils/pdfExport";
@@ -66,6 +66,153 @@ function MoonIcon({ className }: { className?: string }) {
   );
 }
 
+function LightbulbIcon({ className, on }: { className?: string; on: boolean }) {
+  return (
+    <svg className={className} fill={on ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={on ? 1 : 2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  );
+}
+
+function GearIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
+type SettingsTab = "general" | "display";
+
+function SettingsModal({
+  open,
+  onClose,
+  darkMode,
+  setDarkMode,
+  hintsEnabled,
+  setHintsEnabled,
+  matrixEnabled,
+  setMatrixEnabled,
+}: {
+  open: boolean;
+  onClose: () => void;
+  darkMode: boolean;
+  setDarkMode: (v: boolean) => void;
+  hintsEnabled: boolean;
+  setHintsEnabled: (v: boolean) => void;
+  matrixEnabled: boolean;
+  setMatrixEnabled: (v: boolean) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+
+  if (!open) return null;
+
+  const tabs: { id: SettingsTab; label: string }[] = [
+    { id: "general", label: "General" },
+    { id: "display", label: "Display" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      {/* Modal */}
+      <div className="relative flex w-[480px] max-h-[80vh] rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+        {/* Tab sidebar */}
+        <div className="flex flex-col border-r border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 rounded-l-xl py-4 px-2 min-w-[120px]">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? "bg-white text-gray-900 shadow-sm dark:bg-neutral-700 dark:text-white"
+                  : "text-gray-600 hover:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700/50"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {/* Content */}
+        <div className="flex-1 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Settings</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">&times;</button>
+          </div>
+          {activeTab === "general" && (
+            <div className="space-y-5">
+              {/* Hints */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <LightbulbIcon className={`h-5 w-5 ${hintsEnabled ? "text-yellow-500" : "text-gray-400 dark:text-neutral-500"}`} on={hintsEnabled} />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Hints</div>
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">Show helpful tips and suggestions</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setHintsEnabled(!hintsEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    hintsEnabled ? "bg-blue-600" : "bg-gray-300 dark:bg-neutral-600"
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${hintsEnabled ? "translate-x-6" : "translate-x-1"}`} />
+                </button>
+              </label>
+            </div>
+          )}
+          {activeTab === "display" && (
+            <div className="space-y-5">
+              {/* Dark Mode */}
+              <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-3">
+                  {darkMode ? (
+                    <SunIcon className="h-5 w-5 text-yellow-500" />
+                  ) : (
+                    <MoonIcon className="h-5 w-5 text-gray-500 dark:text-neutral-400" />
+                  )}
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Dark Mode</div>
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">Toggle dark/light appearance</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    darkMode ? "bg-blue-600" : "bg-gray-300 dark:bg-neutral-600"
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${darkMode ? "translate-x-6" : "translate-x-1"}`} />
+                </button>
+              </label>
+              {/* Matrix Rain - only visible when dark mode is on */}
+              {darkMode && <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className={`text-lg font-mono leading-none w-5 text-center ${matrixEnabled ? "text-green-500" : "text-gray-400 dark:text-neutral-500"}`}>~</span>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Matrix Rain</div>
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">Background animation in dark mode</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMatrixEnabled(!matrixEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    matrixEnabled ? "bg-blue-600" : "bg-gray-300 dark:bg-neutral-600"
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${matrixEnabled ? "translate-x-6" : "translate-x-1"}`} />
+                </button>
+              </label>}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Frequency Hemisphere visual - shows lowest frequency in the zone (flipped, for footer) */
 function FrequencyHemisphere({ frequency }: { frequency: number | null }) {
   if (frequency === null) return null;
@@ -78,7 +225,7 @@ function FrequencyHemisphere({ frequency }: { frequency: number | null }) {
           src={subHemisphere}
           alt="Frequency indicator"
           className="w-full h-full object-cover object-top"
-          style={{ mixBlendMode: "lighten", transform: "scaleY(-1)" }}
+          style={{ mixBlendMode: document.documentElement.classList.contains('dark') ? "lighten" : "multiply", transform: "scaleY(-1)" }}
         />
         {/* Frequency text overlay */}
         <span
@@ -102,7 +249,7 @@ function BugReportButton() {
 
   const handleSend = () => {
     if (!message.trim()) return;
-    const mailto = `mailto:Admin@somersaudio.com?subject=${encodeURIComponent("Bug Report – L-Acoustics Amp Calc")}&body=${encodeURIComponent(message)}`;
+    const mailto = `mailto:Admin@somersaudio.com?subject=${encodeURIComponent("Bug Report / Feature Request – L-Acoustics Amp Calc")}&body=${encodeURIComponent(message)}`;
     window.open(mailto, "_blank");
     setMessage("");
     setOpen(false);
@@ -113,7 +260,7 @@ function BugReportButton() {
       {open && (
         <div className="absolute bottom-full right-0 mb-2 w-72 rounded-lg border border-gray-300 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Report a Bug</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Bug Report / Feature Request</span>
             <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none">&times;</button>
           </div>
           <textarea
@@ -136,7 +283,7 @@ function BugReportButton() {
         onClick={() => setOpen(!open)}
         className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 shadow transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
       >
-        Report Bug
+        Bug Report / Feature Request
       </button>
     </div>
   );
@@ -170,6 +317,14 @@ export default function App() {
     const saved = localStorage.getItem("rackMode");
     return saved ? JSON.parse(saved) : false;
   });
+  const [hintsEnabled, setHintsEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem("hintsEnabled");
+    return saved ? JSON.parse(saved) : true;
+  });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  // Custom rack names, keyed by rackGroupId (locked) or "unlocked-{idx}" (unlocked)
+  const [rackNameMap, setRackNameMap] = useState<Record<string, string>>({});
+
   // Restore zones from localStorage once data is loaded
   const [zonesRestored, setZonesRestored] = useState(false);
 
@@ -201,6 +356,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("rackMode", JSON.stringify(rackMode));
   }, [rackMode]);
+
+  useEffect(() => {
+    localStorage.setItem("hintsEnabled", JSON.stringify(hintsEnabled));
+  }, [hintsEnabled]);
 
   useEffect(() => {
     async function loadData() {
@@ -331,6 +490,13 @@ export default function App() {
     }
   }, [state]);
 
+  // Listen for native menu Open/Save
+  useEffect(() => {
+    const unsubOpen = window.electronAPI.onMenuOpenProject(() => { handleLoadProject(); });
+    const unsubSave = window.electronAPI.onMenuSaveProject(() => { handleSaveProject(); });
+    return () => { unsubOpen(); unsubSave(); };
+  }, [handleLoadProject, handleSaveProject]);
+
   // Derive active zone
   const activeZone = zones.find((z) => z.id === activeZoneId) ?? zones[0];
 
@@ -394,9 +560,12 @@ export default function App() {
         const ampConfigsUsed = [...new Map(allAmps.map((a) => [a.ampConfig.key, a.ampConfig])).values()];
         const maxPowerRank = Math.max(...ampConfigsUsed.map((c) => c.powerRank), 0);
 
+        // If there are locked amps, always consider the solution successful
+        // so locked amps render even if the solver fails for remaining enclosures
+        const hasLockedAmps = lockedAmps.length > 0;
         solution = {
-          success: solverResult?.success ?? true,
-          errorMessage: solverResult?.errorMessage,
+          success: hasLockedAmps ? true : (solverResult?.success ?? true),
+          errorMessage: solverResult?.success === false ? solverResult.errorMessage : undefined,
           ampInstances: allAmps,
           summary: {
             totalAmplifiers: allAmps.length,
@@ -447,7 +616,7 @@ export default function App() {
     const rackGroups = new Map<string, AmpInstance[]>();
 
     for (const amp of activeZone.lockedAmpInstances) {
-      if (amp.ampConfig.key === "LA12X" && rackMode) {
+      if (amp.ampConfig.key === "LA12X" && (rackMode || amp.rackGroupId)) {
         // Group LA12X by rackGroupId
         const groupId = amp.rackGroupId ?? amp.id;
         if (!rackGroups.has(groupId)) {
@@ -487,10 +656,12 @@ export default function App() {
         }
       }
 
-      // Determine label
+      // Determine label — use stored rack name if available
       let label: string;
-      if (amps[0].ampConfig.key === "LA12X" && rackMode) {
-        label = `LA-RAK #${rackNumber++}`;
+      if (amps[0].ampConfig.key === "LA12X" && (rackMode || amps[0].rackGroupId)) {
+        const rackKey = amps[0].rackGroupId ?? groupId;
+        label = rackNameMap[rackKey] ?? `LA-RAK #${rackNumber}`;
+        rackNumber++;
       } else {
         const model = amps[0].ampConfig.model;
         const num = (ampNumbers.get(model) ?? 0) + 1;
@@ -506,7 +677,31 @@ export default function App() {
     }
 
     return result;
-  }, [activeZone.lockedAmpInstances, rackMode]);
+  }, [activeZone.lockedAmpInstances, rackMode, rackNameMap]);
+
+  // Per-output override map for spread mode (enclosure name -> perOutput)
+  const perOutputMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const req of activeZone.requests) {
+      if (req.perOutput && req.perOutput > 1) {
+        map[req.enclosure.enclosure] = req.perOutput;
+      }
+    }
+    return map;
+  }, [activeZone.requests]);
+
+  // Clear pending-unlock rack name when speaker configuration changes
+  const requestsKey = useMemo(() =>
+    activeZone.requests.map(r => `${r.enclosure.enclosure}:${r.quantity}:${r.perOutput ?? 1}`).join(','),
+    [activeZone.requests]
+  );
+  useEffect(() => {
+    setRackNameMap(prev => {
+      if (!prev["pending-unlock"]) return prev;
+      const { "pending-unlock": _, ...rest } = prev;
+      return rest;
+    });
+  }, [requestsKey]);
 
   // Get unique amp models for the footer toggle
   const ampModels = useMemo<string[]>(() => {
@@ -558,7 +753,7 @@ export default function App() {
       {darkMode && matrixEnabled && <MatrixRain sentences={MATRIX_SENTENCES} opacity={1} />}
 
       {/* Header */}
-      <header className={`relative z-10 flex items-center justify-between bg-blue-800 px-6 py-4 text-white shadow dark:border-b dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
+      <header className={`relative z-10 flex items-center justify-between bg-gray-500 px-6 py-4 text-white shadow dark:border-b dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
         <img
           src={lacousticsLogo}
           alt="L-Acoustics"
@@ -566,9 +761,9 @@ export default function App() {
         />
         <div className="flex items-center gap-2">
           <button
-            onClick={() => generatePDFReport({ zoneSolutions })}
+            onClick={() => generatePDFReport({ zoneSolutions, rackMode })}
             disabled={!zoneSolutions.some((zs) => zs.solution !== null)}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-gray-600 text-gray-200 hover:bg-gray-400 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
             title="Export PDF report"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -576,51 +771,43 @@ export default function App() {
             </svg>
             PDF
           </button>
-          <div className="mx-1 h-6 w-px bg-blue-600 dark:bg-neutral-700" />
-          <button
-            onClick={handleLoadProject}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
-            title="Open project file"
-          >
-            Open
-          </button>
-          <button
-            onClick={handleSaveProject}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
-            title="Save project file"
-          >
-            Save
-          </button>
-          <div className="mx-1 h-6 w-px bg-blue-600 dark:bg-neutral-700" />
+          <div className="mx-1 h-6 w-px bg-gray-400 dark:bg-neutral-700" />
           <button
             onClick={() => setSalesMode(!salesMode)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               salesMode
                 ? "bg-green-500 text-white hover:bg-green-600"
-                : "bg-blue-700 text-blue-200 hover:bg-blue-600 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                : "bg-gray-600 text-gray-200 hover:bg-gray-400 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
             }`}
             title={salesMode ? "Switch to engineer mode" : "Switch to sales mode"}
           >
             {salesMode ? "Sales Mode" : "Engineer Mode"}
           </button>
           <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="rounded-lg p-2 hover:bg-blue-700 dark:hover:bg-neutral-800 transition-colors"
-            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={() => setSettingsOpen(true)}
+            className="rounded-lg p-2 hover:bg-gray-400 dark:hover:bg-neutral-800 transition-colors"
+            title="Settings"
           >
-            {darkMode ? (
-              <SunIcon className="h-5 w-5 text-yellow-400" />
-            ) : (
-              <MoonIcon className="h-5 w-5 text-blue-200" />
-            )}
+            <GearIcon className="h-5 w-5 text-gray-200 dark:text-neutral-400" />
           </button>
         </div>
       </header>
 
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        hintsEnabled={hintsEnabled}
+        setHintsEnabled={setHintsEnabled}
+        matrixEnabled={matrixEnabled}
+        setMatrixEnabled={setMatrixEnabled}
+      />
+
       {/* Main Content */}
       <main className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel - Enclosure Selection */}
-        <section className="w-1/2 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-transparent">
+        <section className="w-1/3 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-transparent">
           <ZoneTabBar
             zones={zones}
             activeZoneId={activeZoneId}
@@ -638,12 +825,25 @@ export default function App() {
               salesMode={salesMode}
               lockedEnclosureCounts={activeLockedEnclosureCounts}
               lockedAmpEnclosures={activeLockedAmpEnclosures}
+              rackMode={rackMode}
             />
           </div>
+          {/* Recommended Configuration — stuck to bottom */}
+          {activeZoneSolution?.solution && (
+            <div className="flex-shrink-0 border-t border-gray-300 dark:border-neutral-800 p-3">
+              <RecommendedConfig
+                solution={activeZoneSolution.solution}
+                rackMode={rackMode}
+                lockedAmpIds={new Set(activeZone.lockedAmpInstances.map(a => a.id))}
+                perOutputMap={perOutputMap}
+                hasErrors={getImpedanceErrors(activeZoneSolution.solution).length > 0}
+              />
+            </div>
+          )}
         </section>
 
         {/* Right Panel - Amplifier Recommendation */}
-        <section className="w-1/2 overflow-auto bg-gray-50 p-6 dark:bg-black/70">
+        <section className="w-2/3 overflow-hidden bg-gray-50 dark:bg-black/70">
           <SolverResults
             zoneSolutions={zoneSolutions}
             activeZoneId={activeZoneId}
@@ -665,7 +865,13 @@ export default function App() {
             onLockAmpInstance={(ampInstance: AmpInstance) => {
               updateZone(activeZoneId, (zone) => ({
                 ...zone,
-                lockedAmpInstances: [...zone.lockedAmpInstances, ampInstance],
+                lockedAmpInstances: [ampInstance, ...zone.lockedAmpInstances],
+              }));
+            }}
+            onLockRack={(ampInstances: AmpInstance[]) => {
+              updateZone(activeZoneId, (zone) => ({
+                ...zone,
+                lockedAmpInstances: [...ampInstances, ...zone.lockedAmpInstances],
               }));
             }}
             onUnlockAmpInstance={(ampInstanceId: string) => {
@@ -684,6 +890,10 @@ export default function App() {
                 ),
               }));
             }}
+            rackNameMap={rackNameMap}
+            onRackNameChange={(rackKey, name) => setRackNameMap(prev => ({ ...prev, [rackKey]: name }))}
+            perOutputMap={perOutputMap}
+            hintsEnabled={hintsEnabled}
             onMoveEnclosure={(move: EnclosureMoveResult) => {
               // Find the active zone's current solution to get amp instances
               const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
@@ -781,20 +991,6 @@ export default function App() {
 
       {/* Footer */}
       <footer className={`relative z-10 border-t border-gray-300 bg-white px-6 py-3 dark:border-neutral-800 ${matrixEnabled ? 'dark:bg-black/70' : 'dark:bg-neutral-900'}`}>
-        {/* Matrix toggle - bottom left, dark mode only */}
-        {darkMode && (
-          <button
-            onClick={() => setMatrixEnabled(!matrixEnabled)}
-            className={`absolute bottom-1 left-1 text-lg font-mono leading-none transition-colors ${
-              matrixEnabled
-                ? "text-green-500 hover:text-green-400"
-                : "text-neutral-600 hover:text-neutral-500"
-            }`}
-            title={matrixEnabled ? "Disable Matrix effect" : "Enable Matrix effect"}
-          >
-            ~
-          </button>
-        )}
         {/* Frequency Hemisphere - absolutely centered horizontally, top-aligned in footer */}
         <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
           <FrequencyHemisphere
@@ -819,7 +1015,7 @@ export default function App() {
                         ? "bg-gray-200 text-gray-400 line-through dark:bg-neutral-800 dark:text-neutral-600"
                         : "text-white hover:brightness-110"
                     }`}
-                    style={!isDisabled ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+                    style={!isDisabled ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
                     title={isDisabled ? `Enable ${model}` : `Disable ${model}`}
                   >
                     {model}
@@ -835,7 +1031,7 @@ export default function App() {
                   ? "text-white hover:brightness-110"
                   : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
               }`}
-              style={rackMode ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+              style={rackMode ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
               title={rackMode ? "Disable LA-RAK grouping" : "Enable LA-RAK rack grouping (LA12X only)"}
             >
               LA-RAK
@@ -852,7 +1048,7 @@ export default function App() {
                     ? "text-white hover:brightness-110"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
-                style={useFeet ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+                style={useFeet ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
               >
                 ft
               </button>
@@ -863,7 +1059,7 @@ export default function App() {
                     ? "text-white hover:brightness-110"
                     : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                 }`}
-                style={!useFeet ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+                style={!useFeet ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
               >
                 m
               </button>
@@ -880,7 +1076,7 @@ export default function App() {
                         ? "text-white hover:brightness-110"
                         : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
                     }`}
-                    style={cableGaugeMm2 === gauge.mm2 ? { backgroundColor: '#b59e5f', textShadow: '0 1px 3px rgba(0,0,0,0.5)' } : undefined}
+                    style={cableGaugeMm2 === gauge.mm2 ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
                     title={`${gauge.mm2}mm² / ${gauge.awg} AWG / ${gauge.swg} SWG`}
                   >
                     {gauge.mm2}mm²

@@ -35,7 +35,7 @@
         "LF": "Syva Low",
         "PA": "Syva"
       },
-      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω. LA12X supports 2 per output pair (LF 2Ω, PA 4Ω parallel).",
+      "impedance_notes": "Hybrid system: Syva Low (4\u03a9 LF) + Syva (8\u03a9 PA). Requires 2 channels: LF at 4\u03a9, PA at 8\u03a9. LA12X supports 2 per output pair (LF 2\u03a9, PA 4\u03a9 parallel).",
       "parallelAllowed": true
     },
     {
@@ -245,7 +245,7 @@
       "impedance_sections_ohms": {
         "HF": 16
       },
-      "impedance_notes": "PDF specifies K2 HF section is 16Ω; other section(s) not specified in that rule, so nominal is defaulted to 8Ω per the document's 'all others are 8Ω' statement.",
+      "impedance_notes": "PDF specifies K2 HF section is 16\u03a9; other section(s) not specified in that rule, so nominal is defaulted to 8\u03a9 per the document's 'all others are 8\u03a9' statement.",
       "parallelAllowed": true
     },
     {
@@ -456,7 +456,8 @@
       "signal_channels": [
         "PA"
       ],
-      "parallelAllowed": true
+      "parallelAllowed": true,
+      "preferredPerOutput": 2
     },
     {
       "enclosure": "L2 / L2D",

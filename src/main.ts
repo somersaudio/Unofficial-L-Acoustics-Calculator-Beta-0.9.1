@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
 import started from "electron-squirrel-startup";
@@ -71,7 +71,7 @@ function showValidationErrorDialog(result: DataLoadResult): void {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1645,
     height: 800,
     minWidth: 900,
     minHeight: 600,
@@ -80,7 +80,7 @@ const createWindow = () => {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    title: "L-Acoustics Amplifier Calculator",
+    title: "Unofficial L-Acoustics Calculator Beta 0.9.1",
   });
 
   // Load the index.html of the app.
@@ -167,6 +167,39 @@ app.on("ready", async () => {
 
   // Create the main window
   createWindow();
+
+  // Build native application menu
+  const isMac = process.platform === "darwin";
+  const template: Electron.MenuItemConstructorOptions[] = [
+    ...(isMac ? [{ role: "appMenu" as const }] : []),
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Open Project...",
+          accelerator: "CmdOrCtrl+O",
+          click: () => {
+            const win = BrowserWindow.getFocusedWindow();
+            if (win) win.webContents.send("menu-open-project");
+          },
+        },
+        {
+          label: "Save Project...",
+          accelerator: "CmdOrCtrl+S",
+          click: () => {
+            const win = BrowserWindow.getFocusedWindow();
+            if (win) win.webContents.send("menu-save-project");
+          },
+        },
+        { type: "separator" },
+        isMac ? { role: "close" as const } : { role: "quit" as const },
+      ],
+    },
+    { role: "editMenu" },
+    { role: "viewMenu" },
+    { role: "windowMenu" },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 });
 
 // Quit when all windows are closed, except on macOS.

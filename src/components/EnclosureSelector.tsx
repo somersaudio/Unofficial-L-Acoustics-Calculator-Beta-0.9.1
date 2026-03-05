@@ -21,6 +21,8 @@ interface EnclosureSelectorProps {
   lockedEnclosureCounts?: Map<string, number>;
   /** Detailed locked enclosure info per amp/rack for grouping display */
   lockedAmpEnclosures?: LockedAmpEnclosureInfo[];
+  /** Whether LA-RAK mode is active — shows ×N per ch control */
+  rackMode?: boolean;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -67,6 +69,7 @@ export default function EnclosureSelector({
   onBump,
   lockedEnclosureCounts = new Map(),
   lockedAmpEnclosures = [],
+  rackMode = false,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -108,9 +111,8 @@ export default function EnclosureSelector({
     "SB10i",
     "SB10r",
     "SB15m",
-    "SB18",
     "SB18m",
-    "SB18 IIi",
+    "SB18 / SB18 IIi",
     "SB21",
     "SB28",
     "KS21",
@@ -220,6 +222,12 @@ export default function EnclosureSelector({
       setBumpedIndices(new Set([index]));
       onBump?.();
     }
+  };
+
+  const handlePerOutputChange = (index: number, value: number) => {
+    const newReqs = [...requests];
+    newReqs[index] = { ...newReqs[index], perOutput: value };
+    onRequestsChange(newReqs);
   };
 
   return (
@@ -337,8 +345,9 @@ export default function EnclosureSelector({
             const enclosureEntries = Array.from(ampInfo.enclosures.entries()).filter(([, count]) => count > 0);
             if (enclosureEntries.length === 0) return null;
 
-            const goldColor = '#b59e5f';
-            const goldColorLight = '#b59e5f33';
+            const isDark = document.documentElement.classList.contains('dark');
+            const goldColor = isDark ? '#b59e5f' : '#7A6B3A';
+            const goldColorLight = isDark ? '#b59e5f33' : '#b59e5f22';
 
             return (
               <div
@@ -351,7 +360,7 @@ export default function EnclosureSelector({
                   <svg className="h-4 w-4" fill={goldColor} viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="font-medium text-white dark:text-white text-sm">
+                  <span className="font-medium text-gray-800 dark:text-white text-sm">
                     {ampInfo.ampLabel}
                   </span>
                 </div>
@@ -387,6 +396,17 @@ export default function EnclosureSelector({
                             </div>
                           )}
                         </div>
+                        {/* ×N per ch badge (if perOutput > 1) */}
+                        {(() => {
+                          const req = requests.find(r => r.enclosure.enclosure === encName);
+                          const perOut = req?.perOutput ?? enclosure?.preferredPerOutput ?? 1;
+                          if (perOut <= 1) return null;
+                          return (
+                            <span className="text-[11px] font-medium whitespace-nowrap" style={{ color: goldColor, opacity: 0.7 }}>
+                              ×{perOut} per ch
+                            </span>
+                          );
+                        })()}
                         {/* Locked count */}
                         <span
                           className="w-16 rounded border px-2 py-1 text-center text-sm font-medium"
@@ -485,6 +505,39 @@ export default function EnclosureSelector({
                     +
                   </button>
                 </div>
+
+                {/* ×N per channel control — for enclosures with per_output > 1 on any enabled amp */}
+                {(() => {
+                  let maxPerOutput = 1;
+                  for (const key of Object.keys(request.enclosure.max_enclosures)) {
+                    const lim = request.enclosure.max_enclosures[key];
+                    if (lim && lim.per_output > maxPerOutput) maxPerOutput = lim.per_output;
+                  }
+                  const minPerOutput = request.enclosure.preferredPerOutput ?? 1;
+                  const currentPerOutput = request.perOutput ?? minPerOutput;
+                  if (maxPerOutput <= 1) return null;
+                  return (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handlePerOutputChange(index, Math.max(minPerOutput, currentPerOutput - 1))}
+                        disabled={currentPerOutput <= minPerOutput}
+                        className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                      >
+                        -
+                      </button>
+                      <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        ×{currentPerOutput} per ch
+                      </span>
+                      <button
+                        onClick={() => handlePerOutputChange(index, Math.min(maxPerOutput, currentPerOutput + 1))}
+                        disabled={currentPerOutput >= maxPerOutput}
+                        className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                      >
+                        +
+                      </button>
+                    </div>
+                  );
+                })()}
 
                 <button
                   onClick={() => handleRemoveRequest(index)}

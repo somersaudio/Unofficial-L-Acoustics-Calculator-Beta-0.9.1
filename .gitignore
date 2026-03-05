@@ -90,3 +90,18 @@ typings/
 
 # Electron-Forge
 out/
+
+# Build output
+dist/
+
+# Reference documents (PDFs, text files)
+*.pdf
+LAREFTEXT.txt
+CABLE_MODEL_IMPROVEMENTS.md
+EASE FILES/
+
+# Misc assets not part of source
+sub hemisphere.png
+
+# Unused theme files (reverted)
+src/themes/

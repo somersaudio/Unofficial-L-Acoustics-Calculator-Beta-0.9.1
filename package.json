@@ -1,8 +1,8 @@
 {
-  "name": "l-acoustic-amp-calc",
-  "productName": "L-Acoustic Amp Calc",
-  "version": "1.0.0",
-  "description": "Amplifier calculator for L-Acoustics speaker configurations",
+  "name": "unofficial-l-acoustics-calculator",
+  "productName": "Unofficial L-Acoustics Calculator",
+  "version": "0.9.1",
+  "description": "Unofficial amplifier calculator for L-Acoustics speaker configurations",
   "main": ".vite/build/main.js",
   "private": true,
   "scripts": {
@@ -14,10 +14,10 @@
   },
   "keywords": [],
   "author": {
-    "name": "JohnSomers91",
-    "email": "132222938+JohnSomers91@users.noreply.github.com"
+    "name": "somersaudio",
+    "email": "265681879+somersaudio@users.noreply.github.com"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
     "@electron-forge/maker-deb": "^7.11.1",
