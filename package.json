@@ -4,6 +4,10 @@
   "version": "0.9.1",
   "description": "Unofficial amplifier calculator for L-Acoustics speaker configurations",
   "main": ".vite/build/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/somersaudio/Unofficial-L-Acoustics-Calculator-Beta-0.9.1.git"
+  },
   "private": true,
   "scripts": {
     "start": "electron-forge start",
@@ -27,6 +31,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",
     "@electron-forge/plugin-vite": "^7.11.1",
+    "@electron-forge/publisher-github": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@electron/notarize": "^3.1.1",
     "@electron/osx-sign": "^2.3.0",
@@ -52,6 +57,7 @@
     "electron-squirrel-startup": "^1.0.1",
     "jspdf": "^4.0.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "update-electron-app": "^3.2.0"
   }
 }

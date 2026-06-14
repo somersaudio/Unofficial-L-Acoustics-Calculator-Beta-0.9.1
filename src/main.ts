@@ -2,12 +2,20 @@ import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
 import started from "electron-squirrel-startup";
+import { updateElectronApp } from "update-electron-app";
 import { loadDataFromFiles } from "./data/dataLoader";
 import type { DataLoadResult } from "./types";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
+}
+
+// Auto-update: on launch (and periodically), check GitHub Releases via the free
+// update.electronjs.org service, download a newer signed build in the background, and
+// prompt the user to restart to apply. Only runs in packaged (signed) builds — no-op in dev.
+if (app.isPackaged) {
+  updateElectronApp();
 }
 
 // Store loaded data globally so it can be accessed by IPC handlers

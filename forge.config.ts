@@ -3,6 +3,7 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
+import { PublisherGithub } from '@electron-forge/publisher-github';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
@@ -33,6 +34,19 @@ const config: ForgeConfig = {
     new MakerZIP({}, ['darwin']),
     new MakerRpm({}),
     new MakerDeb({}),
+  ],
+  publishers: [
+    // `electron-forge publish` uploads the signed build to GitHub Releases.
+    // Created as a draft — review it on GitHub, then click "Publish release" to make it
+    // live (that's when update.electronjs.org serves it to clients). Set draft: false
+    // to publish automatically.
+    new PublisherGithub({
+      repository: {
+        owner: 'somersaudio',
+        name: 'Unofficial-L-Acoustics-Calculator-Beta-0.9.1',
+      },
+      draft: true,
+    }),
   ],
   plugins: [
     new VitePlugin({
