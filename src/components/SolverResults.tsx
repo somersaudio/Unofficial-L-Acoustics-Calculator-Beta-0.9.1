@@ -344,7 +344,7 @@ function buildCableChain(enc: Enclosure | undefined, unitCount: number, ampConfi
  * Multi-channel hybrids (e.g., Syva Low Syva): show enclosure on primary channel only,
  * secondary (allocated) channels are grayed out.
  */
-function CombinedNL8Chain({ instance, cableLengthMeters = 0, useFeet = true }: { instance: AmpInstance; cableLengthMeters?: number; useFeet?: boolean }) {
+function CombinedNL8Chain({ instance, label, cableLengthMeters = 0, useFeet = true }: { instance: AmpInstance; label?: string; cableLengthMeters?: number; useFeet?: boolean }) {
   const ampConfigKey = instance.ampConfig.key;
 
   // Collect all loaded enclosures across all outputs
@@ -463,10 +463,13 @@ function CombinedNL8Chain({ instance, cableLengthMeters = 0, useFeet = true }: {
 
     const midGold = getCableChainGoldStyle(Math.floor(breakoutRows / 2), breakoutRows);
     return (
-      <span className="ml-1 text-[10px] font-normal inline-flex items-center gap-0" style={midGold}>
-        <span className="inline-flex items-center gap-0.5 mr-0.5">&rarr; <CableLengthBadge meters={cableLengthMeters} useFeet={useFeet} /> <span>NL8</span></span>
-        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="flex-shrink-0" style={{ verticalAlign: "middle" }}>{paths}</svg>
-        <span className="inline-flex flex-col">{rows}</span>
+      <span className="ml-1 inline-flex flex-col items-center" style={midGold}>
+        {label && <span className="text-sm font-semibold whitespace-nowrap mb-0.5">{label}</span>}
+        <span className="text-[10px] font-normal inline-flex items-center gap-0">
+          <span className="inline-flex items-center gap-0.5 mr-0.5">&rarr; <CableLengthBadge meters={cableLengthMeters} useFeet={useFeet} /> <span>NL8</span></span>
+          <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="flex-shrink-0" style={{ verticalAlign: "middle" }}>{paths}</svg>
+          <span className="inline-flex flex-col">{rows}</span>
+        </span>
       </span>
     );
   } else {
@@ -561,10 +564,13 @@ function CombinedNL8Chain({ instance, cableLengthMeters = 0, useFeet = true }: {
 
     const midGold = getCableChainGoldStyle(Math.floor(breakoutRows / 2), breakoutRows);
     return (
-      <span className="ml-1 text-[10px] font-normal inline-flex items-center gap-0" style={midGold}>
-        <span className="inline-flex items-center gap-0.5 mr-0.5">&rarr; <CableLengthBadge meters={cableLengthMeters} useFeet={useFeet} /> <span>NL8</span></span>
-        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="flex-shrink-0" style={{ verticalAlign: "middle" }}>{paths}</svg>
-        <span className="inline-flex flex-col">{rows}</span>
+      <span className="ml-1 inline-flex flex-col items-center" style={midGold}>
+        {label && <span className="text-sm font-semibold whitespace-nowrap mb-0.5">{label}</span>}
+        <span className="text-[10px] font-normal inline-flex items-center gap-0">
+          <span className="inline-flex items-center gap-0.5 mr-0.5">&rarr; <CableLengthBadge meters={cableLengthMeters} useFeet={useFeet} /> <span>NL8</span></span>
+          <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="flex-shrink-0" style={{ verticalAlign: "middle" }}>{paths}</svg>
+          <span className="inline-flex flex-col">{rows}</span>
+        </span>
       </span>
     );
   }
@@ -2336,7 +2342,7 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
                   className="flex justify-center items-center px-1 pb-1"
                   style={{ minHeight: `${ampOutputCount * 16}px` }}
                 >
-                  <CombinedNL8Chain instance={instance} cableLengthMeters={rackMaxCableLength} useFeet={useFeet} />
+                  <CombinedNL8Chain instance={instance} label={`Service Amp ${rackLocalIdx + 1}`} cableLengthMeters={rackMaxCableLength} useFeet={useFeet} />
                   <CombinedPACOMChain instance={instance} fontSize={12} cableLengthMeters={rackMaxCableLength} useFeet={useFeet} />
                 </div>
               </div>
@@ -2374,6 +2380,7 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
                   onToggleSpread={useRackMode ? () => {} : () => globalIdx !== undefined && onToggleSpread(globalIdx)}
                   hidePackToggle={useRackMode}
                   isInRack={true}
+                  rackPosition={localIdx + 1}
                   isLocked={isInstLocked}
                   ampIndex={globalIdx}
                   cableLengths={cableLengths}
@@ -2426,17 +2433,17 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, ampIndex, cableLengths, onCableLengthChange, hidePackToggle = false, isInRack = false }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; ampIndex?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void; hidePackToggle?: boolean; isInRack?: boolean }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, ampIndex, cableLengths, onCableLengthChange, hidePackToggle = false, isInRack = false, rackPosition, perOutputMap }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; ampIndex?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void; hidePackToggle?: boolean; isInRack?: boolean; rackPosition?: number; perOutputMap?: Record<string, number> }) {
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
     if (packed && spread) {
       // Prioritize Channels: pack first, then spread
-      return spreadAmpInstance(repackAmpInstance(rawInstance));
+      return spreadAmpInstance(repackAmpInstance(rawInstance), perOutputMap);
     } else if (packed) {
       return repackAmpInstance(rawInstance);
     }
     return rawInstance;
-  }, [packed, spread, rawInstance]);
+  }, [packed, spread, rawInstance, perOutputMap]);
 
   // Stable key prefix for cable lengths — locked amps use ID, unlocked use positional index
   const cableKeyPrefix = isLocked ? instance.id : (ampIndex !== undefined ? String(ampIndex) : instance.id);
@@ -2826,7 +2833,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
           {/* Combined NL8 output — shown when amp is in a LA-RAK */}
           {isInRack && (
             <div className="my-2 flex justify-center">
-              <CombinedNL8Chain instance={instance} cableLengthMeters={ampMaxCableLength} useFeet={useFeet} />
+              <CombinedNL8Chain instance={instance} label={rackPosition ? `Service Amp ${rackPosition}` : undefined} cableLengthMeters={ampMaxCableLength} useFeet={useFeet} />
             </div>
           )}
           {hasAboveRatedOutput && !packed && (
@@ -3322,6 +3329,7 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                   spread={spreadMap[globalIndex] ?? false}
                   onTogglePacked={() => handleTogglePacked(globalIndex)}
                   onToggleSpread={() => handleToggleSpread(globalIndex)}
+                  perOutputMap={perOutputMap}
                   isLocked={true}
                   onLock={() => onLockAmpInstance?.(instance)}
                   onUnlock={() => onUnlockAmpInstance?.(instance.id)}
@@ -3392,6 +3400,7 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
               spread={spreadMap[globalIndex] ?? false}
               onTogglePacked={() => handleTogglePacked(globalIndex)}
               onToggleSpread={() => handleToggleSpread(globalIndex)}
+              perOutputMap={perOutputMap}
               isLocked={false}
               onLock={() => handleLockWithCableMigration?.(instance, globalIndex)}
               onUnlock={() => onUnlockAmpInstance?.(instance.id)}
@@ -3487,6 +3496,7 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
                   spread={spreadMap[index] ?? false}
                   onTogglePacked={() => handleTogglePacked(index)}
                   onToggleSpread={() => handleToggleSpread(index)}
+                  perOutputMap={perOutputMap}
                   isLocked={true}
                   onLock={() => onLockAmpInstance?.(instance)}
                   onUnlock={() => onUnlockAmpInstance?.(instance.id)}
@@ -3514,6 +3524,7 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
               spread={spreadMap[index] ?? false}
               onTogglePacked={() => handleTogglePacked(index)}
               onToggleSpread={() => handleToggleSpread(index)}
+              perOutputMap={perOutputMap}
               isLocked={false}
               onLock={() => handleLockWithCableMigration?.(instance, index)}
               onUnlock={() => onUnlockAmpInstance?.(instance.id)}

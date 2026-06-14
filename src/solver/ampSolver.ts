@@ -1880,7 +1880,7 @@ function getMinimumForRatedImpedance(
  * while respecting the minimum count needed to avoid impedance warnings.
  * Returns a new AmpInstance with redistributed outputs.
  */
-export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
+export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Record<string, number>): AmpInstance {
   const ampConfig = instance.ampConfig;
   const order = ampConfig.channelFillOrder ?? Array.from({ length: ampConfig.outputs }, (_, i) => i);
 
@@ -1957,6 +1957,8 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
 
       // Calculate minimum per group to avoid warning
       const minPerGroup = getMinimumForRatedImpedance(enclosure, ampConfig, limits.per_output);
+      // ×N per ch override (from EnclosureSelector) raises the per-group count when spreading
+      const perOutMulti = Math.max(minPerGroup, perOutputOverrides?.[enclosure.enclosure] ?? minPerGroup);
 
       // Calculate how many groups this enclosure type needs (minimum)
       const groupsNeededForThisType = Math.ceil(totalCount / limits.per_output);
@@ -1966,14 +1968,14 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
         ? Math.min(groupsNeededForThisType, Math.max(1, groups.length - groupsToReserveForSingleChannel))
         : groups.length;
 
-      // Phase 1: Allocate minimum per group to each empty group (up to maxGroupsToUse)
+      // Phase 1: Allocate perOut (or minimum) per group to each empty group (up to maxGroupsToUse)
       let groupsUsed = 0;
-      for (let gi = 0; gi < groups.length && remaining >= minPerGroup && groupsUsed < maxGroupsToUse; gi++) {
+      for (let gi = 0; gi < groups.length && remaining >= perOutMulti && groupsUsed < maxGroupsToUse; gi++) {
         const group = groups[gi];
         // Check if group is empty
         if (outputs[group[0]].totalEnclosures > 0) continue;
 
-        const toStack = minPerGroup;
+        const toStack = Math.min(remaining, perOutMulti, limits.per_output);
         for (let c = 0; c < channelsPerUnit; c++) {
           const oi = group[c];
           const sectionZ = getSectionImpedance(enclosure, c);
@@ -1988,17 +1990,26 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
         groupsUsed++;
       }
 
-      // Phase 2: Least-loaded first — always place on the group with fewest enclosures
+      // Phase 2: place leftovers. Prefer topping up a group that's loaded but below the
+      // rated minimum (impedance warning) before opening a new group; else least-loaded.
       while (remaining > 0) {
         let bestGi = -1;
-        let bestCount = Infinity;
+        let bestWarnCount = -1;
+        let leastGi = -1;
+        let leastCount = Infinity;
         for (let gi = 0; gi < groups.length; gi++) {
           const count = outputs[groups[gi][0]].totalEnclosures;
-          if (count < limits.per_output && count < bestCount) {
-            bestCount = count;
+          if (count >= limits.per_output) continue;
+          if (count > 0 && count < minPerGroup && count > bestWarnCount) {
+            bestWarnCount = count;
             bestGi = gi;
           }
+          if (count < leastCount) {
+            leastCount = count;
+            leastGi = gi;
+          }
         }
+        if (bestGi === -1) bestGi = leastGi;
         if (bestGi === -1) break;
 
         const group = groups[bestGi];
@@ -2025,32 +2036,45 @@ export function spreadAmpInstance(instance: AmpInstance): AmpInstance {
 
       // Calculate minimum per output to avoid warning (e.g., 2 for 16Ω on 8Ω-max amp)
       const minPerOutput = getMinimumForRatedImpedance(enclosure, ampConfig, limits.per_output);
+      // ×N per ch override (from EnclosureSelector) raises the per-channel count when spreading
+      const perOut = Math.max(minPerOutput, perOutputOverrides?.[enclosure.enclosure] ?? minPerOutput);
 
-      // Phase 1: Allocate minimum per output to each empty channel
-      for (let idx = 0; idx < order.length && remaining >= minPerOutput; idx++) {
+      // Phase 1: Allocate perOut (or minimum) per output to each empty channel
+      for (let idx = 0; idx < order.length && remaining >= perOut; idx++) {
         const oi = order[idx];
         if (outputs[oi].totalEnclosures === 0) {
-          outputs[oi].enclosures.push({ enclosure, count: minPerOutput });
-          outputs[oi].totalEnclosures = minPerOutput;
+          const toPlace = Math.min(remaining, perOut, limits.per_output);
+          outputs[oi].enclosures.push({ enclosure, count: toPlace });
+          outputs[oi].totalEnclosures = toPlace;
           if (minImpedanceOverride !== undefined) {
             outputs[oi].minImpedanceOverride = minImpedanceOverride;
           }
-          remaining -= minPerOutput;
+          remaining -= toPlace;
         }
       }
 
-      // Phase 2: Least-loaded first — always place on the channel with fewest enclosures
+      // Phase 2: place leftovers. Prefer topping up a channel that's loaded but below the
+      // rated minimum (showing an impedance warning) so the next unit clears the warning
+      // before a new channel is opened; otherwise fall back to least-loaded.
       while (remaining > 0) {
         let bestIdx = -1;
-        let bestCount = Infinity;
+        let bestWarnCount = -1;
+        let leastIdx = -1;
+        let leastCount = Infinity;
         for (let idx = 0; idx < order.length; idx++) {
           const oi = order[idx];
           const count = outputs[oi].totalEnclosures;
-          if (count < limits.per_output && count < bestCount) {
-            bestCount = count;
+          if (count >= limits.per_output) continue;
+          if (count > 0 && count < minPerOutput && count > bestWarnCount) {
+            bestWarnCount = count;
             bestIdx = idx;
           }
+          if (count < leastCount) {
+            leastCount = count;
+            leastIdx = idx;
+          }
         }
+        if (bestIdx === -1) bestIdx = leastIdx;
         if (bestIdx === -1) break;
 
         const oi = order[bestIdx];
@@ -2438,19 +2462,28 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
         remaining -= toStack;
       }
 
-      // Phase 2: Least-loaded first — always place on the group with fewest enclosures
-      // Ties broken by rackGroups order (sequential per-amp)
+      // Phase 2: place leftovers. Prefer topping up a group that's loaded but below the
+      // rated minimum (impedance warning) before opening a new group; else least-loaded.
+      // Ties broken by rackGroups order (sequential per-amp).
       while (remaining > 0) {
         let bestGi = -1;
-        let bestCount = Infinity;
+        let bestWarnCount = -1;
+        let leastGi = -1;
+        let leastCount = Infinity;
         for (let gi = 0; gi < rackGroups.length; gi++) {
           const { ampIdx, group } = rackGroups[gi];
           const count = allOutputs[ampIdx][group[0]].totalEnclosures;
-          if (count < limits.per_output && count < bestCount) {
-            bestCount = count;
+          if (count >= limits.per_output) continue;
+          if (count > 0 && count < minPerGroup && count > bestWarnCount) {
+            bestWarnCount = count;
             bestGi = gi;
           }
+          if (count < leastCount) {
+            leastCount = count;
+            leastGi = gi;
+          }
         }
+        if (bestGi === -1) bestGi = leastGi;
         if (bestGi === -1) break; // No group had room
 
         const { ampIdx, group } = rackGroups[bestGi];
@@ -2492,19 +2525,28 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
         }
       }
 
-      // Phase 2: Least-loaded first — always place on the channel with fewest enclosures
-      // Ties broken by rackChannelOrder (channelFillOrder within each amp)
+      // Phase 2: place leftovers. Prefer topping up a channel that's loaded but below the
+      // rated minimum (impedance warning) before opening a new channel; else least-loaded.
+      // Ties broken by rackChannelOrder (channelFillOrder within each amp).
       while (remaining > 0) {
         let bestIdx = -1;
-        let bestCount = Infinity;
+        let bestWarnCount = -1;
+        let leastIdx = -1;
+        let leastCount = Infinity;
         for (let idx = 0; idx < rackChannelOrder.length; idx++) {
           const { ampIdx, oi } = rackChannelOrder[idx];
           const count = allOutputs[ampIdx][oi].totalEnclosures;
-          if (count < limits.per_output && count < bestCount) {
-            bestCount = count;
+          if (count >= limits.per_output) continue;
+          if (count > 0 && count < minPerOutput && count > bestWarnCount) {
+            bestWarnCount = count;
             bestIdx = idx;
           }
+          if (count < leastCount) {
+            leastCount = count;
+            leastIdx = idx;
+          }
         }
+        if (bestIdx === -1) bestIdx = leastIdx;
         if (bestIdx === -1) break; // No channel had room
 
         const { ampIdx, oi } = rackChannelOrder[bestIdx];

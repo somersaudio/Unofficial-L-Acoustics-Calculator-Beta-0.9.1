@@ -11,6 +11,7 @@ import {
   setImpedanceCurveOverride,
   hasImpedanceCurveOverride,
 } from "../utils/impedanceModel";
+import { calculateCableLoss } from "../types";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -94,13 +95,31 @@ function freqToX(f: number): number {
   return PADDING.left + t * PLOT_W;
 }
 
-function dbToY(db: number, dbMin: number, dbMax: number = 0): number {
+function dbToY(db: number, dbMin: number, dbMax = 0): number {
   // dbMax at top, dbMin at bottom
   return PADDING.top + ((dbMax - db) / (dbMax - dbMin)) * PLOT_H;
 }
 
 function formatDb(db: number): string {
   return db.toFixed(1);
+}
+
+/** Loss (dB) at a target frequency, log-interpolated between the two nearest curve points. */
+function lossAtFrequency(lossCurve: Array<{ frequency: number; lossDb: number }>, target: number): number | null {
+  if (lossCurve.length === 0) return null;
+  const first = lossCurve[0];
+  const last = lossCurve[lossCurve.length - 1];
+  if (target <= first.frequency) return first.lossDb;
+  if (target >= last.frequency) return last.lossDb;
+  for (let i = 1; i < lossCurve.length; i++) {
+    const b = lossCurve[i];
+    if (b.frequency >= target) {
+      const a = lossCurve[i - 1];
+      const t = (Math.log10(target) - Math.log10(a.frequency)) / (Math.log10(b.frequency) - Math.log10(a.frequency));
+      return a.lossDb + t * (b.lossDb - a.lossDb);
+    }
+  }
+  return last.lossDb;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -124,6 +143,8 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
           outputIndex: o.outputIndex,
           enclosureName: o.enclosureName,
           lossCurve,
+          impedanceOhms: o.impedanceOhms,
+          cableLengthMeters: o.cableLengthMeters,
           color: colors[o.outputIndex % colors.length], // Use outputIndex for consistent color assignment
           hasOverride: hasImpedanceCurveOverride(o.enclosureName),
         };
@@ -159,28 +180,40 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
     dbTicks.push(Math.round(db * 10) / 10);
   }
 
-  // Compute worst-case average loss and max frequency response spread (100Hz–10kHz)
+  // Compute worst-case average loss across all curves
   let worstAvgLoss = 0;
-  let maxSpread = 0;
   for (const curve of curves) {
     if (curve.lossCurve.length === 0) continue;
-    let sum = 0, count = 0, minLoss = 0, maxLoss = 0;
+    let sum = 0;
     for (const pt of curve.lossCurve) {
       sum += pt.lossDb;
-      // Spread calculated over 100Hz–10kHz (the usable bandwidth per RS2015)
-      if (pt.frequency >= 100 && pt.frequency <= 10000) {
-        if (pt.lossDb < minLoss) minLoss = pt.lossDb;
-        if (pt.lossDb > maxLoss) maxLoss = pt.lossDb;
-        count++;
-      }
     }
     const avg = sum / curve.lossCurve.length;
     if (avg < worstAvgLoss) worstAvgLoss = avg;
-    if (count > 0) {
-      const spread = maxLoss - minLoss;
-      if (spread > maxSpread) maxSpread = spread;
+  }
+
+  // Output with the worst (most negative) insertion loss at 10 kHz.
+  let worstCurve = curves[0];
+  let worst10kLoss = lossAtFrequency(curves[0].lossCurve, 10000) ?? 0;
+  for (const curve of curves) {
+    const v = lossAtFrequency(curve.lossCurve, 10000);
+    if (v !== null && v < worst10kLoss) {
+      worst10kLoss = v;
+      worstCurve = curve;
     }
   }
+  // Damping factor for that output. Color the headline by the DF thresholds
+  // (green > 20, orange 10–20, red < 10) so it matches the per-output "DF" readout.
+  const worst10kDFResult = calculateCableLoss(worstCurve.impedanceOhms, worstCurve.cableLengthMeters, gaugeMm2);
+  const worst10kDF = worst10kDFResult ? worst10kDFResult.dampingFactor : null;
+  const loss10kColor =
+    worst10kDF === null
+      ? "text-gray-500 dark:text-neutral-500"
+      : worst10kDF > 20
+        ? "text-green-600 dark:text-green-500"
+        : worst10kDF >= 10
+          ? "text-amber-600 dark:text-amber-500"
+          : "text-red-600 dark:text-red-500";
 
   // Build SVG paths
   const curvePaths = curves.map(curve => {
@@ -302,14 +335,10 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
 
   return (
     <div className="mt-3 border-t border-gray-200 pt-2 dark:border-neutral-700">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-500">
-          Avg {formatDb(worstAvgLoss)} dB
-          {maxSpread > 0 && (
-            <span className={`ml-2 ${maxSpread > 0.5 ? "text-amber-600 dark:text-amber-500" : "text-gray-400 dark:text-neutral-500"}`}>
-              ({formatDb(maxSpread)} dB spread 100Hz–10kHz)
-            </span>
-          )}
+      <div className="flex items-center justify-between mb-0.5">
+        <span className={`text-[11px] font-semibold ${loss10kColor}`}>
+          Insertion loss @ 10 kHz: {formatDb(worst10kLoss)} dB
+          {worst10kDF !== null && ` · DF ${worst10kDF.toFixed(0)}`}
         </span>
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -324,6 +353,11 @@ export default function CableLossChart({ outputs, gaugeMm2 }: CableLossChartProp
             </>
           ) : "Hide"}
         </button>
+      </div>
+      <div className="mb-1">
+        <span className="text-[10px] font-medium text-gray-500 dark:text-neutral-500">
+          Avg {formatDb(worstAvgLoss)} dB
+        </span>
       </div>
 
       {!collapsed && <svg
