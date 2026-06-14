@@ -1,0 +1,41 @@
+name: Release
+
+# Builds and publishes the Windows installer to a GitHub Release.
+# macOS builds (arm64 + x64) are produced locally with `npm run publish` /
+# `npm run make` because they require the local Developer ID signing identity
+# and Apple notarization credentials.
+#
+# To add macOS to CI later, add a `macos-latest` job and store the Developer ID
+# certificate (.p12, base64) + notarization credentials as repository secrets.
+
+on:
+  workflow_dispatch: {}        # run on demand from the Actions tab or `gh workflow run`
+  push:
+    tags:
+      - 'v*'                   # also runs when a version tag (e.g. v0.9.2) is pushed
+
+permissions:
+  contents: write              # lets the GitHub publisher create/upload the release
+
+jobs:
+  windows:
+    name: Build & publish Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build, package, and publish Windows installer
+        run: npm run publish
+        env:
+          # Provided automatically by Actions; used by @electron-forge/publisher-github
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
