@@ -519,14 +519,9 @@ export default function EnclosureSelector({
         // row of the same type remains. Supports multiple arrays of one type.
         const lockedShares = rowLockedShares(requests);
         const rowUnlockedCounts = requests.map((req, i) => req.quantity - lockedShares[i]);
-        // Number multiple arrays of the same enclosure type (Array 1, Array 2, …),
-        // counting only rows that will actually render (a fully amp-locked row is hidden).
-        const typeTotals = new Map<string, number>();
-        requests.forEach((r, i) => {
-          if (rowUnlockedCounts[i] > 0) {
-            typeTotals.set(r.enclosure.enclosure, (typeTotals.get(r.enclosure.enclosure) ?? 0) + 1);
-          }
-        });
+        // Number each array of an enclosure type (Array 1, Array 2, …), counting only
+        // rows that will actually render (a fully amp-locked row is hidden). Always shown
+        // — including for a lone array — so the row format doesn't change when a second is added.
         const typeSeen = new Map<string, number>();
         const rowArrayNums = requests.map((r, i) => {
           if (rowUnlockedCounts[i] <= 0) return 0; // hidden row — not rendered
@@ -574,7 +569,7 @@ export default function EnclosureSelector({
 
             // "Array N" label when this enclosure type has more than one row
             const arrayNum = rowArrayNums[index];
-            const showArrayLabel = (typeTotals.get(request.enclosure.enclosure) ?? 0) > 1;
+            const showArrayLabel = true;
 
             // ×N per-channel control — only for enclosures with per_output > 1 on an enabled amp
             const perChannelControl = (() => {
