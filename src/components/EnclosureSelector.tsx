@@ -765,51 +765,9 @@ export default function EnclosureSelector({
                 {perChannelControl}
                 </div>
 
-                {/* Lock this row "as is" — freezes its controls; still solved normally */}
-                <button
-                  onClick={() => handleToggleLock(index)}
-                  className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700"
-                  style={isLocked ? { backgroundColor: `${lockGold}33`, color: lockGold } : undefined}
-                  title={isLocked ? "Unlock this enclosure row" : "Lock this enclosure row so it can't be changed"}
-                >
-                  {isLocked ? (
-                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                    </svg>
-                  )}
-                </button>
-
-                <button
-                  onClick={() => handleRemoveRequest(index)}
-                  disabled={lockedCount > 0 || isLocked}
-                  className={`rounded p-1 ${
-                    lockedCount > 0 || isLocked
-                      ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
-                      : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
-                  }`}
-                  title={isLocked ? "Unlock to remove" : lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
-                >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
                 </div>
 
-                {/* Secondary controls on their own line to avoid crowding the row */}
+                {/* Secondary controls */}
                 {hasBottomRow && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                     {weightControl}
@@ -821,6 +779,40 @@ export default function EnclosureSelector({
                     ⚠ over safe {deployWord} limit ({rowSafe})
                   </div>
                 )}
+                {/* Lock + remove at the bottom-right of the card */}
+                <div className="mt-1 flex items-center justify-end gap-1">
+                    {/* Lock this row "as is" — freezes its controls; still solved normally */}
+                    <button
+                      onClick={() => handleToggleLock(index)}
+                      className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700"
+                      style={isLocked ? { backgroundColor: `${lockGold}33`, color: lockGold } : undefined}
+                      title={isLocked ? "Unlock this enclosure row" : "Lock this enclosure row so it can't be changed"}
+                    >
+                      {isLocked ? (
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="h-5 w-5 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleRemoveRequest(index)}
+                      disabled={lockedCount > 0 || isLocked}
+                      className={`rounded p-1 ${
+                        lockedCount > 0 || isLocked
+                          ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
+                          : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
+                      }`}
+                      title={isLocked ? "Unlock to remove" : lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
