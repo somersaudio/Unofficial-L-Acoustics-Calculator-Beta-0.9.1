@@ -7,6 +7,7 @@ import {
   AmpConfig,
   Amplifier,
   Enclosure,
+  RiggingPartsData,
 } from "../types";
 
 // =============================================================================
@@ -450,6 +451,17 @@ export async function loadDataFromFiles(
     });
   }
 
+  // Optional: rigging parts data (per-enclosure weights + rigging catalog).
+  // Missing/invalid file is non-fatal — the app simply won't show rigging/weight.
+  let riggingPartsRaw: unknown = null;
+  try {
+    const riggingPath = path.join(dataPath, "rigging_parts.json");
+    const content = await fs.readFile(riggingPath, "utf-8");
+    riggingPartsRaw = JSON.parse(content);
+  } catch {
+    riggingPartsRaw = null;
+  }
+
   // If any file failed to load, return early
   if (errors.length > 0) {
     return { success: false, errors };
@@ -496,6 +508,7 @@ export async function loadDataFromFiles(
       enclosures: normalizedEnclosures,
       loadTables,
       ampConfigs,
+      riggingParts: riggingPartsRaw ? (riggingPartsRaw as RiggingPartsData) : undefined,
     },
   };
 }

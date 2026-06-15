@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility } from "../types";
+import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility, RiggingPartsData } from "../types";
 import { getEnclosureCompatibility, getMinimumEnclosureCount } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
 
@@ -23,6 +23,8 @@ interface EnclosureSelectorProps {
   lockedAmpEnclosures?: LockedAmpEnclosureInfo[];
   /** Whether LA-RAK mode is active — shows ×N per ch control */
   rackMode?: boolean;
+  /** Verified per-enclosure weights + rigging catalog (from data/rigging_parts.json) */
+  riggingParts?: RiggingPartsData;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -70,6 +72,7 @@ export default function EnclosureSelector({
   lockedEnclosureCounts = new Map(),
   lockedAmpEnclosures = [],
   rackMode = false,
+  riggingParts,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -453,6 +456,19 @@ export default function EnclosureSelector({
                     />
                   </div>
                 )}
+                {(() => {
+                  const encW = riggingParts?.enclosures?.[request.enclosure.enclosure]?.weight_kg;
+                  if (typeof encW !== "number") return null;
+                  const stackKg = encW * request.quantity;
+                  return (
+                    <div className="flex-shrink-0 text-right leading-tight" title={`Stack weight: ${request.quantity} × ${encW} kg`}>
+                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {Math.round(stackKg)}<span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> kg</span>
+                      </div>
+                      <div className="text-[10px] text-gray-400 dark:text-neutral-500">{Math.round(stackKg * 2.20462)} lb</div>
+                    </div>
+                  );
+                })()}
                 <div className="flex-1">
                   <div className="flex items-center">
                     <span className="font-medium text-gray-900 dark:text-gray-200">

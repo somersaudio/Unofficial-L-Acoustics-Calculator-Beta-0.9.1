@@ -118,6 +118,31 @@ export interface ValidationError {
   path?: string; // JSON path to the error, e.g., "amplifiers[0].outputs"
 }
 
+// =============================================================================
+// Rigging Data (from data/rigging_parts.json — verified against L-Acoustics docs)
+// =============================================================================
+
+export interface RiggingPart {
+  code: string;
+  name: string;
+  category: string; // flying_frame | rigging_bar | link_plate | downfill | coupling_bar | truss_clamp | bracket_yoke | pole_mount | accessory
+  function: string;
+  weight_kg: number | null;
+  wll: string; // working load limit / rated capacity (with units/notes), "" if not stated
+  verified: boolean;
+}
+
+export interface EnclosureRigging {
+  weight_kg: number | null; // net enclosure weight
+  recommended_rigging: string; // code of the primary flying frame; "" if not flyable
+  rigging_parts: RiggingPart[];
+}
+
+export interface RiggingPartsData {
+  schemaVersion: number;
+  enclosures: Record<string, EnclosureRigging>; // keyed by enclosure name
+}
+
 /** Result of loading and validating all data */
 export interface DataLoadResult {
   success: boolean;
@@ -127,6 +152,7 @@ export interface DataLoadResult {
     enclosures: EnclosuresData;
     loadTables: LoadTablesData;
     ampConfigs: AmpConfig[]; // Normalized list of all amp configurations
+    riggingParts?: RiggingPartsData; // Optional: per-enclosure weights + rigging catalog
   };
 }
 

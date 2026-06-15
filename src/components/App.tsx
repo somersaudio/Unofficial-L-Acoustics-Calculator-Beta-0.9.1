@@ -826,6 +826,7 @@ export default function App() {
               lockedEnclosureCounts={activeLockedEnclosureCounts}
               lockedAmpEnclosures={activeLockedAmpEnclosures}
               rackMode={rackMode}
+              riggingParts={data.riggingParts}
             />
           </div>
           {/* Recommended Configuration — stuck to bottom */}
