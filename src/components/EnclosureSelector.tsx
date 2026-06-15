@@ -537,7 +537,6 @@ export default function EnclosureSelector({
         return (
         <div className="space-y-2">
           {requests.map((request, index) => {
-            const compat = compatibilityMap.get(request.enclosure.enclosure);
             const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
             const showBumpMessage = bumpedIndices.has(index);
             const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
@@ -723,9 +722,6 @@ export default function EnclosureSelector({
                       {!salesMode && (
                         <>
                           {request.enclosure.nominal_impedance_ohms}Ω
-                          {compat?.isLimitedCompatibility && (
-                            <span className="ml-2">({compat.autoSelectedAmp?.model} only)</span>
-                          )}
                         </>
                       )}
                     </div>
