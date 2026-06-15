@@ -1,0 +1,83 @@
+{
+  "enclosure": "SB18 / SB18 IIi",
+  "product": "SB18 (touring) + SB18 IIi (installation; app's \"SB18i\")",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "32 Hz to 60/100 Hz (LF limit -10 dB at 32 Hz; upper limit set by preset)",
+    "max_spl_db": 138,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional in standard configuration; rear-rejection (cardioid) available via dedicated presets and a reversed element",
+    "components": "1 x 18 inch neodymium direct-radiation cone driver in a dual bass-reflex enclosure, one vent using a progressive-profile L-Vent for laminar low-turbulence airflow"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (omnidirectional)",
+      "Cardioid (rear rejection)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA12X",
+      "LA7.16(i)",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA4": 4,
+      "LA12X": 12,
+      "LA7.16(i)": 6,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "SB18_60",
+      "SB18_100",
+      "SB18_60_C",
+      "SB18_60_Cx",
+      "SB18_100_C",
+      "SB18_100_Cx"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4): one IN and one LINK; LINK carries the same signal in parallel for daisy-chaining a second cabinet (parallel linking only supported on LA8/LA12X). Internal pinout uses points 1+/1- for the LF driver; points 2+/2- unused",
+    "breakouts": "DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON) splits one LA8 PA-COM output to four cabinets; SP-Y1 (4-point speakON to 2x 2-point speakON, supplied with CC4FP adapter) splits a paired output to two cabinets"
+  },
+  "physical": {
+    "weight_kg": 52,
+    "dimensions_mm": "750 W x 553 H x 707 D",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood; coated steel front grille with Airnet acoustically neutral 3D fabric; dark grey-brown Pantone 426 C finish",
+    "handling": "4 handles, 8 protective corner stops, 35 mm pole-mount socket"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (floor-stacked logo-down, or platform-stacked on M-BUMP with M-JACK feet)",
+      "Flown (vertical SB18 array, or mixed vertical SB18/Kara array, via M-BUMP or KARA-MINIBU)",
+      "Pole-mounted top enclosure (XT/X or Kiva via the 35 mm socket)"
+    ],
+    "cardioid_array": "Cardioid configuration uses a block of 4 subwoofers with 1 reversed element (reversed cabinet to OUT 1)",
+    "standard_spacing": "Place enclosures side by side; if separated, max distance between adjacent acoustic centers is 1.7 m (SB18_100 presets) or 2.8 m (SB18_60 presets)",
+    "rigging_accessories": [
+      "M-BUMP (flying/stacking frame for vertical SB18 and/or Kara arrays)",
+      "M-BAR (extension bar for M-BUMP)",
+      "M-JACK (set of 4 platform feet for M-BUMP)",
+      "KARA-MINIBU (compact flying/stacking frame for small SB18/Kara arrays)",
+      "KARA-MINIBUEX (extension arms for KARA-MINIBU)",
+      "CLAMP250 (truss clamp)",
+      "SB18PLA (front dolly board)",
+      "SB18COV (transport/storage cover)"
+    ],
+    "rigging_note": "Maximum flown/stacked array size is not fixed by a single number; all configurations must be validated in SOUNDVISION with no stress or stability warning (compliant with BGV-C1 2012 and EN ISO 12100-1)"
+  },
+  "usage": [
+    "Reference 18-inch subwoofer for extending L-Acoustics WST line sources (Kara, Kudo) and coaxial enclosures (X/XT, Kiva) down to a 32 Hz low-frequency limit.",
+    "Needs one amplifier channel per cabinet at 8 ohms; an LA4X drives up to 4, an LA12X up to 12, an LA7.16 up to 6, and an LA2Xi up to 4 (single-ended) or 2 (bridged).",
+    "Pick the upper crossover by preset: SB18_100 (100 Hz, also the spec/Max-SPL reference) for tighter sub/main alignment, or SB18_60 (60 Hz) when handing off lower to the mains.",
+    "Deploy four cabinets with one reversed and a cardioid preset (_C / _Cx) to achieve rear SPL rejection and keep low end off the stage.",
+    "Mount flown or ground-stacked using M-BUMP or KARA-MINIBU hardware, standalone or interleaved with a Kara line array; the pole socket lets it carry a top XT/X or Kiva box.",
+    "Daisy-chain a second cabinet from the LINK speakON only when driven by an LA8 or LA12X; keep side-by-side spacing within 1.7 m (100 Hz) or 2.8 m (60 Hz) acoustic-center limits when boxes cannot touch."
+  ],
+  "source_manual": "SB18 / SB18i / SB18m Subwoofer User Manual (EN), v6.0; with SB18 Rigging Manual (EN) v2.0 and SB18 Product Specification Sheet (EN) 7.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB18/EN/Owner's Manual/SB18_UM_RM.zip"
+}

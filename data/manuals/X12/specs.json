@@ -1,0 +1,80 @@
+{
+  "enclosure": "X12",
+  "product": "X12",
+  "type": "coaxial",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "59 - 20000",
+    "max_spl_db": 136,
+    "nominal_impedance_ohms": 8,
+    "directivity": "90° (vertical) x 60° (horizontal), ellipsoid; rotatable logo allows portrait or landscape orientation",
+    "components": "LF: 1 x 12\" neodymium transducer in bass-reflex cabinet with L-Vents laminar vented ports; HF: 1 x 3\" neodymium compression driver on ellipsoid waveguide, coaxially mounted; internal passive crossover",
+    "max_spl_note": "Peak SPL at 1 m, free field, pink noise crest factor 4, [X12] preset"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (LF/HF/SAT presets)",
+      "Low-latency monitor mode ([X12_MO] reduces latency to 1.18 ms on LA8 and 0.84 ms on LA4X/LA12X)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA8",
+      "LA12X",
+      "LA7.16(i)",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 14,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "X12",
+      "X12_MO",
+      "X12_MO (low-latency)"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK; passive 2-way pinout uses pins 1+/1- (pins 2+/2- not linked)",
+    "breakouts": "SP 4-point speakON loudspeaker cables (4 mm²); DOSUB-LA8 / DO breakout cables for multi-enclosure runs from a single amplifier output bank"
+  },
+  "physical": {
+    "weight_kg": 20,
+    "dimensions_mm": "496 (H) x 430 (W) x 375 (D) approx., trapezoidal cabinet (front 430 mm, rear 341 mm)",
+    "protection_rating": "IP43",
+    "cabinet": "First grade Baltic birch and beech plywood; dark grey brown Pantone 426C standard, pure white RAL 9010 or custom RAL on order",
+    "rigging_hardware": "2x ergonomic handles, M8 DIN580-compatible threaded insert (secondary safety), 4x M10 threaded inserts, 2x 35 mm pole sockets, built-in risers for 35°/55° monitor angles, bottom runners"
+  },
+  "deployment": {
+    "modes": [
+      "Pole-mounted (35 mm sockets, optionally on KS21/SB18/SB15m sub)",
+      "Wall-mounted",
+      "Ceiling-mounted",
+      "Flown",
+      "Ground-stacked",
+      "Stage monitor (risers, 35°/55°)"
+    ],
+    "rigging_accessories": [
+      "X-UL12 (long U-bracket)",
+      "X-US1215 (short U-bracket, shared with X15 HiQ)",
+      "X-UTILT (tilt wall-mount accessory for negative site angles)",
+      "X-BAR (single-enclosure rigging bar for flying)",
+      "CLAMP250 (clamp certified to 250 kg)",
+      "EMBi (pole-mount adapter for X-US1215)",
+      "35 mm pole"
+    ]
+  },
+  "usage": [
+    "Compact passive coaxial point source for short-throw FOH, front fill, under-balcony and distributed install duty where smooth off-axis tonal balance and discreet sightlines matter.",
+    "Doubles as a stage wedge using the [X12_MO] preset and built-in risers, which set a 35° or 55° floor angle; a low-latency variant of [X12_MO] cuts processing delay for in-line monitoring.",
+    "Each X12 needs one amplifier output channel; pack densely on a single amp - up to 12 on LA12X, 14 on LA7.16(i), 4 on LA4X (and 8 on LA8 per the manual).",
+    "Pair roughly 1:1 with a subwoofer to extend LF: SB15m reaches down to ~40 Hz, SB18 and KS21 lower still, using the matched [SB15_100]/[SB18_100]/[KS21_100] sub presets with a 100 Hz crossover.",
+    "Versatile rigging covers pole, wall, ceiling, flown (X-BAR plus CLAMP250) and ground-stack; note SB18i and KS21i subs are not mechanically rated for pole-mounting the X12.",
+    "Fixed 90° x 60° ellipsoid pattern and rotatable front logo let it deploy in portrait or landscape, but coverage is not steerable - choose orientation to match the room rather than expecting array-style shaping."
+  ],
+  "source_manual": "X12 Owner's Manual (EN) version 2.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X12/EN/Owner's Manual/X12_OM_EN.pdf"
+}

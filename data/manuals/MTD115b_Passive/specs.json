@@ -1,0 +1,75 @@
+{
+  "enclosure": "MTD115b (Passive)",
+  "product": "MTD115b (part of the L-Acoustics MTD line: MTD108a / MTD112b / MTD115b)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "65-14000 (+/-3 dB, LLC FRONT); 50-16000 usable bandwidth (-10 dB)",
+    "max_spl_db": 128,
+    "max_spl_note": "Per-enclosure passive system output referenced to 1 m, freefield: 122 dB cont / 128 dB peak in FRONT mode; 125 dB cont / 131 dB peak in XOVER mode (includes preset EQ and band leveling).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Axi-symmetrical 85 degrees (+/-20 degrees) nominal at -6 dB",
+    "components": "1 x 15\" weather-resistant LF loudspeaker (3\" voice coil) coaxially mounted with 1 x 1.4\" exit HF compression driver (titanium diaphragm, 3\" voice coil)",
+    "sensitivity_db": "98.5 dB SPL (2.83 Vrms at 1 m, 65-14k Hz) in passive mode",
+    "power_handling": "265 W RMS / 1060 W peak (46 Vrms long-term, pink noise 6 dB crest factor) at 8 ohms"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Passive (single full-range amplifier channel driving the internal passive crossover)"
+    ],
+    "recommended_amplifiers": [
+      "LA4"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "FRONT",
+      "MONITOR",
+      "X-OVER"
+    ],
+    "preset_note": "In passive mode the MTD115b is processed by the LLC115b-st stereo analog line-level controller, which provides three voicings: FRONT (45 Hz HPF plus low-frequency shelving, ~3 dB LF contour), MONITOR (45 Hz HPF), and X-OVER (100 Hz HPF for use with subwoofers). The original manual specifies legacy LAa amplifiers (LA15a/LA17a/LA24a/LA48a) with MLS load-matching switches; the LA4 count reflects current-generation amplification for this archive enclosure.",
+    "recommended_amp_power": "530 W per enclosure at 8 ohms"
+  },
+  "connection": {
+    "input_connector": "2x 4-pin Neutrik speakON (NL4), interchangeable IN/LINK",
+    "wiring_note": "Passive full-range drive on a single speakON pin pair; the enclosure can also be reconfigured for 2-way active operation."
+  },
+  "physical": {
+    "weight_kg": 31.5,
+    "dimensions_mm": "580 (H) x 440 (front W) x 475 (D); rear width 167 mm; trap angle 41 degrees from vertical",
+    "cabinet": "18 mm / 30 mm Baltic birch plywood, sealed, screwed and rabbeted angles",
+    "finish": "Maroon-gray",
+    "grille": "Black epoxy perforated steel with acoustically transparent foam",
+    "shipping_weight_kg": 34.5,
+    "shipping_dimensions_mm": "655 x 500 x 570"
+  },
+  "deployment": {
+    "modes": [
+      "Floor monitor (wedge)",
+      "Stand / pole-mounted",
+      "U-bracket wall, ceiling or scaffold mount (vertical orientation)",
+      "Overhead flown via ETR2 in horizontal orientation"
+    ],
+    "rigging_accessories": [
+      "ETR2 adjustable U-bracket (vertical mounting; also used horizontally for flown suspension)",
+      "PION1 single-stud flytrack fitting (secondary safety attachment only, not a primary point)",
+      "Integrated flying hardware and threaded rigging inserts",
+      "Pole-mount socket",
+      "Handles",
+      "Omnimount-ready inserts"
+    ],
+    "rigging_note": "CE declaration cites an ultimate safety factor greater than 12 for the MTD115b on ETR2 and on PION1; the recessed side fly-track accepts PION1 for safety only."
+  },
+  "usage": [
+    "Compact 15-inch coaxial point-source box for clubs, houses of worship, theaters and corporate AV where a coherent single-source wavefront and even tonal balance across the room matter more than raw output.",
+    "In passive mode each cabinet needs one full-range amplifier channel through its internal crossover; an LA4 powers up to four MTD115b enclosures, with roughly 530 W recommended per box at its 8-ohm load.",
+    "Doubles effectively as a stage floor monitor thanks to its 41-degree trap angle and the LLC controller MONITOR voicing, while the FRONT voicing suits front-of-house mains duty.",
+    "Pair with L-Acoustics subwoofers (SB115, SB118 or SB218) and switch the LLC controller to X-OVER mode to apply the 100 Hz high-pass and hand the lows to the subs for extended low-frequency reach.",
+    "The 85-degree axi-symmetric coverage stays constant horizontally and vertically, so aim it by rotating the box toward the farthest seats rather than relying on asymmetric dispersion.",
+    "Treat it as legacy inventory: it is a discontinued MTD-line product, so plan spares, controllers and rigging (ETR2 / PION1) around archive availability."
+  ],
+  "source_manual": "MTD 108a / MTD112b / MTD115b Operator Manual V1.2 (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD115/documents.zip"
+}

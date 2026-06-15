@@ -1,0 +1,78 @@
+{
+  "product": "L-Acoustics K3i (installation version of the K3 variable curvature line source loudspeaker)",
+  "enclosure": "K3i",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "42 - 20000",
+    "max_spl_db": 143,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal: Panflex-adjustable 70 deg / 110 deg symmetric or 90 deg asymmetric; Vertical: dependent on number of elements and array curvature",
+    "components": "LF: 2 x 12 in neodymium cone drivers (bass-reflex, L-Vents); HF: 1 x 4 in neodymium diaphragm compression driver on DOSC waveguide with Panflex"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Line source (full-range)",
+      "Line source with low-frequency element (sub-augmented)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16(i)",
+      "LA4X",
+      "LA8"
+    ],
+    "per_amplifier": {
+      "LA12X": 6,
+      "LA7.16(i)": 8,
+      "LA4X": 2
+    },
+    "preset_names": [
+      "[K3 70]",
+      "[K3 90]",
+      "[K3 110]",
+      "[KARAIIDOWNK3]"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point terminal blocks with push-in connection (1+/1- = LF, 2+/2- = HF)",
+    "field_wiring": "4 x 2.5 mm2 or 2 x 2.5 mm2 bare-wire speaker cable, or a custom 4-point speakON (NL4) to bare-wire cable; connector sealing plate with cable gland for weather sealing"
+  },
+  "physical": {
+    "weight_kg": 35,
+    "dimensions_mm": "907 W x 357 H x 429 D (front face 357 H tapering to 287 H; depth 403 to 429)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic birch plywood with coated steel grille and acoustically neutral 3D fabric; high-grade steel rigging with anti-corrosion coating",
+    "finish": "Dark grey brown Pantone 426 C, Pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Flown array",
+      "Stacked array"
+    ],
+    "max_per_flown_array": "Up to 16 K3i flown (with K3i-RIGBAR as main lifting accessory)",
+    "inter_element_angles": "0.25, 1, 2, 3, 4, 5, 7.5, 10 deg (via K3i-LINK plates)",
+    "rigging_accessories": [
+      "K3i-LINK (standard rigging plate)",
+      "K3i-ENDLINK (end rigging plate, required on top enclosure)",
+      "K3i-BUMP (flying frame)",
+      "K3i-BAR (extension bar for K3i-BUMP)",
+      "K3i-RIGBAR (rigging bar and pullback)",
+      "K3i-TILTBRACKET",
+      "K3i-CEILINGBRACKET",
+      "KARAIIi-DOWNK3i (interface for flying Kara IIi below K3i)",
+      "CLAMP250",
+      "M6 inserts for rigging plates and accessories"
+    ]
+  },
+  "usage": [
+    "Long-throw line source for medium-to-large permanent installs such as concert halls, clubs, congress centers and sport venues; delivers K2-class output in a compact, lighter cabinet with installation-friendly mounting hardware.",
+    "Uses one amplifier channel per box (LF and HF bridged off one channel via terminal-block wiring), so plan amp capacity around max enclosures per controller: 6 on an LA12X, 8 on an LA7.16(i), or 2 on an LA4X.",
+    "Pick the horizontal-coverage preset to match the room: [K3 70] for tight long throw, [K3 110] for wide near-field, or [K3 90] for asymmetric audience geometry; combine settings within a single hang to follow seating shape.",
+    "Pair with KS28 or KS21i subwoofers and the matching [xxxx_60] crossover presets to extend low-end down to roughly 25 Hz, keeping the K3i mains on their reference 42 Hz - 20 kHz response.",
+    "Vertical splay is set with K3i-LINK plates from 0.25 deg up to 10 deg; flown arrays can run up to 16 enclosures using K3i-RIGBAR, with K3i-ENDLINK mandatory on the top box.",
+    "IP55-rated and color-matchable out of the box, making it suited to weather-exposed outdoor positions and architecturally sensitive indoor installs; always validate array size and rigging loads in Soundvision before deployment."
+  ],
+  "source_manual": "K3i Owner's Manual (EN) version 3.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3i/EN/Owner's%20Manual/K3i_OM_EN.pdf"
+}

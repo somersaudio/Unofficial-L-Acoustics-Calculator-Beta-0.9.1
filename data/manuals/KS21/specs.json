@@ -1,0 +1,86 @@
+{
+  "enclosure": "KS21",
+  "product": "KS21",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "29-100",
+    "frequency_range_note": "Low-frequency limit is 29 Hz on the [KS21_60] presets and 31 Hz on the [KS21_100] presets (-10 dB). Upper limit is set by preset to either 60 Hz (A15 pairing) or 100 Hz (A10 pairing).",
+    "max_spl_db": 138,
+    "max_spl_note": "138 dB peak at 1 m, half-space, pink noise crest factor 4, on the [KS21_100] preset.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional in standard configuration; cardioid (rear rejection) when four enclosures are arrayed with one element reversed using the cardioid presets.",
+    "components": "1 x 21\" high-excursion neodymium direct-radiating cone driver in a bass-reflex enclosure with L-Vents (reduces port turbulence/noise and raises LF efficiency)."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (omnidirectional)",
+      "Cardioid (4-box block, one element reversed)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA12X",
+      "LA7.16(i)",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 8,
+      "LA7.16(i)": 8,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "KS21_60",
+      "KS21_100",
+      "KS21_60_C",
+      "KS21_100_C",
+      "KS21_60_Cx",
+      "KS21_100_Cx"
+    ],
+    "preset_note": "_C / _Cx presets are for cardioid blocks; the reversed element runs the SR-channel preset while the forward elements run SB. Standard presets route all four amp outputs to SB on input A."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK; subwoofer wired on pin 1+/1- (LF+/LF-), pins 2+/2- not linked",
+    "breakouts": "Daisy-chain via the LINK connector; SP cables are 4-point speakON, 4 mm2 gauge. CC4FP and PA-COM breakouts available for multi-enclosure cabling."
+  },
+  "physical": {
+    "weight_kg": 49,
+    "dimensions_mm": "762 (W) x 571 (H) x 752 (D)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood, dark grey-brown (Pantone 426 C); coated steel grille with acoustically neutral 3D fabric; high-grade anti-corrosion-coated steel rigging components."
+  },
+  "deployment": {
+    "modes": [
+      "Flown vertical array",
+      "Ground-stacked (vertical or upright)",
+      "Stacked on chariot",
+      "Pole-mount base (M20x150 insert, 35 mm socket)"
+    ],
+    "max_per_flown_array": "A15-BUMP: 8 safe / 16 maximum; A15-RIGBAR: 4",
+    "max_per_stacked_array": "3 with no rigging accessory; 4 with KS21-OUTRIG; KS21-CHARIOT: 3 (4 with K2-JACK stabilizers)",
+    "inter_element_angles": "Not specified for subwoofer arrays; refer to Soundvision for mechanical limits.",
+    "rigging_accessories": [
+      "A15-BUMP",
+      "A15-RIGBAR",
+      "KS21-OUTRIG",
+      "KS21-CHARIOT",
+      "KS21-CHARIOTCOV",
+      "KS21-PLA",
+      "Integrated two-point rigging arms with spring-loaded pins",
+      "Ground runners and corner stops",
+      "35 mm pole socket with M20x150 insert"
+    ]
+  },
+  "usage": [
+    "Compact 1x21\" reference subwoofer built to extend the low end of A15 and A10 line-source systems; its two-point rigging arms let it be flown or stacked inline with A15 to build a true full-range hang.",
+    "Each cabinet needs one amplifier channel (8 ohm). Plan one LA12X or LA7.16(i) to drive up to 8 KS21, one LA4X for up to 4, or LA2Xi for 4 (SE) / 2 (bridged).",
+    "Pick the upper-limit preset to match the main system: use a _60 preset (29 Hz low limit) when paired with A15, or a _100 preset (31 Hz low limit) when paired with A10.",
+    "For directional low end, deploy a block of four with one box reversed and load the cardioid (_C / _Cx) presets to reject energy off the back of the array (good for keeping stage and audience bleed under control).",
+    "Keep subs side by side for best coupling; if they must be split, hold acoustic-center spacing within 2.8 m at the 60 Hz crossover or 1.7 m at 100 Hz to avoid combing.",
+    "Flown limits are 8 (safe) / 16 (max) per A15-BUMP hang; ground stacks top out at 3 boxes, or 4 with KS21-OUTRIG, and require safety straps above four or when not rigging-locked together. IP55-rated for outdoor use."
+  ],
+  "source_manual": "KS21 Owner's Manual (EN) version 2.2",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21/EN/Owner's Manual/KS21_OM_EN.pdf"
+}

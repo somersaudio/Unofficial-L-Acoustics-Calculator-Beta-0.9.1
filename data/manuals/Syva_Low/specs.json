@@ -1,0 +1,74 @@
+{
+  "enclosure": "Syva Low",
+  "product": "Syva Low",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "40 Hz low-frequency limit (-10 dB) on the standalone SYVA LOW_100 preset; provides usable LF contour to the Syva system",
+    "max_spl_db": 137,
+    "max_spl_note": "137 dB peak at 1 m (half-space, pink noise crest factor 4) on SYVA LOW_100 with LA4X or LA12X; 131 dB when driven by LA2Xi",
+    "nominal_impedance_ohms": 4,
+    "directivity": "Omnidirectional low-frequency radiation (subwoofer); used to add a +9 dB low-end contour and extend bandwidth under the Syva head",
+    "components": "2 x 12\" LF cone drivers (K2-derived) in a bass-reflex enclosure with L-Vents",
+    "acoustical_load": "Bass-reflex, L-Vents"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standalone LF extension on SYVA LOW_100 preset",
+      "Combined Syva-on-Syva-Low stack via SYVA LOW SYVA preset (AutoConnect)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA12X",
+      "LA7.16i",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 6,
+      "LA7.16(i)": 8,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_PBTL": 4
+    },
+    "preset_names": [
+      "SYVA LOW_100",
+      "SYVA LOW SYVA"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) IN",
+    "autoconnect": "AutoConnect plate routes power through the subwoofer when a Syva head is stacked on top: pins 1+/1- carry Syva Low LF and 2+/2- carry Syva MF/HF. When AutoConnect is in use, do not connect the speakON or screw terminals on the Syva head.",
+    "amplifier_drive": "Single amplifier channel per cabinet (4 ohm); compatible with SP cables and SP-Y1 / DOSUB-LA8 breakouts"
+  },
+  "physical": {
+    "weight_kg": 29,
+    "dimensions_mm": "849 (W) x 350 (H) x 334 (D)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood, coated steel grill with acoustically neutral 3D fabric front",
+    "finish": "Dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked as a podium base under a Syva head (four top studs and a top plate locate the head; head held by magnets)",
+      "Ground-stacked standalone as a low-frequency extension",
+      "Wall-mounting and flying also possible per system rigging"
+    ],
+    "rigging_accessories": [
+      "Syva Base (baseplate shared by Syva, Syva Low and Syva Sub)",
+      "Two anti-vibration mats (supplied for ground-stacking)",
+      "SyvaLF Cov (protective transport cover for Syva Low or Syva Sub)"
+    ],
+    "stacking_note": "Recommended ratio is 1 Syva Low per 1 Syva head, adding roughly +9 dB of low-frequency contour and extending system bandwidth to ~40 Hz"
+  },
+  "usage": [
+    "Low-frequency extension and podium base for the Syva colinear head: stack one Syva Low under each Syva to add about +9 dB of low-end contour and pull system response down to roughly 40 Hz.",
+    "Each Syva Low is a single 4 ohm load needing one amplifier channel; an LA4X drives up to 4, an LA7.16i up to 8, and an LA12X up to 6 enclosures.",
+    "When the Syva head sits on top, use the AutoConnect plate only and leave the head's speakON and screw terminals unused to avoid amplifier damage.",
+    "Load the SYVA LOW_100 preset when running the cabinet on its own, or SYVA LOW SYVA for the combined Syva-over-Syva-Low stack.",
+    "Expect about 137 dB peak SPL with an LA4X or LA12X, dropping to 131 dB if powered by an LA2Xi, so size amplification to the target level.",
+    "For deeper sub extension below 40 Hz, pair the system with Syva Sub (approx. 2 Syva Sub per Syva Low + Syva); ground-stack on the supplied anti-vibration mats or a Syva Base."
+  ],
+  "source_manual": "Syva Owner's Manual (EN), version 1.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
+}

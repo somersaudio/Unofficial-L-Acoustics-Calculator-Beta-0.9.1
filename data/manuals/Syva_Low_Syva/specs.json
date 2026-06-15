@@ -1,0 +1,72 @@
+{
+  "enclosure": "Syva Low Syva",
+  "product": "L-Acoustics Syva Low (low-frequency extension for the Syva system)",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "42 - 20000",
+    "max_spl_db": 142,
+    "max_spl_note": "142 dB peak at 1 m, half-space, with the [SYVA LOW SYVA] hybrid preset on LA4X, LA12X, or LA2Xi in bridge mode; 136 dB on a single-channel LA2Xi. Figure is for the full Syva-on-Syva-Low stack.",
+    "nominal_impedance_ohms": 2.7,
+    "directivity": "Inherited from the Syva top element: nominally 140 degrees horizontal by +5/-21 degrees vertical (J-shape) above 1 kHz. The Syva Low extension is omnidirectional in its passband and adds no pattern control of its own.",
+    "components": "Syva Low extension cabinet: 2 x 12 inch LF cone drivers (K2-derived) in a bass-reflex enclosure with L-Vents. In the coupled stack it sits below a Syva top featuring 6 x 5 inch MF cone drivers and 3 x 1.75 inch HF compression drivers on DOSC waveguides.",
+    "impedance_note": "The 2.7 ohm value is the combined Syva + Syva Low load presented to one amplifier output when both are driven together via the [SYVA LOW SYVA] preset; the Syva Low extension cabinet alone is rated 4 ohms."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "[SYVA LOW SYVA] hybrid preset, Syva and Syva Low driven from the same amplifier output (one channel per coupled pair)",
+      "Separated mode where Syva Low runs the [SYVA LOW_100] preset (LF up to 100 Hz) on its own channel while Syva runs the [SYVA] preset"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA4X",
+      "LA7.16i",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 4,
+      "LA4X": 2,
+      "LA2Xi_SE": 2,
+      "LA7.16(i)": 8
+    },
+    "preset_names": [
+      "SYVA LOW SYVA",
+      "SYVA LOW_100"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) on the Syva Low cabinet; pins 1+/1- carry LF. AutoConnect contact plate on top routes power up to a Syva placed directly on top.",
+    "autoconnect": "When Syva is stacked on Syva Low, AutoConnect passes audio/power through the connector plate: pins 1+/1- to LF, pins 2+/2- to Syva MF/HF. Do not use the speakON or screw terminals on the Syva top while AutoConnect is engaged.",
+    "coupling_cable": "If Syva is placed near (within 60 cm) rather than on top of Syva Low, an SP-Y1 splitter cable feeds both from the one amplifier output running the [SYVA LOW SYVA] preset."
+  },
+  "physical": {
+    "weight_kg": 50,
+    "weight_note": "50 kg / 110 lb is the combined Syva + Syva Low stack; the Syva Low extension cabinet alone is 29 kg / 64 lb.",
+    "dimensions_mm": "350 W x 334 D x 2128 H (full Syva-on-Syva-Low stack); Syva Low cabinet alone 350 W x 334 D x 849 H",
+    "protection_rating": "IP55 (Syva Low cabinet)",
+    "cabinet": "Premium-grade Baltic beech and birch plywood, coated steel grill with acoustically neutral 3D fabric; dark grey brown Pantone 426C standard, pure white RAL 9010 or custom RAL on order"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked, Syva top resting directly on the Syva Low base (AutoConnect engaged)",
+      "Ground-stacked on a Syva Base plate for added stability"
+    ],
+    "max_per_flown_array": "Not flown in this configuration; the coupled Syva-on-Syva-Low stack is a ground-stack only (1 stack per Syva Base)",
+    "rigging_accessories": [
+      "Syva Base (base plate, max 1)",
+      "Anti-vibration mats (supplied for ground-stacking the LF cabinet)",
+      "SyvaLF Cov (protective transport cover for Syva Low)"
+    ]
+  },
+  "usage": [
+    "Use Syva Low as the bass-reflex podium beneath a Syva colinear top to extend the system down to 42 Hz and add roughly 9 dB of low-frequency contour, turning Syva into a full-range medium-throw source.",
+    "Pair one Syva Low to one Syva for the standard coupled ratio; stack the Syva directly on top so AutoConnect handles the audio and power link with no external speaker cable between the two.",
+    "Drive the coupled pair from a single amplifier output using the [SYVA LOW SYVA] preset, so one stack consumes one channel; budget 2 channels per the per-enclosure planning in this calculator.",
+    "Plan amplifier loading at the configured channel counts: up to 4 Syva Low on an LA12X, 2 on an LA4X, 2 per LA2Xi (SE), and 8 on an LA7.16i.",
+    "The combined Syva + Syva Low load is about 2.7 ohms per driven output, so respect the per-output limits and never engage AutoConnect while also feeding the Syva top via its own speakON or screw terminals.",
+    "For deeper extension add Syva Sub at a 2:1:1 ratio (two Syva Sub per Syva Low + Syva), reaching down to 27 Hz; this stack is ground-stacked only, optionally on a Syva Base for stability."
+  ],
+  "source_manual": "Syva Owner's Manual (EN) v1.0 (covers Syva, Syva Low, Syva Sub)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
+}

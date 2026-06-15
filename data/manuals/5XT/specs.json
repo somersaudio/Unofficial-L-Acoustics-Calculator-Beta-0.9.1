@@ -1,0 +1,83 @@
+{
+  "enclosure": "5XT",
+  "product": "5XT",
+  "type": "coaxial",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "95 - 20000 (usable bandwidth, -10 dB, [5XT] preset)",
+    "max_spl_db": 121,
+    "max_spl_note": "121 dB peak at 1 m, free field, pink noise crest factor 4, [5XT] preset; extends to 40 Hz with SB15m or 27 Hz with SB10i subwoofer support",
+    "nominal_impedance_ohms": 16,
+    "directivity": "110 degrees axisymmetric (nominal, -6 dB)",
+    "components": "1 x 5\" cone driver (LF) coaxially loaded with 1 x 1\" diaphragm compression driver (HF); 2-way passive with internal custom-filter crossover; bass-reflex LF loading"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (passive, single amplifier channel per enclosure)",
+      "Low-latency mode for stage-monitor use ([5XT_MO]) on X/A series controllers"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA8",
+      "LA12X",
+      "LA4",
+      "LA7.16(i)",
+      "LA2Xi_SE"
+    ],
+    "per_amplifier": {
+      "LA4": 12,
+      "LA12X": 24,
+      "LA7.16(i)": 48,
+      "LA4X": 16,
+      "LA2Xi_SE": 16
+    },
+    "per_amplifier_note": "Manual drive-capacity table (per output / total): LA2Xi 4/16 (SE), LA4X 4/16, LA8 6/24, LA12X 6/24. App per_amplifier values used directly from inputs.",
+    "preset_names": [
+      "[5XT]",
+      "[5XT_MO]",
+      "[SB15_100]",
+      "[SB10_100]"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel, interchangeable as IN or LINK; plus 2x 2-point screw terminals each acting as IN/LINK. Internal pinout uses speakON 1+/1- for the transducer; points 2+/2- not linked.",
+    "breakouts": "SP-Y1 (4-point speakON to 2x 2-point speakON, with CC4FP adapter) for two enclosures; DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON) for four enclosures; optional 5XT-SEALPLATE for screw-terminal cabling (cable gland fits up to 4 mm gauge)"
+  },
+  "physical": {
+    "weight_kg": 3.5,
+    "dimensions_mm": "165 (H) x 165 (W) x 165 (D)",
+    "dimensions_note": "Manual diagram explicitly labels width only (165 mm / 6.5 in); enclosure is near-cubic per official L-Acoustics data (165 x 165 x 165 mm).",
+    "protection_rating": "IP30 standard; IP54 with 5XT-SEALPLATE and a down-tilt angle of 20 degrees or more",
+    "cabinet": "premium grade Baltic birch plywood, steel front with anti-corrosion coating; finish dark grey brown Pantone 426 C or pure white RAL 9010 (custom RAL on special order)"
+  },
+  "deployment": {
+    "modes": [
+      "Standalone point source (short-throw reinforcement)",
+      "Point source with SB15m or SB10i subwoofer for extended LF",
+      "Stage monitor (floor wedge) with [5XT_MO] preset",
+      "Stage monitor with subwoofer",
+      "Wall-mounted or ceiling-mounted via ETR5 U-bracket",
+      "Pole-mounted via 3/8\" microphone-stand insert"
+    ],
+    "max_per_flown_array": "Not flown as an array; deployed as a single point-source element. Wall/ceiling mount limit 1 per ETR5; pole-mount limit 1 per stand.",
+    "inter_element_angles": "Not applicable (single-enclosure point source; ETR5 provides site-angle adjustment)",
+    "rigging_accessories": [
+      "ETR5 adjustable U-bracket (2x M6 inserts on enclosure sides)",
+      "3/8\" insert on bottom face for microphone stand",
+      "5XT-SEALPLATE connector sealing plate (optional)",
+      "ETR5 also doubles as connector protection in storage"
+    ]
+  },
+  "usage": [
+    "Ultra-compact 5\" coaxial point source for short-throw fill, foreground music, and discreet install jobs where a minimal visual footprint matters; the near-cubic 165 mm cabinet weighs only 3.5 kg.",
+    "Each 5XT needs a single passive amplifier channel; pack them densely on one controller - up to 16 per LA4X/LA2Xi, 24 per LA12X, or 48 on an LA7.16(i) per the app counts.",
+    "Load the [5XT] factory preset for FOH/fill duty or [5XT_MO] for floor-monitor use; a low-latency variant of the monitor preset trims delay to roughly 0.84-1.18 ms depending on controller.",
+    "Pair with SB15m (down to 40 Hz) or SB10i (down to 27 Hz) and apply the matching [SB15_100]/[SB10_100] presets; keep adjacent sub acoustic centers within 1.7 m when a 100 Hz crossover is used.",
+    "Wire IN and LINK speakON connectors interchangeably to daisy-chain units in parallel, but watch the 16 ohm nominal load so total paralleled enclosures stay within the per-output limit (4 on LA2Xi/LA4X, 6 on LA8/LA12X).",
+    "For outdoor or wet installs, fit the 5XT-SEALPLATE and aim the box at 20 degrees or more down-tilt to reach IP54; the bare enclosure is only IP30."
+  ],
+  "source_manual": "5XT Owner's Manual (EN) version 4.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/5XT/EN/Owner's Manual/5XT_OM_EN.pdf"
+}

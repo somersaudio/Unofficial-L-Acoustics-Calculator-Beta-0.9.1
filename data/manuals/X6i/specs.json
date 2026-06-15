@@ -1,0 +1,89 @@
+{
+  "enclosure": "X6i",
+  "product": "L-Acoustics X6i",
+  "type": "coaxial",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "54 Hz - 20 kHz ([X6i_50] preset); 69 Hz - 20 kHz ([X6i] preset), both -10 dB",
+    "max_spl_db": 123,
+    "max_spl_note": "123 dB with [X6i] preset; 117 dB with [X6i_50] preset (peak at 1 m, free field, pink noise crest factor 4). Reduced when driven by LA2Xi.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degrees axisymmetric (nominal, -6 dB)",
+    "components": "Coaxial 2-way passive: LF 1 x 6.5 in, HF 1 x 1.5 in neodymium compression driver; bass-reflex (L-Vents) acoustical load"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive 2-way, single amplifier output per enclosure"
+    ],
+    "recommended_amplifiers": [
+      "LA7.16i",
+      "LA12X",
+      "LA4X",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "X6i",
+      "X6i_50",
+      "X6i_MO"
+    ]
+  },
+  "connection": {
+    "input_connector": "4-point terminal block with push-in connection and connector sealing plate (IN/LINK)",
+    "adapters": "SPCON 2-point speakON-to-bare-wire adaptor (2.5 mm2 gauge) replaces the sealing plate; not compatible with X6i-onCW, WALLx2, PANx2, GROUND, GROUND35, GROUND55"
+  },
+  "physical": {
+    "weight_kg": 6.3,
+    "dimensions_mm": "362 (H) x 187 (W) x 170 (D) (front face); 175 mm depth at the grill",
+    "protection_rating": "IP55 (vertical orientation with connector at top)",
+    "cabinet": "Premium-grade Baltic birch and beech plywood; steel grill with anti-corrosion coating; finishes: Dark grey brown Pantone 426C, Pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "wall-mount",
+      "ceiling-mount",
+      "truss-mount",
+      "ground-stack / floor monitor",
+      "pole-mount",
+      "pendant"
+    ],
+    "monitor_angles": "0 degrees, 35 degrees, or 55 degrees when ground-stacked (cabinet shape provides three monitor angles)",
+    "rigging_accessories": [
+      "8 x M6 inserts (rear/sides)",
+      "X6i-onCW",
+      "WALL",
+      "WALLx2",
+      "PAN",
+      "PANx2",
+      "TILT (0-40 degrees)",
+      "TILT5",
+      "TILT15",
+      "TILT40",
+      "TILT-SUPPORT",
+      "GROUND",
+      "GROUND35",
+      "GROUND55",
+      "X6i-HBAR",
+      "VBAR",
+      "CEILING-PENDANT",
+      "POLE"
+    ]
+  },
+  "usage": [
+    "Compact 6.5 in coaxial point source for short-throw install: vocal reinforcement, fills, and surrounds in performing arts centers, houses of worship, corporate rooms, clubs, and hospitality spaces.",
+    "Passive design - each cabinet needs a single amplifier output. One LA7.16i drives up to 16, an LA12X up to 12, an LA4X or LA2Xi (single-ended) up to 8, and an LA2Xi in BTL mode up to 2.",
+    "Choose the [X6i_50] preset for standalone full-range coverage down to 54 Hz, or the higher-output [X6i] preset (123 dB, 69 Hz) for stronger vocals or when paired with a sub.",
+    "Extend the low end with SB6i or SB10i subwoofers using the matched crossover presets - closely coupled (200 Hz), coupled (100 Hz), or separated (60 Hz).",
+    "Use the [X6i_MO] low-latency monitor preset for stage-monitor duty; the cabinet shape gives 0/35/55 degree wedge angles, and LFC compensates coupling between paired monitors.",
+    "IP55 rated for indoor or outdoor use, but only in the vertical position with the connector at the top; observe that orientation constraint and reseal the inserts when accessories are removed."
+  ],
+  "source_manual": "X6i Owner's Manual (EN) version 2.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X6i/EN/Owner's Manual/X6i_OM_EN.pdf"
+}

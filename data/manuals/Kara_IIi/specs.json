@@ -1,0 +1,82 @@
+{
+  "enclosure": "Kara IIi",
+  "product": "KARA IIi",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000",
+    "max_spl_db": 142,
+    "max_spl_note": "142 dB peak at 1 m, free field, pink noise crest factor 4, preset [KARA II 70] with LA4X/LA8/LA12X; 137 dB with LA2Xi",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal 70 deg or 110 deg symmetric, or 90 deg asymmetric (35/90) via Panflex L-Fins; vertical depends on element count and array curvature",
+    "components": "LF: 2 x 8 in neodymium cone drivers (bass-reflex); HF: 1 x 3 in neodymium diaphragm compression driver on DOSC waveguide with Panflex L-Fins"
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "2-way active (1 enclosure per amplifier output pair: LF + HF)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16(i)",
+      "LA4X",
+      "LA2Xi",
+      "LA8"
+    ],
+    "per_amplifier": {
+      "LA12X": 6,
+      "LA7.16(i)": 8,
+      "LA4X": 4,
+      "LA2Xi_SE": 4
+    },
+    "preset_names": [
+      "KARA II 70",
+      "KARA II 90",
+      "KARA II 110",
+      "KARA II_FI"
+    ],
+    "per_amplifier_note": "Counts are maximum enclosures per amplified controller. LA2Xi yields reduced max SPL/drive capacity vs LA4X/LA8/LA12X."
+  },
+  "connection": {
+    "input_connector": "2x 4-point terminal blocks with push-in connection, labeled IN and LINK (daisy-chain); internal pinout 1+/1- = LF, 2+/2- = HF for 2-way active operation",
+    "breakouts": "Optional connector sealing plate with cable gland for weather-resistant installs; custom 4-point speakON-to-bare-wire cable available for connection to amplified controllers"
+  },
+  "physical": {
+    "weight_kg": 21,
+    "dimensions_mm": "701 W x 252 H x 409 D (approx; trapezoidal enclosure, dims per datasheet)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium grade Baltic birch plywood; coated steel grille with acoustically neutral 3D fabric; rigging components in high-grade anti-corrosion coated steel",
+    "finish": "Dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "flown line source array",
+      "ground-stacked array",
+      "stacked on SB18 IIi or KS21i subwoofers"
+    ],
+    "max_per_flown_array_note": "Stacked configurations: safe limit 6 Kara IIi, maximum limit 9 Kara IIi; on SB18 IIi stack max 9 Kara IIi over 3 SB18 IIi. Flown array element count must be validated in Soundvision.",
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10 degrees (set via KARAIIi-LINK plates)",
+    "rigging_accessories": [
+      "KARAIIi-LINK",
+      "KARAIIi-ENDLINK",
+      "KARAIIi-TILT",
+      "KARAIIi-FIXBRACKET",
+      "KARAIIi-TILTBRACKET",
+      "KARAIIi-BUMP",
+      "KARAIIi-RIGBAR",
+      "M-BARi",
+      "CLAMP250",
+      "KARAIIi-SCREEN"
+    ]
+  },
+  "usage": [
+    "Long-throw install line source for fixed venues such as performing-arts centers, theaters, opera houses, houses of worship, corporate and exhibition spaces.",
+    "Drive each enclosure 2-way active off an L-Acoustics controller: an LA12X powers up to 6, an LA7.16(i) up to 8, an LA4X up to 4, and an LA2Xi up to 4 cabinets.",
+    "Pick the preset to match horizontal coverage: KARA II 70, KARA II 90, or KARA II 110, plus KARA II_FI for short-throw flat-response fill (optimized at the 110 setting).",
+    "Extend low end with SB18 IIi or KS21i subs in roughly a 3-to-1 ratio; mixed lines couple optimally up to about 9 Kara IIi over 3 SB18 IIi.",
+    "Keep stacked counts within the 6-enclosure safe limit (9 maximum) and always confirm array geometry and mechanical safety in Soundvision before rigging.",
+    "IP55-rated and color-matchable, so it suits discreet indoor or weather-exposed outdoor installs; do not mix Kara IIi with the touring Kara II / Karai rigging, which is not mechanically compatible."
+  ],
+  "source_manual": "Kara IIi Owner's Manual (EN) version 5.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA IIi/EN/Owner's Manual/Kara_IIi_OM_EN.pdf"
+}

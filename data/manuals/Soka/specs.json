@@ -1,0 +1,81 @@
+{
+  "enclosure": "Soka",
+  "product": "L-Acoustics Soka (on-wall ultra-shallow Colinear Source). Closely related sibling: Soka inWall (separate product entry).",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "60 Hz - 20 kHz (preset-dependent: [Soka_60] 60 Hz-20 kHz, [Soka] 100 Hz-20 kHz, [Soka_200] 200 Hz-20 kHz), usable bandwidth -10 dB",
+    "max_spl_db": 133,
+    "max_spl_note": "Peak at 1 m, free field, pink noise crest factor 4. Per preset with LA4X/LA7.16i/LA12X (or LA2Xi bridge mode): 124 dB [Soka_60], 130 dB [Soka], 133 dB [Soka_200]. With LA2Xi (standard): 124/128/130 dB respectively.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "140 degrees horizontal x nominal vertical +5/-21 degrees (>2 kHz); marketed as 140 x 26 degrees H x V",
+    "components": "LF: 9 x 3.5 inch neodymium cone drivers (closed enclosure); HF: 3 x 1 inch neodymium compression drivers on conical/DOSC waveguide with L-Fins, arranged in J-shaped colinear array"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (single amplifier channel per enclosure)"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "per_amplifier_note": "Max enclosures per controller: LA2Xi 1/output, 4 total (SE) or 2 total (BTL/bridge); LA4X 2/output, 8 total; LA7.16i 1/output, 16 total; LA12X 3/output, 12 total. LA2Xi yields reduced max SPL/drive capacity.",
+    "preset_names": [
+      "[SOKA]",
+      "[SOKA_60]",
+      "[SOKA_200]"
+    ],
+    "preset_note": "Sub-coupling presets pair Soka with SB6i/SB10i: e.g. [SOKA_200]+[SB6_200]/[SB10_200] for closely coupled, [SOKA]+[SB6_100]/[SB10_100] for coupled, [SOKA_60]+[SB6_60]/[SB10_60] for separated. Pre-alignment delays apply (e.g. Soka 1.4 ms with [SOKA]+[SB6_100]); refer to Preset Guide."
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection, IN +/- and LINK marked, supplied with connector sealing plate (two cable glands for 2.5 mm2 cables)",
+    "breakouts": "Optional SPCON 2-point speakON-to-bare-wire adaptor (2.5 mm2, ferruled) replaces the sealing plate; SPCON is only compatible with VBAR and POLE rigging accessories. Custom 2-point speakON-to-bare-wire cable also supported."
+  },
+  "physical": {
+    "weight_kg": 9.4,
+    "dimensions_mm": "1064 H x 99 W x 104.2 D (datasheet: 1065 mm height)",
+    "protection_rating": "IP55 (weatherized, indoor/outdoor)",
+    "cabinet": "Premium grade Baltic beech and birch plywood; coated steel grille with acoustically neutral 3D fabric",
+    "finish": "Dark grey brown Pantone 426C or pure white RAL 9010 (custom RAL on special order)"
+  },
+  "deployment": {
+    "modes": [
+      "on-wall (surface mounted)",
+      "ceiling mounted",
+      "flown / vertically rigged",
+      "pole mounted"
+    ],
+    "rigging_accessories": [
+      "Soka-onW (on-wall mounting accessory)",
+      "WALLx2 (wall-mounting kit)",
+      "PANx2 (adjustable pan kit +/-45 degrees)",
+      "TILT5 (fixed 5-degree tilt)",
+      "PAN (adjustable pan +/-45 degrees)",
+      "TILT-SUPPORT (support plate for TILT/PAN/WALL accessories)",
+      "VBAR (vertical rigging bar with seven pickup points and cable pass-through)",
+      "POLE (35 mm / 1-3/8 inch pole-mount adapter)"
+    ],
+    "rigging_inserts_note": "6x M6 inserts for external rigging and safety. This OM covers on-wall Soka only; in-wall configurations use the Soka inWall (Sokar) manual.",
+    "secondary_safety": "L-Acoustics recommends secondary safety / safety straps at all times; Soundvision used for mechanical and acoustical modeling."
+  },
+  "usage": [
+    "Ultra-shallow (about 104 mm deep), slim on-wall line source for premium installs where the box must visually disappear: lounges, hotels, museums, lecture halls, houses of worship, and residential or commercial spaces.",
+    "Each enclosure needs one passive amp channel. Pack density per controller: up to 16 on an LA7.16i, 12 on an LA12X, 8 on an LA4X, and 4 on an LA2Xi (2 in bridge/BTL mode) - the LA7.16i is the most channel-efficient choice for large install counts.",
+    "Pick the preset to trade bandwidth for output: [Soka_60] reaches down to 60 Hz at 124 dB for full-range standalone use, while [Soka] (130 dB) and [Soka_200] (133 dB) restrict the low end to 100/200 Hz for higher SPL or sub-coupled designs.",
+    "Pair with SB6i or SB10i subwoofers using matched preset sets and the published pre-alignment delays; closely coupled rigs use the [SOKA_200]/[SB_200] family, separated rigs use the [SOKA_60]/[SB_60] family.",
+    "Wide 140-degree horizontal by tight ~26-degree vertical pattern makes it well suited as a main system in reverberant rooms or as a discreet surround, keeping energy off ceilings and floors.",
+    "Connection is a sealed 4-point push-in terminal block (2.5 mm2 cable through glands); use SPCON only with VBAR or POLE mounts. IP55 rating and color-matchable finish allow weather-exposed and outdoor placements."
+  ],
+  "source_manual": "Soka Owner's Manual (EN) version 3.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Soka/EN/Owner's Manual/Soka_OM_EN.pdf"
+}

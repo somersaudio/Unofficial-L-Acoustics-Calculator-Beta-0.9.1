@@ -1,0 +1,72 @@
+{
+  "enclosure": "SB6i",
+  "product": "SB6i",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "29 Hz - 200 Hz (LF limit -10 dB: 29 Hz with SB6_60/SB6_100, 32 Hz with SB6_200; upper limit set by preset to 60/100/200 Hz)",
+    "max_spl_db": 115,
+    "max_spl_note": "Peak SPL at 1 m, half-space, pink noise crest factor 4: 110 dB [SB6_60], 111 dB [SB6_100], 115 dB [SB6_200]. For LA2Xi, refer to LA2Xi system spec sheet.",
+    "nominal_impedance_ohms": 4,
+    "directivity": "Omnidirectional (standard configuration) over the subwoofer bandwidth",
+    "components": "2 x 6.5\" neodymium cone drivers (direct radiating) in a bass-reflex enclosure with L-Vents laminar venting"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (single amplifier output drives the enclosure)"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 8,
+      "LA7.16(i)": 16,
+      "LA4X": 4,
+      "LA2Xi_SE": 4
+    },
+    "per_amplifier_note": "Values are total enclosures per controller. Per-output drive capacity: LA2Xi 1/output, LA4X 1/output, LA7.16i 1/output, LA12X 2/output.",
+    "preset_names": [
+      "SB6_60",
+      "SB6_100",
+      "SB6_200"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection (internal pinout IN+/IN- to LF+/LF-), behind a connector sealing plate with cable glands accepting up to 2 x 2.5 mm2",
+    "cabling_options": "Terminal block output for LA2Xi SE / LA7.16i, or 1- and 2-channel speakON outputs via custom 2-point speakON-to-bare-wire cable (2.5 mm2)",
+    "cable": "2 x 2.5 mm2 speaker cable with bare-wire endings"
+  },
+  "physical": {
+    "weight_kg": 8.6,
+    "dimensions_mm": "532 H x 360 W x 99 D (104.2 mm depth including connector/mounting detail per datasheet)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood; coated steel grille with acoustically neutral 3D fabric",
+    "finish": "Dark grey brown Pantone 426 C, Pure White RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "on-wall mounting (SB6i with SB6i-onCW)",
+      "on-ceiling mounting (SB6i with SB6i-onCW)",
+      "recessed in-wall / in-ceiling / in-tile (via SB6r variants)"
+    ],
+    "max_per_flown_array": "1 per SB6i-onCW (single enclosure per wall/ceiling mount; safety factor 5)",
+    "rigging_accessories": [
+      "SB6i-onCW (on-wall / on-ceiling mounting interface with silent blocks, two surface-mounting plates, M6x35 Torx fasteners and safety screws)"
+    ],
+    "rigging_note": "8x M6 inserts on the rear for mounting accessories and safety; rotatable front logo; replace placeholder screws in unused inserts to prevent acoustic leaks."
+  },
+  "usage": [
+    "Ultra-shallow installation subwoofer (only ~99 mm deep) intended to extend the low end of compact L-Acoustics enclosures like X4i and Soka where visual discretion or in-wall/in-ceiling integration matters.",
+    "Each SB6i needs one amplifier output channel; plan total counts per controller as 4 on LA2Xi/LA4X, 8 on LA12X, or 16 on LA7.16i (note LA12X drives 2 per output, others 1 per output).",
+    "Pick the preset by deployment: SB6_60 for subs separated from the mains (110 dB, 29 Hz LF), SB6_100 (111 dB) or SB6_200 (115 dB) for coupled placements next to the full-range boxes for higher output and crossover headroom.",
+    "Use the 8 rear M6 inserts with the SB6i-onCW accessory for on-wall or on-ceiling mounting (one enclosure per mount), or specify the SB6r recessed variants for flush in-wall/in-ceiling/in-tile integration.",
+    "Wired through a sealed 4-point push-in terminal block (up to 2.5 mm2) for permanent installs; IP55-rated cabinet allows use in protected outdoor and demanding indoor environments.",
+    "Always reinstall placeholder screws in unused rear inserts to avoid air leaks, and add pre-alignment delay from the Preset Guide when combining with line-source mains."
+  ],
+  "source_manual": "SB6i Owner's Manual (EN) version 1.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB6i/EN/Owner's%20Manual/SB6i_OM_EN.pdf"
+}

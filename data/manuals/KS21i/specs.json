@@ -1,0 +1,88 @@
+{
+  "enclosure": "KS21i",
+  "product": "KS21i (IP55 weather-resistant variant of the KS21 21-inch high-power subwoofer)",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "29-100",
+    "frequency_range_note": "Low frequency limit (-10 dB) of 29 Hz with [KS21_60] preset and 31 Hz with [KS21_100]; upper limit set by preset to 60 Hz or 100 Hz",
+    "max_spl_db": 138,
+    "max_spl_note": "138 dB peak at 1 m, half-space, pink noise crest factor 4 ([KS21_100]) per amplified controller with LA2Xi bridge mode / LA4X / LA7.16i / LA12X; 131 dB with LA2Xi in standard (non-bridge) mode",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional in standard configuration; cardioid configuration available (4-box block with one element reversed) for rear SPL rejection",
+    "components": "1 x 21-inch high-excursion neodymium direct-radiating cone driver; bass-reflex acoustical load with L-Vents to reduce port turbulence/noise"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (omnidirectional) configuration",
+      "Cardioid configuration (4-enclosure block, one reversed)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16i",
+      "LA4X",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 8,
+      "LA7.16(i)": 8,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "[KS21_60]",
+      "[KS21_100]",
+      "[KS21_60_C]",
+      "[KS21_60_Cx]",
+      "[KS21_100_C]",
+      "[KS21_100_Cx]"
+    ],
+    "preset_note": "Non-C presets are standard config (upper limit 60/100 Hz); _C and _Cx presets are cardioid. LA2Xi reaches full SPL only in bridge (BTL) mode."
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection; each set of (+/-) terminals is interchangeable as IN or LINK",
+    "sealing": "Connector sealing plate with cable gland for IP55 weatherproofing",
+    "internal_pinout": "IN+/IN- map to LF+/LF-",
+    "cables": "2x 2.5 mm2 speaker cable with bare-wire endings, or custom 2-point speakON-to-bare-wire cable (custom made)"
+  },
+  "physical": {
+    "weight_kg": 46,
+    "dimensions_mm": "569 W x 629 H x 752 D (front 569 x 629; depth 752)",
+    "dimensions_note": "Front face 569 mm W x 629 mm H; depth 752 mm; figures from datasheet (752 / 602 / 569 / 629 mm callouts)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium grade Baltic beech and birch plywood; coated steel grill with acoustically neutral 3D fabric; high-grade steel rigging components with anti-corrosion coating",
+    "finish": "Dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Flown vertical array (with A15i-BUMP)",
+      "Stacked / ground-stacked vertical array",
+      "Flown/stacked in combination with A15i or A10i as a full-range line source",
+      "Wall- or ceiling-mounted (M8 inserts with bracket)"
+    ],
+    "inserts": "18 inserts per side: 12 M6 for flown configs with rigging frame, 2 M8 for wall/ceiling mounting, 4 M6 for screen attachment; 1 DIN580-compatible M8 threaded insert for secondary safety",
+    "rigging_accessories": [
+      "A15i-BUMP (flying frame for vertical A15i/KS21i arrays)",
+      "A15KS-Ui (U-bracket for A15i and KS21i)",
+      "CLAMP250 (250 kg clamp)",
+      "Ai-FIXBRACKET (fastening/stability bracket)",
+      "KS21i-LINK / KS21i-SLINK (standard rigging plates)",
+      "KS21i-ENDLINK / KS21i-ENDSLINK (end rigging plates)",
+      "KS21i-ULINK II (plates for flying two KS21i with A15KS-Ui)",
+      "KS21i-SCREEN (acoustically transparent front screen)"
+    ],
+    "safety_note": "Flown deployments use 4:1 safety factor (Machinery Directive 2006/42/EC); ground-stacked arrays should be secured with Ai-FIXBRACKET. Use Soundvision to validate any specific array."
+  },
+  "usage": [
+    "Compact 21-inch install subwoofer built to extend the low end of A15i and A10i line source systems down to 29 Hz, with an IP55 rating for weather-exposed permanent installs.",
+    "Each enclosure presents an 8-ohm load needing one amplifier channel; pack density runs up to 8 per LA12X or LA7.16i, 4 per LA4X, and on LA2Xi either 4 (single-ended) or 2 when bridged for maximum output.",
+    "Drive with [KS21_60] or [KS21_100] presets to set the crossover point (60 or 100 Hz) so the sub blends cleanly with the main system bandwidth.",
+    "Deploy in cardioid mode by grouping four boxes with one reversed and loading the _C/_Cx presets to reject low-frequency energy off the back of the array, useful for keeping stages and rear zones clean.",
+    "To hit the full 138 dB peak on LA2Xi, the amplifier must run in bridge mode; in standard mode output drops to 131 dB, so plan amp mode around target SPL.",
+    "Can be flown (A15i-BUMP) or ground-stacked, including combined arrays with A15i/A10i; secure ground stacks with Ai-FIXBRACKET and verify every array configuration in Soundvision before rigging."
+  ],
+  "source_manual": "KS21i Owner's Manual (EN) version 4.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21i/EN/Owner's Manual/KS21i_OM_EN.pdf"
+}

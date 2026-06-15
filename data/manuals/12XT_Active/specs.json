@@ -1,0 +1,75 @@
+{
+  "enclosure": "12XT (Active)",
+  "product": "12XT",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000",
+    "max_spl_db": 133,
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degrees axi-symmetric (-6 dB)",
+    "components": "LF: 1x 12-inch weather-resistant transducer; HF: 1x 3-inch diaphragm compression driver, coaxially mounted in a bass-reflex tuned cabinet",
+    "max_spl_note": "133 dB peak at 1 m, free field, 10 dB crest-factor pink noise with [12XTA_FI] preset",
+    "frequency_range_note": "55 Hz - 20 kHz at -10 dB with [12XTA_FR] preset; extends to 32 Hz in HIGH-PASS mode paired with an SB18"
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "FULL RANGE (nominal bandwidth, standalone)",
+      "HIGH-PASS (100 Hz high-pass for SB18 pairing)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "12XTA_FR",
+      "12XTA_FI",
+      "12XTA_MO",
+      "12XTA_FR_100",
+      "12XTA_FI_100",
+      "12XTA_MO_100"
+    ],
+    "drive_note": "In active mode each enclosure consumes two amp channels (separate LF and HF feeds). On an LA4/LA4X the first two enclosures take output channels 1 and 3, with a second unit paralleled on each, for up to four active 12XT per controller; resources are optimized for two or four units. Active RMS handling: LF 290 W, HF 135 W with [12XTA_FI]."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel for IN/LINK daisy-chaining; in active wiring 1+/1- carry LF and 2+/2- carry HF",
+    "cables": "L-ACOUSTICS SP.7 / SP10 / SP25 4-conductor loudspeaker cables (4 mm2 / 11 AWG)"
+  },
+  "physical": {
+    "weight_kg": 29,
+    "dimensions_mm": "540 x 410 x 389 (H x W x D)",
+    "cabinet": "18, 24 and 30 mm Baltic birch plywood, grey-brown RAL 8019 finish, powder-coated steel grille with Airnet acoustically transparent cloth",
+    "weather_resistance": "weather-resistant LF transducer; cabinet not for prolonged moisture exposure",
+    "active_passive_switch": "active/passive mode selected by a switch behind the logo-side handle"
+  },
+  "deployment": {
+    "modes": [
+      "stacked / floor wedge monitor with 30 degrees or 60 degrees fixed wedge angles",
+      "pole-mounted via integrated 35 mm socket",
+      "flown with XTLIFTBAR rigging accessory",
+      "wall or ceiling mounted with ETR12-2 bracket",
+      "wall or ceiling mounted with Omnimount 120.0 Series (four M8 inserts)"
+    ],
+    "rigging_accessories": [
+      "ETR12-2 mounting bracket",
+      "XTLIFTBAR",
+      "Omnimount 120.0 Series fixture",
+      "integrated handles and pole-mount socket",
+      "M8 safety eyebolt insert (rear face)"
+    ]
+  },
+  "usage": [
+    "Mid-size 90-degree coaxial box for multi-purpose reinforcement; in active 2-way mode reserve two amp channels per cabinet (one LF, one HF) rather than the single channel a passive 12XT needs.",
+    "A single LA4/LA4X powers up to four active 12XT, with the first pair on channels 1 and 3 and a second unit paralleled onto each; plan stage counts in multiples of two or four to keep amp resources balanced.",
+    "Pick the preset to match the job: FR for FOH front-fill, FI for flat-response speech/distributed fills, MO for floor-monitor (half-space) duty, using the wedge cabinet's 30/60-degree angles for short or long throw.",
+    "When bottom-end is needed, switch to the HIGH-PASS (_100) presets and pair one active 12XT with one SB18 to extend the system down to 32 Hz.",
+    "Toggle the active/passive switch behind the handle before connecting; active mode lets the LA4/LA4X manage crossover, time-alignment, EQ and protection instead of the onboard passive network.",
+    "Discontinued archive product (no longer manufactured) - verify legacy LA4/LA4X firmware holds the 12XTA preset library before deployment."
+  ],
+  "source_manual": "12XT Coaxial Enclosure User Manual (EN), Version 1.4",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
+}

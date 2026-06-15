@@ -1,0 +1,82 @@
+{
+  "enclosure": "Kara II",
+  "product": "Kara II",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000",
+    "frequency_range_note": "Usable bandwidth -10 dB with [KARA II 70] preset; -10 dB low-cut extends to 85 Hz on the short-throw [KARA II_FI] preset",
+    "max_spl_db": 142,
+    "max_spl_note": "Peak at 1 m, free field, pink noise crest factor 4, [KARA II 70] preset",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal: Panflex/L-Fins selectable 70 or 110 symmetric, or 90 asymmetric (35/55 or 55/35); 70 setting adds ~2 dB on-axis gain above 1 kHz vs 110. Vertical: variable, set by number of elements and array curvature (WST line source)",
+    "components": "LF: 2 x 8-inch neodymium cone drivers (bass-reflex loaded); HF: 1 x 3-inch neodymium diaphragm compression driver on DOSC waveguide with L-Fins"
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "2-way active: one amp channel drives LF, one drives HF",
+      "Standard latency (3.84 ms)",
+      "Low-latency mode for [KARA II_MO] monitor use: 1.18 ms on LA7.16i, 0.84 ms on LA2Xi/LA4X/LA12X"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16(i)",
+      "LA4X",
+      "LA2Xi_SE"
+    ],
+    "per_amplifier": {
+      "LA12X": 6,
+      "LA7.16(i)": 8,
+      "LA4X": 4,
+      "LA2Xi_SE": 4
+    },
+    "preset_names": [
+      "[KARA II 70]",
+      "[KARA II 90]",
+      "[KARA II 110]",
+      "[KARA II_FI]",
+      "[KARA II_MO]"
+    ],
+    "preset_note": "Each horizontal directivity setting requires its matching preset (70/90/110). [KARA II_FI] is a flat short-throw fill preset optimized for the 110 fins setting; [KARA II_MO] is the stage-monitor preset (also 110-optimized) and supports the low-latency operating mode."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), 1 IN + 1 LINK, interchangeable IN/LINK",
+    "pinout": "1+/1- = LF, 2+/2- = HF (L-Acoustics 2-way active pinout)",
+    "breakouts": "Multi-enclosure cabling via DOFILL-LA8 (8-point PA-COM to 2x 4-point speakON) or DO3WFILL (one 2-way active + two passive); SP-Y1 splits a 4-point speakON to 2x 2-point speakON"
+  },
+  "physical": {
+    "weight_kg": 26,
+    "dimensions_mm": "733 W x 162 H x 482 D (front face); rear depth ~500 mm including handles per datasheet",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic birch plywood; coated steel front grille with acoustically neutral 3D fabric; high-grade steel rigging with anti-corrosion coating; Pantone 426 C dark grey-brown finish"
+  },
+  "deployment": {
+    "modes": [
+      "Flown line source array",
+      "Ground-stacked array",
+      "Stage monitor (floor wedge)"
+    ],
+    "max_per_flown_array": "16 elements at safe limit / 24 at maximum limit (M-BUMP + optional M-BAR); 6 with KARA-MINIBU",
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10 degrees",
+    "rigging_accessories": [
+      "M-BUMP",
+      "M-BAR",
+      "M-JACK",
+      "KARA-ANGARMEX",
+      "KARA-MINIBU",
+      "KARA-MINIBUEX",
+      "KARA-PULLBACK"
+    ]
+  },
+  "usage": [
+    "Long-throw variable-curvature line source for the K Series, suited to throws beyond ~35 m in performing arts, houses of worship, large corporate and special events where tight vertical control matters.",
+    "Each Kara II is a 2-way active box needing 2 amp channels (LF + HF); plan amp counts at 6 boxes per LA12X, 8 per LA7.16(i), 4 per LA4X, and 4 per LA2Xi SE.",
+    "Use Panflex to mix directivity within one hang (70/90/110) to even out horizontal SPL mapping; the 70 setting trades width for roughly 2 dB more reach above 1 kHz.",
+    "Match the preset to the fins: [KARA II 70/90/110] for the directivity in use, [KARA II_FI] for flat short-throw fills, and [KARA II_MO] for stage-monitor duty with the available low-latency mode.",
+    "Extend the low end by pairing with KS28, SB18, or KS21 subs; observe the preset-defined acoustic-center spacing (e.g. 2.8 m for a 60 Hz crossover, 1.7 m for 100 Hz) for clean coupling.",
+    "Flying caps at 16 elements (safe) / 24 (max) on M-BUMP; the IP55 rating and birch enclosure suit touring and limited outdoor exposure, but always model the rig in Soundvision to verify mechanical safety."
+  ],
+  "source_manual": "Kara II Owner's Manual (EN) version 5.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA II/EN/Owner's Manual/Kara_II_OM_EN.pdf"
+}

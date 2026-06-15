@@ -1,0 +1,80 @@
+{
+  "enclosure": "K1",
+  "product": "K1",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "35-20000",
+    "max_spl_db": 149,
+    "max_spl_note": "Peak SPL per amplified controller, measured at 1 m under free-field with crest-factor-4 pink noise, [K1] preset.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degrees symmetric horizontal; vertical coverage set by number of elements and array curvature",
+    "components": "LF: 2 x 15\" neodymium (bass-reflex); MF: 4 x 6.5\" neodymium direct-radiating (bass-reflex); HF: 3 x 3\" diaphragm compression drivers on DOSC waveguide. K-shape transducer layout, 3-way active."
+  },
+  "amplification": {
+    "amp_channels_required": 4,
+    "operating_modes": [
+      "Line source (K1 preset)",
+      "K1 + K1-SB low extension (K1SB_X)",
+      "With K1-SB subwoofer (K1SB_60)",
+      "With K1-SB for rear noise control (K1SB_100_NC)",
+      "With KS28 subwoofer (KS28_60)",
+      "With CS1 cardioid subwoofer (CS1_60 / CS1_60_S)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 2
+    },
+    "preset_names": [
+      "K1",
+      "K1SB_X",
+      "K1SB_60",
+      "K1SB_100_NC",
+      "KS28_60",
+      "CS1_60",
+      "CS1_60_S"
+    ],
+    "amplification_note": "Quad-amplified by LA12X; one LA12X drives 2 K1 enclosures (4 outputs each: 2 LF, 1 MF, 1 HF). LA-RAK II AVB houses three LA12X."
+  },
+  "connection": {
+    "input_connector": "2x 8-point PA-COM (CA-COM), interchangeable IN/LINK for daisy-chaining",
+    "breakouts": "DOSUB-LA8 (8-pt PA-COM to 4x 2-pt speakON for passive subs), DOFILL-LA8 (8-pt PA-COM to 2x 4-pt speakON for 2-way active), DO3WFILL (8-pt PA-COM to 1x 4-pt speakON + 2x 2-pt speakON)",
+    "internal_pinout": "PA-COM A/B = left LF, C/D = right LF, E/F = MF, G/H = HF"
+  },
+  "physical": {
+    "weight_kg": 106,
+    "dimensions_mm": "1342 W x 438 H x 520 D (front 505 mm); 1342 x 438 x 520 mm / 52.8 x 17.2 x 20.5 in",
+    "protection_rating": "IP43",
+    "cabinet": "Premium grade Baltic birch plywood with high-density polyethylene; coated steel grill with acoustically neutral 3D fabric; high grade anti-corrosion steel rigging; finish grey brown RAL 8019"
+  },
+  "deployment": {
+    "modes": [
+      "Flown line array (K1-BUMP)",
+      "Ground-stacked (K1-BUMP)"
+    ],
+    "max_per_flown_array": "16 K1 safe limit, 24 K1 maximum limit with K1-BUMP (14 K1 + 3 LA-RAK II AVB safe / 23 K1 + 4 LA-RAK II AVB maximum when racks are flown on the array)",
+    "inter_element_angles": "0, 0.5, 1, 1.5, 2, 2.5, 3, 4 or 5 degrees",
+    "rigging_accessories": [
+      "K1-BUMP (flying/stacking frame)",
+      "K1-DELTA (azimuth tuning, rear dual-motor attachment)",
+      "K1-LASERMOUNT (laser support plate)",
+      "KARA-DOWNK1 (Kara II downfill bumper, up to 6 Kara II)",
+      "K2-LINK (rear attachment of K2 below K1)",
+      "K1-CHARIOT / K1-CHARIOT2 (4-cabinet transport chariot)",
+      "K1-PLA (front dolly)",
+      "K-BUMPFLIGHT (flight case for 2 bumps)"
+    ]
+  },
+  "usage": [
+    "Flagship long-throw WST line source for large-scale touring and arena/festival main hangs where consistent 90-degree symmetric horizontal coverage and long throw are needed.",
+    "Power-dense: each cabinet needs 4 amp channels, so one LA12X drives 2 K1 and a 3-up LA-RAK II AVB powers 6 K1 - budget amp inventory in pairs of cabinets.",
+    "Pair with low end for full-range output: K1-SB for tight low extension (K1SB_60), or KS28 / CS1 cardioid subs; the recommended K1-SB ratio is 2 K1 : 1 K1-SB integrated within the hang.",
+    "Use the K1SB_100_NC preset when rear/backstage SPL rejection matters - it trades a little front output for broadband cardioid cancellation behind the array.",
+    "Inter-element angles are limited to 5 degrees max, so K1 is best for medium-to-long throw zones; pair shorter-throw boxes (Kara II via KARA-DOWNK1, or K2 via K2-LINK) underneath for near-field downfill.",
+    "Mind the rigging limits: flown arrays are capped at 16 cabinets (safe) / 24 (maximum), and IP43 protection means it is suited to covered or short-term outdoor use rather than permanent weather exposure - always validate any array in Soundvision."
+  ],
+  "source_manual": "K1 Owner's Manual (EN) version 4.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1/EN/Owner's Manual/K1_OM_EN.pdf"
+}

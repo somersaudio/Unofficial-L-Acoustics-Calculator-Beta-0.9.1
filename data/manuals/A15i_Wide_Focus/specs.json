@@ -1,0 +1,88 @@
+{
+  "product": "A15i (A15i Wide and A15i Focus)",
+  "enclosure": "A15i Wide/Focus",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "A15i Wide: 42 Hz - 20 kHz; A15i Focus: 41 Hz - 20 kHz (usable bandwidth, -10 dB, [A15] preset)",
+    "max_spl_db": 144,
+    "max_spl_note": "144 dB for A15i Focus and 141 dB for A15i Wide; peak at 1 m, free field, pink noise crest factor 4, [A15] preset. Values shown are for non-LA2Xi amplification; refer to LA2Xi spec sheet for LA2Xi-driven SPL.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Two enclosure variants share the cabinet: A15i Wide has 30 deg enclosure coverage, A15i Focus has 10 deg. Both use Panflex L-Fins for selectable horizontal directivity: 70 deg or 110 deg symmetric, or 90 deg asymmetric (35/55 or 55/35).",
+    "components": "2-way passive constant-curvature WST design. LF: 1 x 15 in cone driver (bass-reflex, L-Vents). HF: 1 x 3 in diaphragm neodymium compression driver on DOSC waveguide with L-Fins."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "LA2Xi single-ended (SE)",
+      "LA2Xi bridged (BTL)",
+      "LA4X one-channel speakON",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 10,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "per_amplifier_note": "Per-amplifier values are total enclosures across the controller (1 per output on LA4X/LA2Xi; 3 per output / 12 total on LA12X; 1 per output / 10 total on LA7.16i). LA2Xi BTL halves capacity to 2 total.",
+    "preset_names": [
+      "[A15]",
+      "[A15_FI]",
+      "[A15_MO]"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection; each terminal set (+ and -) is interchangeable as IN or LINK for parallel daisy-chaining",
+    "breakouts": "Supplied connector sealing plate with two cable glands (input cable plus a plugged second gland for the parallel link cable); glands accept cables up to 2 x 4 mm2 / 12 AWG. For LA4X/LA12X, custom speakON-to-bare-wire cables connect to the terminal block."
+  },
+  "physical": {
+    "weight_kg": 32,
+    "weight_note": "A15i Focus 32 kg / 71 lb; A15i Wide 29 kg / 64 lb (net). Connectors page lists Focus at 33 kg / 73 lb.",
+    "dimensions_mm": "A15i Wide: 752 W x 180 H x ~521 D (front face tapers, 494/525 across body); A15i Focus: 752 W x 345 H x ~516 D (424/490/522 across body). Heights differ because of the wider enclosure's shallower wedge.",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood; coated steel grille with acoustically neutral 3D fabric. Finishes: dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on order."
+  },
+  "deployment": {
+    "modes": [
+      "Flown vertical line source",
+      "Flown horizontal array",
+      "Ground-stacked (on KS21i or standalone)",
+      "Single-enclosure point source for fills/delays"
+    ],
+    "max_per_flown_array": "Safe use without Soundvision verification: 8 A15i Wide/Focus in a vertical array, or 3 in a horizontal array. Other configurations must be checked for mechanical safety in Soundvision.",
+    "inter_element_angles": "A15i Wide and A15i Focus can be freely mixed within one array; combine the 30 deg and 10 deg enclosures plus custom L-Fin settings to shape vertical SPL mapping and throw.",
+    "rigging_accessories": [
+      "A15i-BUMP (flying frame, vertical, A15i + KS21i)",
+      "A15i-RIGBAR (rigging bar / pullback)",
+      "A15i-LIFT (horizontal deployment)",
+      "A15KS-Ui (U-bracket)",
+      "M-BARi (extension bar)",
+      "CLAMP250",
+      "Ai-FIXBRACKET",
+      "A15i-TILTBRACKET",
+      "A15i-TILT",
+      "A15iWIDE-LINK / A15iFOCUS-LINK and ENDLINK rigging plates",
+      "A15i-ULINK II / A15iKS21i-ULINK II",
+      "KS21i-SLINK / KS21i-ENDSLINK for mounting on/under KS21i"
+    ]
+  },
+  "usage": [
+    "Medium-throw passive line-source element for permanent installs; A15i Wide (30 deg) suits broad mains and center clusters, while A15i Focus (10 deg) projects up to roughly 45 m for longer-throw zones.",
+    "Runs on a single amplifier channel and shares one universal [A15] preset across both variants and all L-Fin settings, so plug-and-play with no per-enclosure tuning. Use [A15_FI] for short-throw fills and [A15_MO] for monitor duty.",
+    "Plan amp loading by total enclosures per controller: 12 on an LA12X, 10 on an LA7.16i, 4 on an LA4X, 4 on an LA2Xi in SE mode (only 2 in BTL).",
+    "Pair with KS21i subwoofers (flown or ground-stacked) to reinforce the low-frequency contour and extend response down to about 29 Hz; apply the listed pre-alignment delays (e.g. ~9 ms on the tops with [KS21_60_C]).",
+    "Single enclosures work well as front-fill or delay point sources, with Panflex L-Fins selecting 70, 90, or 110 deg horizontal coverage to match audience geometry.",
+    "IP55 rating, sealed terminal-block input with cable glands, and weatherable finishes make it appropriate for semi-exposed venues; always verify arrays beyond 8-high vertical / 3-wide horizontal in Soundvision."
+  ],
+  "source_manual": "A15i Owner's Manual (EN) version 5.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15i Wide/EN/Owner's Manual/A15i_OM_EN.pdf"
+}

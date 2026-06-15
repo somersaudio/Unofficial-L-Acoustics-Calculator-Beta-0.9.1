@@ -1,0 +1,80 @@
+{
+  "enclosure": "Syva",
+  "product": "L-Acoustics Syva",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "87 Hz - 20 kHz",
+    "max_spl_db": 137,
+    "max_spl_note": "137 dB peak at 1 m, free field, pink noise crest factor 4, [SYVA] preset. The datasheet cover cites 142 dB as a marketing figure; the specification table value is 137 dB.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal 140 deg, vertical +5/-21 deg in J-shape (above 1 kHz); colinear source pattern (~140 x 26 deg)",
+    "components": "Colinear source: 6 x 5\" MF speakers (bass-reflex, L-Vents) + 3 x 1.75\" HF compression-driver diaphragms loaded by DOSC waveguides with L-Fins, in a J-shaped progressive curvature; 2-way passive"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "2-way passive (single amp channel per enclosure)"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 10,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "[SYVA]",
+      "[SYVA LOW SYVA]",
+      "[SYVA SUB SYVA]",
+      "[SYVA LOW_100]",
+      "[SYVA SUB_100]"
+    ],
+    "preset_note": "[SYVA] is the standalone reference preset. The hybrid presets and the _100 LF presets apply when Syva is coupled with Syva Low or Syva Sub via AutoConnect. Reduced max SPL/drive capacity when powered by LA2Xi."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) IN; alternative screw terminal (IN+/IN-); plus AutoConnect for hybrid stacking on Syva Low/Sub. Use only one connector type at a time. speakON is only accessible when Syva Wall is used with a wedge.",
+    "breakouts": "SP-Y1 (4-point speakON to 2x 2-point speakON, with CC4FP adapter), DOSUB-LA8, DOFILL-LA8, DO3WFILL PA-COM breakout cables for multi-enclosure powering"
+  },
+  "physical": {
+    "weight_kg": 21,
+    "dimensions_mm": "1301 (H) x 209 (W) x 170 (D), front face; 144 mm rear width, 1304 mm rear height (tapered cabinet)",
+    "protection_rating": "IP54",
+    "cabinet": "First-grade Baltic beech and birch plywood; steel grille with anti-corrosion coating and acoustically neutral 3D fabric; fine-grain dark grey-brown Pantone 426C finish (custom RAL colors available)"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (on Syva Base)",
+      "Stacked on Syva Low or Syva Sub (Syva Base, AutoConnect)",
+      "Wall-mounted (Syva Wall)",
+      "Pole-mounted (Syva Pole, 35 mm adapter)",
+      "Flown (Syva Bar with provided 12 mm shackle WLL 1 t, or secured to structure via CLAMP250)"
+    ],
+    "max_per_flown_array": "1 (Syva is deployed as a single standalone element per mount point, not a multi-box flown array)",
+    "rigging_accessories": [
+      "Syva Base",
+      "Syva Wall",
+      "Syva Pole",
+      "Syva Bar",
+      "CLAMP250"
+    ],
+    "rigging_note": "DIN580-compatible M8 threaded insert for secondary safety plus 2 integrated inserts for rigging accessories. Four magnets/lodgings on the cabinet base mate with studs on Syva Low/Sub for secure stacking. Do not ground-stack Syva without Syva Base."
+  },
+  "usage": [
+    "Compact colinear (line source) point-of-sale speaker for medium-throw reinforcement up to about 35 m, well suited to architectural installs, corporate events, performing-arts venues, houses of worship, and high-end residential or L-ISA immersive setups where wide 140-degree horizontal coverage with low visual impact is wanted.",
+    "Each enclosure needs one amplifier channel; size racks by the per-amp limits: up to 12 Syva on an LA12X, 10 on an LA7.16i, and 4 on an LA4X (or 4 single-ended / 2 bridged on LA2Xi).",
+    "Standalone Syva is limited to 87 Hz on the low end, so pair it with LF extensions for full-range program: 1:1 with Syva Low extends response to ~40 Hz (9 dB contour), while adding 2 Syva Sub per Syva Low/Syva reaches down to 27 Hz (12 dB contour).",
+    "When stacking on Syva Low or Syva Sub, drive the system through AutoConnect and load the matching hybrid/LF presets ([SYVA] plus [SYVA LOW_100] / [SYVA SUB_100]); do not also use the speakON or screw-terminal inputs in that configuration.",
+    "Deploy as a single element per mount: ground-stacked on Syva Base, on a sub, wall-mounted, pole-mounted, or flown on Syva Bar - never ground-stack without Syva Base, and use the DIN580 M8 insert for a secondary safety tether.",
+    "Rated IP54 with sealed connector covers, making it viable for protected outdoor and demanding install environments when the gaskets are properly fitted."
+  ],
+  "source_manual": "Syva Owner's Manual (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva/EN/Owner's Manual/Syva_OM_EN.pdf",
+  "datasheet": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva/EN/System Spec Sheet/SYVA_SPS_EN_2.2.pdf"
+}

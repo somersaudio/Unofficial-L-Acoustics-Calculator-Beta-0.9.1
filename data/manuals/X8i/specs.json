@@ -1,0 +1,93 @@
+{
+  "enclosure": "X8i",
+  "product": "L-Acoustics X8i",
+  "type": "coaxial",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "43 Hz - 20 kHz ([X8i_40] preset, -10 dB); 67 Hz - 20 kHz ([X8i] preset, -10 dB)",
+    "max_spl_db": 129,
+    "max_spl_note": "129 dB with [X8i] preset; 123 dB with [X8i_40] preset. Peak level at 1 m, free field, pink noise crest factor 4. Reduced max SPL when driven by LA2Xi.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degrees axisymmetric (conical, -6 dB), free of secondary lobes across the band",
+    "components": "2-way passive coaxial: 1x 8\" LF transducer with 1x 1.5\" neodymium HF compression driver mounted coaxially; bass-reflex acoustical load (L-Vents)"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Passive (single amp channel per enclosure; HF/LF crossover handled internally)"
+    ],
+    "recommended_amplifiers": [
+      "LA7.16i",
+      "LA12X",
+      "LA4X",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "X8i",
+      "X8i_40",
+      "X8i_MO",
+      "SB10_100",
+      "SB10_60",
+      "SYVA SUB_100",
+      "KS21_100",
+      "KS21_60"
+    ],
+    "preset_note": "[X8i] = higher SPL / vocal or sub-paired use; [X8i_40] = extended low end for full-range standalone; [X8i_MO] = stage monitor reference response (59 Hz - 20 kHz). A low-latency monitor variant cuts latency from 3.84 ms to ~1.18 ms (LA7.16i) / ~0.84 ms (LA2Xi/LA4X/LA12X). SB10_*, SYVA SUB_*, KS21_* are subwoofer-pairing presets routed to the SB section."
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection and connector sealing plate (internal pinout for L-Acoustics 2-way passive enclosures); IN/LINK marked",
+    "breakouts": "Optional SPCON adapter: 2-point speakON to bare-wire (2.5 mm2, ferruled) that replaces the sealing plate. SPCON is incompatible with X8i-onCW, WALLx2, PANx2, GROUND, GROUND35 and GROUND55 accessories."
+  },
+  "physical": {
+    "weight_kg": 11,
+    "dimensions_mm": "480 H x 240 W x 217-222 D (front face 217 mm, rear/overall depth 222 mm); 18.9 x 9.4 x 8.5-8.7 in",
+    "protection_rating": "IP55 (only when mounted vertically with the connector at the top)",
+    "cabinet": "Premium-grade Baltic birch and beech plywood; steel front grill with anti-corrosion coating",
+    "finish": "Dark grey brown Pantone 426C, Pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Wall-mount",
+      "Ceiling-mount",
+      "Truss-mount",
+      "Flown (pendant/vertical)",
+      "Pole-mount",
+      "Ground-stack",
+      "Stage monitor (35 degrees / 55 degrees wedge angles)"
+    ],
+    "rigging_inserts": "8x M6 inserts on the rear of the enclosure; one insert reserved for secondary safety on flown/wall/ceiling installs. Rotatable grill logo for any orientation.",
+    "rigging_accessories": [
+      "X8i-onCW",
+      "WALL",
+      "WALLx2",
+      "TILT (0-40 degrees adjustable)",
+      "TILT5",
+      "TILT15",
+      "TILT40",
+      "TILT-SUPPORT",
+      "PAN",
+      "PANx2",
+      "VBAR",
+      "CEILING-PENDANT",
+      "POLE",
+      "GROUND / GROUND35 / GROUND55"
+    ]
+  },
+  "usage": [
+    "Compact 8\" coaxial point source for short-throw install work - vocal/speech reinforcement, fills and complement to larger systems in performing-arts venues, houses of worship, corporate spaces, theaters, clubs and high-end residential/yacht installs.",
+    "Strictly passive: budget one amp channel per box, so a single LA4X handles up to 8 enclosures, an LA12X up to 12, and an LA7.16i up to 16 (LA2Xi: 8 in single-ended, only 2 in bridged).",
+    "Choose the preset to the job - [X8i_40] for standalone full-range coverage down to 43 Hz, or [X8i] for maximum 129 dB SPL when running hot or paired with a sub.",
+    "When low-end extension is needed, pair with SB10i(r), Syva Sub or KS21(i); use coupled presets (100 Hz) for the tightest blend or separated presets (60 Hz) when the sub sits apart - mind the differing headroom (4 dB with SB10i(r), 8 dB with Syva Sub/KS21(i)).",
+    "Doubles as a stage wedge via the [X8i_MO] preset and the 35/55-degree monitor angles; a low-latency variant is available, and LFC in LA Network Manager compensates coupling between paired monitors.",
+    "Rated IP55 for indoor/outdoor use, but only when mounted vertically with the connector at the top - keep placeholder screws in unused M6 inserts to avoid acoustic leaks, and reserve one insert for secondary safety on any suspended deployment."
+  ],
+  "source_manual": "X8i Owner's Manual (EN) version 2.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X8i/EN/Owner's Manual/X8i_OM_EN.pdf"
+}

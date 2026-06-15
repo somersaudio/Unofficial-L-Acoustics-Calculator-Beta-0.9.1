@@ -1,0 +1,288 @@
+{
+  "_comment": "Maps each app enclosure to its distilled spec file + official L-Acoustics manual. Spec files hold extracted facts + original usage summaries (not verbatim manual text); full manuals are linked, not bundled.",
+  "schemaVersion": 1,
+  "enclosures": {
+    "Syva Low Syva": {
+      "folder": "Syva_Low_Syva",
+      "specs": "Syva_Low_Syva/specs.json",
+      "source_manual": "Syva Owner's Manual (EN) v1.0 (covers Syva, Syva Low, Syva Sub)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
+    },
+    "5XT": {
+      "folder": "5XT",
+      "specs": "5XT/specs.json",
+      "source_manual": "5XT Owner's Manual (EN) version 4.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/5XT/EN/Owner's Manual/5XT_OM_EN.pdf"
+    },
+    "A10 Wide/Focus": {
+      "folder": "A10_Wide_Focus",
+      "specs": "A10_Wide_Focus/specs.json",
+      "source_manual": "A10 Owner's Manual (EN) version 2.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10 Wide/EN/Owner's Manual/A10_OM_EN.pdf"
+    },
+    "A10i Wide/Focus": {
+      "folder": "A10i_Wide_Focus",
+      "specs": "A10i_Wide_Focus/specs.json",
+      "source_manual": "A10i Owner's Manual (EN) version 5.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10i%20Wide/EN/Owner's%20Manual/A10i_OM_EN.pdf"
+    },
+    "A15 Wide/Focus": {
+      "folder": "A15_Wide_Focus",
+      "specs": "A15_Wide_Focus/specs.json",
+      "source_manual": "A15 Owner's Manual (EN) version 3.2",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15 Wide/EN/Owner's Manual/A15_OM_EN.pdf"
+    },
+    "A15i Wide/Focus": {
+      "folder": "A15i_Wide_Focus",
+      "specs": "A15i_Wide_Focus/specs.json",
+      "source_manual": "A15i Owner's Manual (EN) version 5.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15i Wide/EN/Owner's Manual/A15i_OM_EN.pdf"
+    },
+    "K1": {
+      "folder": "K1",
+      "specs": "K1/specs.json",
+      "source_manual": "K1 Owner's Manual (EN) version 4.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1/EN/Owner's Manual/K1_OM_EN.pdf"
+    },
+    "K1-SB": {
+      "folder": "K1_SB",
+      "specs": "K1_SB/specs.json",
+      "source_manual": "K1-SB Owner's Manual (EN), version 2.0 (shared K1 / K1-SB owner's manual)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1-SB/EN/Owner's Manual/K1_OM_EN.pdf"
+    },
+    "K2": {
+      "folder": "K2",
+      "specs": "K2/specs.json",
+      "source_manual": "K2 Owner's Manual (EN) version 4.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K2/EN/Owner's Manual/K2_OM_EN.pdf"
+    },
+    "K3": {
+      "folder": "K3",
+      "specs": "K3/specs.json",
+      "source_manual": "K3 Owner's Manual (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3/EN/Owner%27s%20Manual/K3_OM_EN.pdf"
+    },
+    "K3i": {
+      "folder": "K3i",
+      "specs": "K3i/specs.json",
+      "source_manual": "K3i Owner's Manual (EN) version 3.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3i/EN/Owner's%20Manual/K3i_OM_EN.pdf"
+    },
+    "KS21": {
+      "folder": "KS21",
+      "specs": "KS21/specs.json",
+      "source_manual": "KS21 Owner's Manual (EN) version 2.2",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21/EN/Owner's Manual/KS21_OM_EN.pdf"
+    },
+    "KS21i": {
+      "folder": "KS21i",
+      "specs": "KS21i/specs.json",
+      "source_manual": "KS21i Owner's Manual (EN) version 4.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21i/EN/Owner's Manual/KS21i_OM_EN.pdf"
+    },
+    "KS28": {
+      "folder": "KS28",
+      "specs": "KS28/specs.json",
+      "source_manual": "KS28 Owner's Manual (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS28/EN/Owner's Manual/KS28_OM_EN.pdf"
+    },
+    "Kara II": {
+      "folder": "Kara_II",
+      "specs": "Kara_II/specs.json",
+      "source_manual": "Kara II Owner's Manual (EN) version 5.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA II/EN/Owner's Manual/Kara_II_OM_EN.pdf"
+    },
+    "Kara IIi": {
+      "folder": "Kara_IIi",
+      "specs": "Kara_IIi/specs.json",
+      "source_manual": "Kara IIi Owner's Manual (EN) version 5.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA IIi/EN/Owner's Manual/Kara_IIi_OM_EN.pdf"
+    },
+    "Kiva II": {
+      "folder": "Kiva_II",
+      "specs": "Kiva_II/specs.json",
+      "source_manual": "Kiva II Owner's Manual (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KIVA II/EN/Owner's Manual/Kiva_II_OM_EN.pdf"
+    },
+    "L2 / L2D": {
+      "folder": "L2_L2D",
+      "specs": "L2_L2D/specs.json",
+      "source_manual": "L2 Owner's Manual (EN) version 5.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/L2/EN/Owner's Manual/L2_OM_EN.pdf"
+    },
+    "SB10i": {
+      "folder": "SB10i",
+      "specs": "SB10i/specs.json",
+      "source_manual": "SB10i Owner's Manual (EN) version 2.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB10i/EN/Owner's Manual/SB10i_OM_EN.pdf"
+    },
+    "SB15m": {
+      "folder": "SB15m",
+      "specs": "SB15m/specs.json",
+      "source_manual": "SB15m User Manual (EN), v4.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB15m/EN/Owner's Manual/SB15m_UM_RM.zip"
+    },
+    "SB18 / SB18 IIi": {
+      "folder": "SB18_SB18_IIi",
+      "specs": "SB18_SB18_IIi/specs.json",
+      "source_manual": "SB18 / SB18i / SB18m Subwoofer User Manual (EN), v6.0; with SB18 Rigging Manual (EN) v2.0 and SB18 Product Specification Sheet (EN) 7.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB18/EN/Owner's Manual/SB18_UM_RM.zip"
+    },
+    "SB6i": {
+      "folder": "SB6i",
+      "specs": "SB6i/specs.json",
+      "source_manual": "SB6i Owner's Manual (EN) version 1.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB6i/EN/Owner's%20Manual/SB6i_OM_EN.pdf"
+    },
+    "Soka": {
+      "folder": "Soka",
+      "specs": "Soka/specs.json",
+      "source_manual": "Soka Owner's Manual (EN) version 3.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Soka/EN/Owner's Manual/Soka_OM_EN.pdf"
+    },
+    "Syva": {
+      "folder": "Syva",
+      "specs": "Syva/specs.json",
+      "source_manual": "Syva Owner's Manual (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva/EN/Owner's Manual/Syva_OM_EN.pdf"
+    },
+    "Syva Low": {
+      "folder": "Syva_Low",
+      "specs": "Syva_Low/specs.json",
+      "source_manual": "Syva Owner's Manual (EN), version 1.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
+    },
+    "Syva Sub": {
+      "folder": "Syva_Sub",
+      "specs": "Syva_Sub/specs.json",
+      "source_manual": "Syva Owner's Manual (EN) - covers Syva, Syva Low, and Syva Sub",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Sub/EN/Owner's Manual/Syva_OM_EN.pdf"
+    },
+    "X12": {
+      "folder": "X12",
+      "specs": "X12/specs.json",
+      "source_manual": "X12 Owner's Manual (EN) version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X12/EN/Owner's Manual/X12_OM_EN.pdf"
+    },
+    "X15 HiQ": {
+      "folder": "X15_HiQ",
+      "specs": "X15_HiQ/specs.json",
+      "source_manual": "X15 HiQ Owner's Manual (EN) version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X15 HiQ/EN/Owners' Manual/X15_HiQ_OM_EN.pdf"
+    },
+    "X4i": {
+      "folder": "X4i",
+      "specs": "X4i/specs.json",
+      "source_manual": "X4i Owner's Manual (EN) version 6.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X4i/EN/Owner's Manual/X4i_OM_EN.pdf"
+    },
+    "X6i": {
+      "folder": "X6i",
+      "specs": "X6i/specs.json",
+      "source_manual": "X6i Owner's Manual (EN) version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X6i/EN/Owner's Manual/X6i_OM_EN.pdf"
+    },
+    "X8": {
+      "folder": "X8",
+      "specs": "X8/specs.json",
+      "source_manual": "X8 Owner's Manual (EN) version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X8/EN/Owner's Manual/X8_OM_EN.pdf"
+    },
+    "X8i": {
+      "folder": "X8i",
+      "specs": "X8i/specs.json",
+      "source_manual": "X8i Owner's Manual (EN) version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X8i/EN/Owner's Manual/X8i_OM_EN.pdf"
+    },
+    "8XT": {
+      "folder": "8XT",
+      "specs": "8XT/specs.json",
+      "source_manual": "8XT Owner's Manual (EN), version 1.4 (8XT_UM_ML_1.4)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/8XT/documents.zip"
+    },
+    "12XT (Active)": {
+      "folder": "12XT_Active",
+      "specs": "12XT_Active/specs.json",
+      "source_manual": "12XT Coaxial Enclosure User Manual (EN), Version 1.4",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
+    },
+    "12XT (Passive)": {
+      "folder": "12XT_Passive",
+      "specs": "12XT_Passive/specs.json",
+      "source_manual": "12XT Coaxial Enclosure User Manual (EN), version 1.4",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
+    },
+    "115XT HiQ": {
+      "folder": "115XT_HiQ",
+      "specs": "115XT_HiQ/specs.json",
+      "source_manual": "115XT HiQ Coaxial Stage Monitor User Manual (EN), version 1.4",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XTHiQ/documents.zip"
+    },
+    "112XT": {
+      "folder": "112XT",
+      "specs": "112XT/specs.json",
+      "source_manual": "112XT Operator's Manual (EN) - L-Acoustics XT LINE (112XT, 115XT, 115XT HiQ)",
+      "official_pdf": "https://www.manualslib.com/manual/809803/L-Acoustics-112xt.html"
+    },
+    "115XT": {
+      "folder": "115XT",
+      "specs": "115XT/specs.json",
+      "source_manual": "112XT / 115XT / 115XT HiQ XT LINE Operator Manual V2 (EN) and 115XT Datasheet (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XT/documents.zip"
+    },
+    "MTD108a": {
+      "folder": "MTD108a",
+      "specs": "MTD108a/specs.json",
+      "source_manual": "MTD108a / MTD112b / MTD115b Operator Manual V1.2 (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD108/documents.zip"
+    },
+    "MTD112b": {
+      "folder": "MTD112b",
+      "specs": "MTD112b/specs.json",
+      "source_manual": "MTD 112 Owner Manual (EN) and MTD112b CE Declaration of Conformity (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD112B/documents.zip"
+    },
+    "MTD115b (Active)": {
+      "folder": "MTD115b_Active",
+      "specs": "MTD115b_Active/specs.json",
+      "source_manual": "L-Acoustics MTD Line (MTD108a, MTD112b, MTD115b) Operator Manual V1.2, Section 2.4 / 8.5 (EN)",
+      "official_pdf": "https://www.manualslib.com/manual/1544004/L-Acoustics-Mtd-Series.html"
+    },
+    "MTD115b (Passive)": {
+      "folder": "MTD115b_Passive",
+      "specs": "MTD115b_Passive/specs.json",
+      "source_manual": "MTD 108a / MTD112b / MTD115b Operator Manual V1.2 (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD115/documents.zip"
+    },
+    "ARCS Wide/Focus": {
+      "folder": "ARCS_Wide_Focus",
+      "specs": "ARCS_Wide_Focus/specs.json",
+      "source_manual": "ARCS Wide/Focus User Manual (EN), version 4.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCS%20WIFO/documents.zip#documents/ARCSWIFO_UM_EN.pdf"
+    },
+    "ARCS": {
+      "folder": "ARCS",
+      "specs": "ARCS/specs.json",
+      "source_manual": "ARCS Wide/Focus System User Manual (EN) v4.0; ARCS Wide/Focus System Rigging Manual (EN) v9.0; ARCS WIDE datasheet (EN)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCS%20WIFO/documents.zip"
+    },
+    "Kiva": {
+      "folder": "Kiva",
+      "specs": "Kiva/specs.json",
+      "source_manual": "KIVA / SB15m User Manual (EN) version 1.2",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KIVA%20II/EN/Owner's%20Manual/Kiva_II_OM_EN.pdf"
+    },
+    "Kilo": {
+      "folder": "Kilo",
+      "specs": "Kilo/specs.json",
+      "source_manual": "KIVA KILO System User Manual (EN), Version 3.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kilo/documents.zip"
+    },
+    "SB118": {
+      "folder": "SB118",
+      "specs": "SB118/specs.json",
+      "source_manual": "SB118 Owner's Manual / User Manual (EN), version 2.0",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB118/documents.zip"
+    }
+  }
+}

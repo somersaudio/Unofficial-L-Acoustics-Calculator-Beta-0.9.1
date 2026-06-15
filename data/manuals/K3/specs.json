@@ -1,0 +1,80 @@
+{
+  "enclosure": "K3",
+  "product": "K3",
+  "type": "line source",
+  "status": "current",
+  "source_manual": "K3 Owner's Manual (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3/EN/Owner%27s%20Manual/K3_OM_EN.pdf",
+  "electroacoustic": {
+    "frequency_range_hz": "42-20000",
+    "max_spl_db": 143,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal: 70 or 110 deg symmetric, or 90 deg asymmetric (left/right) via Panflex; Vertical: variable, set by element count and array curvature (WST line source)",
+    "components": "2x 12-inch neodymium LF cone drivers (bass-reflex, L-Vents) + 1x 4-inch diaphragm neodymium HF compression driver on DOSC waveguide with Panflex; 2-way active",
+    "max_spl_note": "143 dB peak at 1 m, free field, pink noise crest factor 4, K3_70 preset; bandwidth measured at -10 dB with K3_70 preset"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "2-way active (LF + HF, dedicated amplifier channels)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16(i)",
+      "LA4X",
+      "LA8"
+    ],
+    "per_amplifier": {
+      "LA12X": 6,
+      "LA7.16(i)": 8,
+      "LA4X": 2
+    },
+    "preset_names": [
+      "K3 70",
+      "K3 90",
+      "K3 110",
+      "KARAIIDOWNK3",
+      "KARADOWNK3"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK; pinout 1+/1- = LF, 2+/2- = HF",
+    "breakouts": "DOFILL-LA8 (8-point PA-COM to 2x 4-point speakON) for driving two 2-way active enclosures from one PA-COM run; DO3WFILL for one active enclosure plus two passive subs"
+  },
+  "physical": {
+    "weight_kg": 43,
+    "dimensions_mm": "950 W x 287 H x 403 D (front face 357 wide; trapezoidal)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic birch plywood with die-cast aluminum side panels, coated steel grille and acoustically neutral 3D fabric; finish Pantone 426 C dark grey brown"
+  },
+  "deployment": {
+    "modes": [
+      "flown line source (K3-BUMP)",
+      "ground-stacked (K3-CHARIOT + K2-JACK, or K3-BUMP)",
+      "stacked on KS28 (K3-TILT)",
+      "with Kara II downfill (KARA-DOWNK3)"
+    ],
+    "max_per_flown_array": "16 safe limit, 24 maximum (K3-BUMP); 16 flown-with-pullback (K3-RIGBAR)",
+    "inter_element_angles": "0.25, 1, 2, 3, 4, 5, 7.5, 10 deg (range 0 to 10 deg)",
+    "rigging_accessories": [
+      "K3-BUMP (flying frame)",
+      "K3-BAR (extension bar)",
+      "K3-RIGBAR (rigging bar and pullback, includes LA-SLING2T)",
+      "K3-TILT (stack K3 on KS28)",
+      "K3-CHARIOT",
+      "K2-JACK",
+      "KARA-DOWNK3",
+      "DELTA 1.5T",
+      "BPCHAIN 1.5T",
+      "LA-SLING2T"
+    ]
+  },
+  "usage": [
+    "Compact long-throw line source built around full-size K2 transducers, aimed at mid-sized festivals, tours, performing-arts venues, corporate and special events where K1/K2 footprint is too large.",
+    "Each K3 is 2-way active and needs two amp channels, so one amplified controller drives multiple boxes: 6 per LA12X, 8 per LA7.16(i), and 2 per LA4X.",
+    "Choose the horizontal preset to match coverage: K3 70 for tightest long throw and peak SPL, K3 110 for wide near-field fills, or K3 90 for asymmetric (left/right) audience shapes via Panflex.",
+    "Strong reinforced-LF contour down to 42 Hz lets K3 work stand-alone without flown subs; pair with KS28 (or KS21) for infra extension, using the matching xxxx_60 sub preset for crossover alignment around 60 Hz.",
+    "Flown arrays scale to 16 boxes (safe limit) under K3-BUMP, up to 24 with the right mechanical conditions; always validate any array in Soundvision for safety factor and stability.",
+    "Doubles as outfill or delay for K1/K2 main hangs, and can carry Kara II as downfill (KARA-DOWNK3, up to 12 K3 + 6 Kara II safe) for extended vertical coverage."
+  ]
+}

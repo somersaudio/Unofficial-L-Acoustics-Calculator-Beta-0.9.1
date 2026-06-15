@@ -1,0 +1,68 @@
+{
+  "enclosure": "112XT",
+  "product": "L-Acoustics 112XT (coaxial XT-series stage monitor / FOH enclosure; part of the legacy XT LINE with 115XT and 115XT HiQ)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "65 Hz - 18 kHz (±3 dB, FRONT preset); usable bandwidth 55 Hz - 18 kHz (-10 dB)",
+    "max_spl_db": 133,
+    "max_spl_note": "Datasheet/marketing peak figure is 133 dB; the manual specification table lists continuous SPL of roughly 122-125 dB depending on preset, with peaks of 128-131 dB.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90° x 90° axi-symmetrical (coaxial point-source pattern, approx. ±20° at -6 dB)",
+    "components": "1x 12\" weather-resistant low-frequency transducer (3\" voice coil, bass-reflex loaded) coaxially mounted with 1x 1.4\" exit compression driver (3\" voice coil, titanium diaphragm)"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "2-way passive (single amplifier channel per enclosure)",
+      "Active bi-amplification via LA controller presets",
+      "3-way operation when paired with an L-Acoustics subwoofer (3W / 3WX presets)"
+    ],
+    "recommended_amplifiers": [
+      "LA4"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "FRONT",
+      "FILL",
+      "MONITOR",
+      "3W",
+      "3WX"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK for daisy-chaining",
+    "note": "Pin 1+/1- carry the loudspeaker signal; multiple cabinets can be looped through the second connector."
+  },
+  "physical": {
+    "weight_kg": 27,
+    "dimensions_mm": "540 H x 410 W (front) x 375 D, tapered to approx. 165 mm wide at the rear",
+    "cabinet": "Baltic birch plywood (18 mm / 30 mm panels, sealed, screwed and rabbeted), Maroon-gray finish",
+    "protection_rating_note": "No formal IP rating published; the 12\" LF driver is specified as weather-resistant for short-term outdoor use under cover."
+  },
+  "deployment": {
+    "modes": [
+      "Floor stage monitor (wedge angle from the cabinet geometry)",
+      "Pole/stand-mounted FOH point source",
+      "Wall or truss mount via U-bracket",
+      "Short vertical coupled arrays via coupling bars"
+    ],
+    "rigging_accessories": [
+      "ETR112XT U-bracket (yoke mount for wall/truss/stand)",
+      "CPL112XT coupling adapter bars for vertical stacking/arrays",
+      "XTLIFTBAR fly bar (5 pick points for tilt: +14, +7, 0, -7, -14 degrees)"
+    ]
+  },
+  "usage": [
+    "Compact 12-inch coaxial enclosure that doubles as a low-profile stage monitor wedge and a stand-mounted FOH/fill box, delivering a coherent point-source 90 x 90 pattern.",
+    "Each cabinet is an 8-ohm load needing one amplifier channel; an LA4 drives up to 4 enclosures, so a four-wedge monitor world fits on a single LA4.",
+    "Use the MONITOR preset for floor-wedge duty and FRONT/FILL presets for front-of-house or fill applications to tailor the LF tuning.",
+    "Extend low-frequency response by pairing with an L-Acoustics subwoofer (e.g. SB15, SB18, SB218, dV-SUB) and switching to the 3W or 3WX three-way presets.",
+    "Symmetric 90-degree coverage and the coaxial design make it easy to rotate for horizontal or vertical orientation without changing the pattern.",
+    "Legacy archive product: it must be driven through an L-Acoustics LA-series controller/amplifier with the correct XT preset; mixing with current K/Kara/X-series rigs requires preset and gain matching."
+  ],
+  "source_manual": "112XT Operator's Manual (EN) - L-Acoustics XT LINE (112XT, 115XT, 115XT HiQ)",
+  "official_pdf": "https://www.manualslib.com/manual/809803/L-Acoustics-112xt.html"
+}

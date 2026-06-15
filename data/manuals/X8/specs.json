@@ -1,0 +1,85 @@
+{
+  "enclosure": "X8",
+  "product": "X8",
+  "type": "coaxial",
+  "status": "current",
+  "source_manual": "X8 Owner's Manual (EN) version 2.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X8/EN/Owner's Manual/X8_OM_EN.pdf",
+  "electroacoustic": {
+    "frequency_range_hz": "60 - 20000",
+    "max_spl_db": 129,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Axisymmetric (conical) 100 degrees, nominal -6 dB",
+    "components": "Passive 2-way coaxial: LF 1x 8\" cone driver + HF 1x 1.5\" neodymium diaphragm compression driver, coaxially mounted; bass-reflex acoustical load with L-Vents laminar ports and conical waveguide",
+    "max_spl_note": "129 dB peak at 1 m, free field, pink noise crest factor 4, [X8] preset",
+    "monitoring_angle_deg": 35
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Single PA channel (passive 2-way, one amplifier output per enclosure)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA7.16(i)",
+      "LA12X",
+      "LA2Xi",
+      "LA8 (legacy)"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "X8",
+      "X8_MO",
+      "SB15_100",
+      "SB15_100_C",
+      "SB15_100_Cx"
+    ],
+    "preset_note": "[X8] is the short-throw/PA reference preset; [X8_MO] is the stage-monitor preset; a low-latency monitor variant cuts latency from 3.84 ms to ~0.84-1.18 ms. SB15_100 presets are for the paired SB15m subwoofer."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK; internal pinout uses points 1+/1- only (2+/2- not linked)",
+    "breakouts": "SP-Y1 (4-point speakON to 2x 2-point speakON) for two passive enclosures; DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON) for four passive enclosures"
+  },
+  "physical": {
+    "weight_kg": 12,
+    "dimensions_mm": "424 (H) x 264 (W front) x 306 (D), with 250 mm rear width and 278 mm tapered depth",
+    "protection_rating": "IP43",
+    "cabinet": "Premium grade Baltic beech and birch plywood; coated steel grill with acoustically neutral 3D fabric",
+    "finish": "Dark grey brown Pantone 426C, or pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Pole-mounted (35 mm integrated pole socket in handle)",
+      "Stage floor monitor (35 degree wedge angle vs vertical)",
+      "Wall-mounted",
+      "Ceiling-mounted",
+      "Flown (single enclosure)"
+    ],
+    "rigging_accessories": [
+      "X-US8 (short U-bracket)",
+      "X-UL8 (long U-bracket)",
+      "X-UL8i (long U-bracket, install version)",
+      "X-UTILT (tilt-adjust wall-mount bracket for X series)",
+      "X-BAR (rigging bar for one enclosure, ~10 angulations)",
+      "EMBi (pole-mount socket)",
+      "CLAMP250 (250 kg rated clamp)",
+      "DIN580-compatible M8 threaded insert (secondary safety)",
+      "4x M10 threaded inserts"
+    ],
+    "rigging_note": "Single-enclosure rigging only; flown deployments use X-US8/X-UL8 or X-BAR. M8 DIN580 insert provides secondary safety. Front logo can be rotated for any orientation."
+  },
+  "usage": [
+    "Coaxial point-source intended primarily as a high-SPL stage monitor; the [X8_MO] preset and 35 degree wedge angle make it usable as a low-profile floor wedge at FOH or in control rooms.",
+    "Each X8 needs only one amplifier channel since it is a passive 2-way design - budget up to 12 per LA12X, 8 per LA4X, or 16 per LA7.16i when planning channel counts.",
+    "Pair one X8 with one SB15m subwoofer (1:1 ratio) using the [SB15_100] preset to extend low-frequency reach below the X8's 60 Hz limit.",
+    "Its 100 degree axisymmetric (conical) directivity gives wide, even coverage with no minimum listening distance, suiting front-fill, under-balcony fill, and discreet install fills.",
+    "Use the low-latency monitor preset variant when minimal latency matters for performers (drops from 3.84 ms to roughly 0.84-1.18 ms depending on the amplifier).",
+    "Flexible mounting (35 mm pole socket, U-brackets, X-BAR, CLAMP250) plus IP43 rating and white/custom RAL finish options support discreet permanent installs as well as touring use."
+  ]
+}

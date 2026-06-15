@@ -1,0 +1,73 @@
+{
+  "enclosure": "Syva Sub",
+  "product": "L-Acoustics Syva Sub",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "27 Hz low-frequency limit (-10 dB) with [SYVA SUB_100]; 29 Hz with [SYVA SUB_200]. Subwoofer extension element for the Syva system; upper limit set by preset (100 Hz with [SYVA SUB_100]).",
+    "max_spl_db": 130,
+    "max_spl_note": "Peak at 1 m, half-space, pink noise crest factor 4: 128 dB with [SYVA SUB_100], 130 dB with [SYVA SUB_200].",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional (subwoofer); no directivity rating specified. Operates as a passive radiating LF/infra extension element.",
+    "components": "1 x 12\" high-excursion LF driver built on a KS28 woofer motor; bass-reflex enclosure with L-Vents."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "SE (single-ended, one channel per enclosure on LA2Xi)",
+      "BTL (bridged, doubles per-channel capacity on LA2Xi)"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "SYVA SUB_100",
+      "SYVA SUB_200"
+    ],
+    "preset_note": "[SYVA SUB_100] sets a 100 Hz upper limit with polarity reversed to optimize acoustic summation with Syva / Syva Low. [SYVA SUB_200] yields a slightly higher LF limit (29 Hz) for higher max SPL (130 dB). All routed mono (one input feeds all outputs)."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) IN connector; LF carried on speakON points 1+/1-",
+    "autoconnect": "AutoConnect pass-through plate routes audio and power when Syva or Syva Low is stacked on top (LF on AutoConnect points 1+/1-); do not use the speakON connector simultaneously with AutoConnect.",
+    "labeling": "Carries an enclosure label to distinguish it from Syva Low when both subwoofers are in a rig."
+  },
+  "physical": {
+    "weight_kg": 27,
+    "dimensions_mm": "350 (W) x 334 (D) x 849 (H)",
+    "protection_rating": "IP55",
+    "cabinet": "First-grade Baltic beech and birch plywood; steel grille with anti-corrosion coating and acoustically neutral 3D fabric; fine-grain dark grey-brown (Pantone 426C) finish, available in RAL colors."
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked as a standalone subwoofer",
+      "Used as a podium base under Syva or Syva Low (AutoConnect)",
+      "Side-by-side grouping with other subwoofers"
+    ],
+    "rigging_accessories": [
+      "Syva Base (baseplate for Syva / Syva Low / Syva Sub)",
+      "Two anti-vibration mats (supplied) for ground-stacking",
+      "SyvaLF Cov protective transport cover"
+    ],
+    "rigging_note": "When grouping subwoofers that are not side by side, keep adjacent acoustic centers within 1.7 m for a 100 Hz upper-limit configuration and apply geometric delays. No pre-alignment delay is needed for the Syva system itself."
+  },
+  "usage": [
+    "Infra-low-frequency extension for the Syva colinear-source system, pushing usable bandwidth down to 27 Hz to add weight below what Syva Low covers.",
+    "Each cabinet uses one amplifier channel; pack up to 12 on an LA12X, 16 on an LA7.16i, 4 on an LA4X, or 4 (SE) / 2 (BTL) on an LA2Xi.",
+    "L-Acoustics recommends a ratio of 2 Syva Sub per 1 Syva Low plus 1 Syva, giving roughly 12 dB of low-frequency contour reinforcement.",
+    "Load the [SYVA SUB_100] preset for normal use - it bands the sub to 100 Hz and inverts polarity for clean summation; use [SYVA SUB_200] when you need slightly more max SPL.",
+    "Doubles as a stable podium base: stack Syva or Syva Low on top and let AutoConnect carry both audio and power - never patch the speakON IN while AutoConnect is engaged.",
+    "Place sub cabinets side by side where possible; if spread out, keep acoustic centers within 1.7 m and add geometric delays per the configuration."
+  ],
+  "source_manual": "Syva Owner's Manual (EN) - covers Syva, Syva Low, and Syva Sub",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Sub/EN/Owner's Manual/Syva_OM_EN.pdf"
+}

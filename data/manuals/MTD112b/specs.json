@@ -1,0 +1,68 @@
+{
+  "enclosure": "MTD112b",
+  "product": "MTD112b",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "65 - 18000",
+    "max_spl_db": 122,
+    "max_spl_note": "Continuous maximum SPL at 1 m, measured in half-space with pink noise",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degrees conical (axisymmetric)",
+    "components": "12 in LF cone (4 in flat-wire copper voice coil) and 2 in exit HF compression driver (3 in titanium-alloy diaphragm) arranged as a single coaxial dual-concentric assembly sharing one magnet; the LF cone flare loads the HF driver"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (processed)"
+    ],
+    "recommended_amplifiers": [
+      "LA4"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "FRONT",
+      "MONITOR",
+      "X-OVER"
+    ],
+    "controller": "Originally driven via the dedicated MTD 112 LLCa line-level controller (mono-amplification, one amp channel per enclosure); minimum 300 W into 8 ohms recommended (amplifier should sustain ~49 V continuously and ~60 V peak)",
+    "preset_note": "FRONT = broadband FOH voicing; MONITOR = floor-monitor voicing; X-OVER = 110 Hz high-pass for use with a subwoofer"
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) per enclosure; wired pin 1+/1- (2+/2- unused), single-channel passive feed from one amplifier output",
+    "breakouts": "Controller line-level I/O (when used with the MTD 112 LLCa) is on 3-pin XLR, balanced; a separate mono SUB/SUM output feeds subwoofer or central-source amplification"
+  },
+  "physical": {
+    "weight_kg": 27.5,
+    "dimensions_mm": "540 x 410 x 375 (H x W x D)",
+    "cabinet": "18 mm Baltic birch plywood, rabbeted/screwed/glued, with internal steel bracing; structured heavy-duty paint in RAL 8019 maroon-gray; honeycomb perforated 1.5 mm steel grille with reticulated foam",
+    "shape": "Disymmetrical wedge (also usable upright)"
+  },
+  "deployment": {
+    "modes": [
+      "floor monitor",
+      "ground-stacked FOH (single or pair)",
+      "stand-mounted",
+      "flown (horizontal only)",
+      "side fill atop a subwoofer",
+      "delay/underbalcony fill"
+    ],
+    "rigging_accessories": [
+      "ETR1 adjustable U-bracket (primary flown/wall/scaffold mount, horizontal orientation only; WLL 27.5 daN, safety factor >12)",
+      "PION1 Aeroquip flying stud (secondary safety attachment only, not a main rigging point)"
+    ],
+    "rigging_note": "Three Aeroquip-type fixing posts (top, bottom, rear) plus four threaded fixing nuts for accessory or U-bracket mounting; flown suspension is horizontal-only via the ETR1"
+  },
+  "usage": [
+    "Compact 12 in/2 in coaxial point source for small-to-medium FOH, monitoring, side-fill, and delay/underbalcony duty; its single-axis coherence makes it well suited to wedge use in any orientation.",
+    "Each cabinet is passive and requires exactly one amplifier channel; budget 4 enclosures per LA4 and aim for at least ~300 W into 8 ohms to keep the amp out of clipping (the controller's limiters handle driver protection).",
+    "Originally a system with the MTD 112 LLCa controller: pick FRONT for broadband FOH, MONITOR for stage wedges, and X-OVER (110 Hz high-pass) when subs are added.",
+    "For FOH it works best as a true point source - deploy singly or in a tight pair, ideally with delay-compensated multiple sources rather than large arrays.",
+    "Sub pairing: roughly one MTD 118 per pair of MTD112b, or one SB 218 for four MTD112b, fed mono from the controller's summed SUB output; keep the sub-to-top path-length offset under ~1.7 m to avoid crossover cancellation.",
+    "Discontinued legacy MTD product - flown installs are horizontal-only via the ETR1 bracket, with the PION1 stud serving only as a secondary safety point."
+  ],
+  "source_manual": "MTD 112 Owner Manual (EN) and MTD112b CE Declaration of Conformity (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD112B/documents.zip"
+}

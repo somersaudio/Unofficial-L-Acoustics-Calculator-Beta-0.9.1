@@ -1,0 +1,83 @@
+{
+  "enclosure": "A10 Wide/Focus",
+  "product": "A10 (A10 Wide / A10 Focus) — passive medium-throw line source. L-Acoustics groups all A10 documentation under \"A10 Wide\" in the Documentation Center; Wide and Focus are dispersion variants of the same enclosure and share one document set.",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "Wide: 67 Hz - 20 kHz; Focus: 66 Hz - 20 kHz (usable bandwidth, -10 dB, [A10] preset)",
+    "max_spl_db": 140,
+    "max_spl_note": "Peak at 1 m, free field, pink noise crest factor 4. A10 Wide reaches 137 dB; A10 Focus reaches 140 dB (value shown).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Enclosure coverage 10° (Focus) or 30° (Wide); HF Panflex waveguide adjustable to 70° or 110° symmetric, or 90° asymmetric (L/R or up/down)",
+    "components": "LF: 1x 10\" neodymium cone driver (bass-reflex, L-Vents); HF: 1x 2.5\" diaphragm neodymium compression driver on DOSC waveguide with Panflex"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (single amplifier channel drives the full enclosure via one preset)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA12X",
+      "LA7.16(i)",
+      "LA2Xi",
+      "LA8 (legacy)"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "[A10]",
+      "[A10_FI]",
+      "[A10_MO]",
+      "[KS21_100]",
+      "[KS21_100_C]",
+      "[KS21_100_Cx]"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK; internal pinout uses points 1+/1- for the transducer, points 2+/2- not linked",
+    "breakouts": "Optional accessories: 4-point speakON to 2x 2-point speakON with CC4FP adapter; 8-point PA-COM to 4x 2-point speakON"
+  },
+  "physical": {
+    "weight_kg": 20,
+    "weight_note": "A10 Wide: 20 kg / 44 lb; A10 Focus: 22 kg / 49 lb (net)",
+    "dimensions_mm": "752 (W) x 571 (H) x 620 (D)",
+    "protection_rating": "IP55 (weatherized for outdoor use)",
+    "cabinet": "Premium grade Baltic beech and birch plywood, bent-wood construction; coated steel grille with acoustically neutral 3D fabric; finish Pantone 426 C dark grey brown"
+  },
+  "deployment": {
+    "modes": [
+      "flown vertical line source array",
+      "flown horizontal/radial line source array",
+      "ground-stacked on KS21 subwoofer",
+      "individual flown point source (configurable directivity)",
+      "individual pole-mounted point source"
+    ],
+    "max_per_flown_array": "Vertical array: up to 8 with A10-BUMP (up to 4 with A10-RIGBAR); radial array: up to 9 with 3x A10-LIFT; safe/maximum limits depend on Soundvision-verified deployment geometry",
+    "inter_element_angles": "Adjustable site angles via 13-16 pickup points per side; A-TILT stacking accessory opening angle 12.5°-25°; pole-mount A-MOUNT site angle 0°, -5° or -15°",
+    "rigging_accessories": [
+      "A10-BUMP (flying frame)",
+      "A10-RIGBAR (rigging bar and pullback)",
+      "A10-LIFT (horizontal/radial deployment)",
+      "A-TILT (site-angle element for stacking A10 onto KS21)",
+      "KS21-OUTRIG",
+      "A-MOUNT (pole mount)",
+      "X-BAR"
+    ]
+  },
+  "usage": [
+    "Medium-throw passive line source for production audio up to about 35 m; choose A10 Focus (10° enclosure) for tight, longer projection or A10 Wide (30° enclosure) for broad coverage with preserved sightlines.",
+    "Drive each enclosure on one amplifier channel: LA4X gives one A10 per output (max 8 per amp) for full Autosolver optimization, while LA12X can power up to three per output (max 12) to cut cabling at the cost of per-box tuning.",
+    "Use the single [A10] preset for all main-PA arrays regardless of Wide/Focus mix or Panflex setting; switch to [A10_FI] for short-throw front fill/delay and [A10_MO] for stage monitoring (a low-latency monitor variant trims latency for live wedge use).",
+    "Pair with KS21 subwoofers via [KS21_100] to extend bandwidth down to roughly 31 Hz; one KS21 per two A10 reinforces the LF contour, one KS21 per single A10 adds about 2 dB more.",
+    "Tailor HF coverage in the field with Panflex L-Fins (70°, 110°, or 90° asymmetric) without changing the preset, adapting horizontal spread to the audience without re-tuning.",
+    "Deploy as a flown vertical array (up to 8 on A10-BUMP), a radial/horizontal array on A10-LIFT, ground-stacked on KS21 with A-TILT, or as a single pole-mounted point source; IP55 rating supports outdoor shows, and all array sizes must be validated in Soundvision for safety factor."
+  ],
+  "source_manual": "A10 Owner's Manual (EN) version 2.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10 Wide/EN/Owner's Manual/A10_OM_EN.pdf"
+}

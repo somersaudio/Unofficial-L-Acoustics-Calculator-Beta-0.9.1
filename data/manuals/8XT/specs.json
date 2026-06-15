@@ -1,0 +1,82 @@
+{
+  "enclosure": "8XT",
+  "product": "L-Acoustics 8XT",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "65 Hz - 20 kHz (usable bandwidth, -10 dB; extendable down to 32 Hz with SB18 subwoofer)",
+    "max_spl_db": 127,
+    "max_spl_note": "Peak at 1 m, free field, 10 dB crest factor pink noise, [8XT_FI] preset",
+    "nominal_impedance_ohms": 8,
+    "directivity": "100 degrees axi-symmetric (-6 dB), constant-directivity coaxial",
+    "components": "1x 8'' weather-resistant LF transducer in a bass-reflex tuned enclosure; 1x 1.5'' diaphragm compression driver coaxially loaded by the 8'' cone for HF directivity control; passive 3rd-order crossover network",
+    "power_handling_w": "280 W long-term RMS ([8XT_FI] preset)"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "FULL RANGE (standalone, 65 Hz - 20 kHz)",
+      "HIGH-PASS (100 Hz HPF with separately-amplified SB18, system down to 32 Hz)",
+      "LOW-EXTENSION (8XT and SB18 on the same controller, system down to 32 Hz, requires custom preset)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X"
+    ],
+    "per_amplifier": {
+      "LA4": 8
+    },
+    "preset_names": [
+      "[8XT_FR]",
+      "[8XT_FI]",
+      "[8XT_MO]",
+      "[8XT_FR_100]",
+      "[8XT_FI_100]",
+      "[8XT_MO_100]",
+      "[SB18_100]",
+      "[SB18_100_C]"
+    ],
+    "preset_note": "FR = FRONT (FOH), FI = FILL (flat free-field for speech/classical/fill), MO = MONITOR (flat half-space for floor/wall/ceiling). _100 variants add a 100 Hz high-pass for use with subwoofers. SB18 presets are used in LOW-EXTENSION mode when subs share the controller.",
+    "channel_assignment_note": "LA4/LA4X output-channel routing changes with the selected preset; verify cabling before operating. PA signal routed via IN A (outputs 1-2) and IN B (outputs 3-4). System resources are optimized for 4 or 8 enclosures per controller (2 or 4 8XT plus 2 SB18 in LOW-EXTENSION mode)."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel for daisy-chaining a second enclosure",
+    "wiring_convention": "Pins 1+/1- carry the signal (IN+/IN-); pins 2+/2- not used",
+    "recommended_cables": "L-Acoustics SP.7 (0.7 m), SP10 (10 m), SP25 (25 m) 4-conductor 4 mm2 speakON cables",
+    "parallel_limit": "Maximum two 8XT per LA4/LA4X output channel (4 ohm load when paralleled)"
+  },
+  "physical": {
+    "weight_kg": 11,
+    "dimensions_mm": "422 x 250 x 271 (H x W x D)",
+    "cabinet": "15 and 18 mm Baltic birch plywood, wedge-shaped; finish Grey Brown RAL 8019 or Pure White RAL 9010",
+    "front": "Polyester-coated steel grill with acoustically transparent Airnet fabric",
+    "rigging_material": "Polyester-coated steel",
+    "handle": "Integrated into the cabinet",
+    "construction_note": "Weather-resistant transducers and oxidation-resistant hardware for indoor and outdoor use"
+  },
+  "deployment": {
+    "modes": [
+      "Pole-mounted (integrated 35 mm pole socket)",
+      "Stacked (two fixed cabinet angles of 30 and 40 degrees from vertical)",
+      "Wall/ceiling-mounted via ETR8-2 adjustable bracket",
+      "Wall/ceiling-mounted via OMNIMOUNT 30.0 SERIES (four predrilled M6 inserts)"
+    ],
+    "rigging_accessories": [
+      "ETR8-2 adjustable wall/ceiling mounting bracket (sold separately)",
+      "OMNIMOUNT 30.0 SERIES brackets (four M6 inserts with screws)",
+      "M8 safety eyebolt insert on rear face",
+      "35 mm pole socket (integrated)"
+    ],
+    "rigging_note": "Refer to the XT and P rigging procedures manual for XT-range-specific procedures."
+  },
+  "usage": [
+    "Compact passive coaxial point-source for front-fill, distributed sound, floor monitoring, and small full-range systems; the smallest enclosure in the legacy XT coaxial range.",
+    "Exclusively driven by the LA4 or LA4X amplified controller, which supplies protection, filtering, and EQ; one amp channel powers one 8XT, or two in parallel, so a single 4-channel LA4/LA4X can run up to eight cabinets.",
+    "Run standalone in FULL RANGE mode (65 Hz - 20 kHz) when low-end extension is not needed; pick FRONT, FILL, or MONITOR presets to match FOH, free-field/speech, or half-space placement.",
+    "Pair with SB18 subwoofers for full-bandwidth coverage down to 32 Hz: HIGH-PASS mode runs the subs on separate amps, while LOW-EXTENSION mode shares one controller (custom preset required); the recommended ratio is two 8XT per SB18.",
+    "Daisy-chain a second enclosure through the parallel speakON outputs, but never exceed two 8XT per amp channel; keep cable runs short to maintain damping factor on the 4-ohm paralleled load.",
+    "Weather-resistant build with a wedge cabinet supports indoor/outdoor install duty - pole-mount, stack at 30 or 40 degrees, or fix to walls/ceilings via the ETR8-2 or OMNIMOUNT brackets with the rear M8 safety eyebolt."
+  ],
+  "source_manual": "8XT Owner's Manual (EN), version 1.4 (8XT_UM_ML_1.4)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/8XT/documents.zip"
+}

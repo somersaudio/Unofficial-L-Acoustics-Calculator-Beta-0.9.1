@@ -1,0 +1,68 @@
+{
+  "enclosure": "MTD108a",
+  "product": "MTD108a (L-Acoustics MTD Line; covered together with MTD112b and MTD115b)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "85-20000 Hz (+/-3 dB), LLC FRONT position; usable bandwidth 65-20000 Hz (-10 dB)",
+    "max_spl_db": 123,
+    "max_spl_note": "Per-enclosure system output at 1 m including preset EQ (freefield): 122 dB peak / 116 dB continuous in FRONT mode, 123 dB peak / 117 dB continuous in MONITOR/XOVER mode. The legacy MTD108 datasheet listed 118 dB continuous SPL at 1 m (half-space, pink noise).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Axi-symmetrical conical 100 degrees (+/-15 degrees), identical horizontal and vertical coverage",
+    "components": "1x 8-inch weather-resistant low-frequency loudspeaker (2-inch voice coil) coaxially loaded by 1x 1-inch exit neodymium compression driver (titanium diaphragm); passive crossover at 2 kHz",
+    "sensitivity_db": "94 dB SPL (2.83 Vrms at 1 m, 85-20k Hz)",
+    "power_handling": "250 Wrms long-term / 1000 W peak at 8 ohms (45 Vrms, pink noise 6 dB crest factor)"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (single-channel, single amplifier channel per enclosure)"
+    ],
+    "recommended_amplifiers": [
+      "LA4"
+    ],
+    "per_amplifier": {
+      "LA4": 8
+    },
+    "preset_names": [
+      "FRONT",
+      "MONITOR/XOVER"
+    ],
+    "preset_note": "The original MTD line was processed by the dedicated MTD108LLCa analog line-level controller (FRONT mode adds a low-frequency contour; XOVER/MONITOR mode applies a 125 Hz high-pass filter for use with a subwoofer) and powered by legacy LAa-series amplifiers (LA15a/LA17a/LA24a/LA48a). Amplifier mapping (LA4, max 8 per amp) and the single amp channel reflect the calculator's current archive-bundle configuration.",
+    "recommended_power_legacy": "Manufacturer-recommended amplifier power was 500 W into 8 ohms (one enclosure); a single amp channel can drive up to four parallel MTD108a (2 ohms, 2000 W recommended)."
+  },
+  "connection": {
+    "input_connector": "2x 4-pin Neutrik speakON (NL4), wired in parallel for daisy-chaining / paralleling enclosures (pins 1+/1- active, 2+/2- no connection)"
+  },
+  "physical": {
+    "weight_kg": 10.5,
+    "dimensions_mm": "421 x 250 x 242 (H x W x D)",
+    "cabinet": "15 mm and 18 mm Baltic birch plywood, sealed, screwed and rabbeted joints; maroon-gray (RAL 8019) high-resiliency paint; front protected by 1.5 mm powder-coated steel grille over acoustically transparent open-cell foam",
+    "trap_angle": "22.5 or 45 degrees with respect to vertical (for floor-monitor use)",
+    "shipping_weight_kg": 11.5
+  },
+  "deployment": {
+    "modes": [
+      "pole/tripod mount (36 mm diameter socket)",
+      "wall mount via Omnimount bracket (4 integral rear attachment points)",
+      "ceiling / wall / scaffold mount via ETR8 adjustable U-bracket (horizontal or vertical orientation)",
+      "floor monitor (22.5 degree short-throw or 45 degree long-throw listening angle)"
+    ],
+    "rigging_accessories": [
+      "ETR8 adjustable U-bracket",
+      "Omnimount bracket",
+      "PION1 single-stud Aeroquip flytrack fitting-to-ring (safety attachment)"
+    ],
+    "rigging_note": "ETR8 has a working load limit of 10.5 daN with an ultimate-strength safety factor greater than 12; mountable via 1, 2 or 3 of the 9 mm bracket holes. Manufacturer recommends dissociating (spacing) individual enclosures rather than tightly coupling them to preserve true point-source behavior and avoid comb filtering."
+  },
+  "usage": [
+    "Compact passive coaxial enclosure best suited to distributed and proximity reinforcement: delay rings, front fill, under-balcony fills, surround/effects channels, and speech reinforcement in theatres, clubs, houses of worship, retail, and AV installs.",
+    "Each enclosure is passive and single-channel, so it needs one amplifier channel; the calculator pairs it with the LA4, fitting up to 8 enclosures per amplifier when wired across its channels.",
+    "At a nominal 8 ohms, up to four MTD108a can be paralleled on one amp channel (down to 2 ohms); plan amplifier headroom around roughly 500 W per enclosure to avoid clipping the HF driver.",
+    "Daisy-chain enclosures through the two parallel speakON connectors, keeping cable runs short and gauge low-resistance to maintain damping factor.",
+    "Doubles as a high-efficiency floor monitor using the 22.5 degree (short-throw) or 45 degree (long-throw) trap angles.",
+    "Extend low end and SPL by adding an SB115/SB118/SB218 subwoofer crossed over around 100-150 Hz; the XOVER preset applies a 125 Hz high-pass for sub integration."
+  ],
+  "source_manual": "MTD108a / MTD112b / MTD115b Operator Manual V1.2 (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/MTD108/documents.zip"
+}

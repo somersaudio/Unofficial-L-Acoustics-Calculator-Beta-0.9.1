@@ -1,0 +1,69 @@
+{
+  "enclosure": "K1-SB",
+  "product": "K1-SB",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "30-80 (usable bandwidth in [K1SB_60] preset; enclosure low-frequency limit 30 Hz at -10 dB)",
+    "max_spl_db": 145,
+    "nominal_impedance_ohms": 4,
+    "directivity": "Omnidirectional subwoofer (cardioid behavior achievable in arrays via Soundvision-defined configurations); used as a vertically flyable companion to K1/K2 line sources",
+    "components": "2 x 15\" neodymium cone drivers (4\" voice coil, magnesium die-cast basket, weather-resistant), bass-reflex enclosure with progressive-profile L-Vents; 1200 W RMS power handling"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Subwoofer / contour mode ([K1SB_60]) for added low-end impact below the mains, 30-80 Hz",
+      "LF line-source extension / throw mode ([K1SB_X]) giving the K1-SB the same response as the K1 low section so it can extend the sub-low line source for enhanced low-frequency throw"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA-RAK II AVB (touring rack housing three LA12X)"
+    ],
+    "per_amplifier": {
+      "LA12X": 4
+    },
+    "preset_names": [
+      "K1SB_60",
+      "K1SB_X"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) IN; pins 1+/1- carry the LF signal, pins 2+/2- not linked",
+    "breakouts": "Fed from an LA12X via SP (4-point speakON) cables or via DOSUB-LA8 breakout (8-point PA-COM to 4x 2-point speakON) for driving four passive subs from one amplifier"
+  },
+  "physical": {
+    "weight_kg": 83,
+    "dimensions_mm": "1342 x 505 x 434 (WxHxD)",
+    "protection_rating": "IP45",
+    "cabinet": "Premium-grade Baltic birch plywood; coated steel grille with acoustically neutral 3D fabric; dark grey brown Pantone 426C (also pure white RAL 9010)"
+  },
+  "deployment": {
+    "modes": [
+      "Flown as a standalone subwoofer array on a K1-BUMP",
+      "Flown at the top of a vertical array of K1, K2 or KARA enclosures (shares the captive 4-point rigging system)",
+      "Ground-stacked on K1-CHARIOT (up to four enclosures) or on a K1-PLA dolly"
+    ],
+    "max_per_flown_array": "20 enclosures (safe limit) / 24 (maximum limit) on a K1-BUMP",
+    "inter_element_angles": "0deg, 0.5deg, 1deg, 1.5deg, 2deg, 2.5deg, 3deg, 4deg, 5deg (preset via the captive rigging)",
+    "rigging_accessories": [
+      "K1-BUMP (flying/stacking frame)",
+      "K1-CHARIOT (transport chariot for up to 4)",
+      "K1-PLA (front dolly board)",
+      "K2-LINK (hangs K2 under K1-SB)",
+      "KARA-DOWNK1 (Kara II downfill bumper)",
+      "K1-SBCOV / K1-CHARIOTCOV (protective covers)",
+      "K1-LASERMOUNT (laser inclinometer plate)"
+    ]
+  },
+  "usage": [
+    "Dedicated companion subwoofer for K1 and K2 line sources; one LA12X channel feeds one K1-SB, and a single LA12X (4 outputs) can drive up to 4 enclosures wired in parallel off one preset.",
+    "Use the [K1SB_60] preset (30-80 Hz) in subwoofer/contour mode to add low-end impact and weight beneath the mains; use [K1SB_X] to make the K1-SB behave like the K1 low section so it extends the sub-low line source for greater LF throw.",
+    "Because it integrates the same captive 4-point rigging and inter-enclosure angle set as K1, it can be flown directly in-line at the top of a K1/K2/KARA hang, or flown as its own array, with a Soundvision-verified safe limit of 20 (24 max) per K1-BUMP.",
+    "Recommended pairing is roughly one K1-SB per K1, mounted behind the array (about 0.5-1 m front-panel spacing when in-line); follow the manual's pre-alignment delays (e.g. K1 = 6 ms with [K1SB_60], 0 ms when running [K1SB_X] together with [K1]).",
+    "Single 4-point speakON input carries only the LF pair (1+/1-), so it must be driven by an L-Acoustics amplified controller (LA12X); confirm the per-controller enclosure count and total impedance before connecting.",
+    "Heavy (83 kg) IP45-rated touring sub; verify rigging load and structural capacity in Soundvision for any flown or mixed-array deployment rather than relying on a fixed count."
+  ],
+  "source_manual": "K1-SB Owner's Manual (EN), version 2.0 (shared K1 / K1-SB owner's manual)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1-SB/EN/Owner's Manual/K1_OM_EN.pdf"
+}

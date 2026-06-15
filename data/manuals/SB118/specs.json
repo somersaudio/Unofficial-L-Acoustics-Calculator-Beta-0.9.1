@@ -1,0 +1,73 @@
+{
+  "enclosure": "SB118",
+  "product": "SB118",
+  "type": "subwoofer",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "32 Hz low-frequency limit (-10 dB, [SB118_100] preset); no upper limit published for the sub",
+    "max_spl_db": 135,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omni-directional as a single element; an SB118 array can be configured as a cardioid sub with up to 10 dB of rear rejection",
+    "components": "1 x 18-inch weather-resistant LF transducer loaded in a dual-vented (double bass-reflex) bandpass enclosure",
+    "power_handling_note": "Long-term RMS power handling 600 W ([SB118_100] preset)"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "STANDARD (omni-directional)",
+      "CARDIOID (front-to-rear cancellation array)",
+      "HYBRID (SB118 plus ARCS or XT main driven from one controller)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA8"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "SB118_60",
+      "SB118_100",
+      "SB118_60_C",
+      "SB118_100_C",
+      "ARCS_S118_LO",
+      "ARCS_S118_HI",
+      "8XT_SB118",
+      "12XTP_SB118"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel for IN/LINK daisy-chaining",
+    "wiring_note": "Pins 1+/1- carry the LF signal; pins 2+/2- not used. Links to a second SB118 via SP.7 cable; feeds from LA4 via SP10/SP25, or from LA8 via DOSUB-LA8 with DO.7/DO10/DO25 cables"
+  },
+  "physical": {
+    "weight_kg": 61,
+    "dimensions_mm": "800 x 442 x 820 (W x H x D)",
+    "cabinet": "18 and 24 mm Baltic birch plywood, Grey Brown RAL 8019 finish, polyester-coated steel grill, integrated handles",
+    "weight_note": "Owner's manual spec table lists 61 kg; the 2006 CE declaration lists 63 kg"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked vertical arrays",
+      "Stacked horizontal arrays (line-up, block, on-end, line-down)",
+      "Pole-mount base for a single XT enclosure on top"
+    ],
+    "max_per_flown_array": "Stacking runners and guides certified for up to 8 SB118 enclosures",
+    "rigging_accessories": [
+      "Integrated stacking runners and runner guides",
+      "35 mm / 1.4 in pole-mount socket for an XT top",
+      "SB118PLA front dolly board (optional)",
+      "SB118COV protective cover (optional)"
+    ]
+  },
+  "usage": [
+    "Dedicated 18-inch subwoofer used to extend the low end of XT, KIVA, ARCS, dV-DOSC and similar L-Acoustics tops down to 32 Hz.",
+    "Each cabinet is 8 ohms and needs a single amp channel; an LA4 powers up to four SB118 (one per channel), while an LA8 handles up to eight (two paralleled per channel).",
+    "Choose the crossover by preset: the _100 presets cross at 100 Hz for XT/compact tops, the _60 presets at 60 Hz for larger systems, with _C variants for cardioid sub arrays.",
+    "Run STANDARD mode for omni coverage or CARDIOID mode (front-facing plus reverse-facing cabinets) to push low-frequency energy off the stage; cardioid gives roughly 10 dB of rear rejection.",
+    "HYBRID presets (ARCS_S118 / 8XT_SB118 / 12XTP_SB118) let one LA4 drive both the sub and the main tops, saving amp channels in small rigs.",
+    "Stack up to 8 cabinets per vertical column on the integrated runners (secure with appropriate hardware); a 35 mm socket on top accepts an XT pole mount, and the optional SB118PLA dolly aids transport."
+  ],
+  "source_manual": "SB118 Owner's Manual / User Manual (EN), version 2.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB118/documents.zip"
+}

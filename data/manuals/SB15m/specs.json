@@ -1,0 +1,81 @@
+{
+  "enclosure": "SB15m",
+  "product": "SB15m",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "40-100",
+    "max_spl_db": 137,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional (standard) or cardioid configurations",
+    "components": "1 x 15-inch direct-radiating cone driver, bass-reflex / L-Vent loaded",
+    "max_spl_note": "137 dB peak at 1 m, half-space, pink noise crest factor 4, [SB15_100] preset",
+    "rms_power_handling_w": 600
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (omnidirectional)",
+      "Cardioid"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA12X",
+      "LA7.16(i)",
+      "LA4 (legacy)",
+      "LA8 (legacy)"
+    ],
+    "per_amplifier": {
+      "LA4": 4,
+      "LA12X": 12,
+      "LA7.16(i)": 9,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "SB15_100",
+      "SB15_100_C"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), one IN and one LINK for parallel routing to a second SB15m",
+    "breakouts": "Driven from LA8 PA-COM output via DOSUB-LA8 breakout (8-point to 4x 2-point speakON); SP-Y1 splitter (4-point to 2x 2-point speakON, with CC4FP adapter) splits paired output channels",
+    "note": "Parallel daisy-chaining through the LINK connector is only supported on the legacy LA8 controller"
+  },
+  "physical": {
+    "weight_kg": 36,
+    "dimensions_mm": "580 (W) x 520 (H) x 439 (D)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic birch plywood; coated steel grille with Airnet acoustically neutral 3D fabric; high-strength steel rigging hardware with anti-corrosion coating",
+    "finish": "Dark grey-brown (Pantone 426C), pure white (RAL 9010), or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (single, block, or vertical array)",
+      "Flown",
+      "Pole-mounted (35 mm socket for one XT or two KIVA enclosures)",
+      "Mixed KIVA/SB15m vertical array"
+    ],
+    "max_per_flown_array": "8 with KIBU-SB and WLL 1 t shackle; 6 with KIBU-SB and CLAMP250 (truss). Ground-stacked: up to 8.",
+    "inter_element_spacing": "Place subwoofers side by side; maximum 1.7 m between adjacent acoustic centers when not contiguous",
+    "rigging_accessories": [
+      "SB15MRIG coupling bars with LOCKTAB locking tabs (2 bars / 2 tabs supplied)",
+      "KIBU-SB flying frame (supplied with two WLL 1 t bow shackles)",
+      "CLAMP250 truss clamp",
+      "Integrated 35 mm pole-mount socket",
+      "2 handles"
+    ]
+  },
+  "usage": [
+    "Compact 15-inch subwoofer designed to extend the low end of the KIVA line source and XT coaxial series down to a 40 Hz (-10 dB) limit.",
+    "Each enclosure presents an 8 ohm load and needs one amp channel: budget 4 per LA4X or LA2Xi (single-ended), 9 per LA7.16(i), and up to 12 per LA12X.",
+    "Use the [SB15_100] preset for standard omnidirectional single elements or arrays, and [SB15_100_C] for cardioid blocks of four (one reversed element wired to OUT 1) to cut rear-stage spill.",
+    "Keep cabinets touching side by side; if a gap is unavoidable, never let adjacent acoustic centers exceed 1.7 m or low-frequency coupling degrades.",
+    "Flown arrays cap at 8 enclosures on a KIBU-SB with a 1 t shackle or 6 when clamped to truss via CLAMP250; ground stacks also top out at 8 - always validate stress and stability in SOUNDVISION first.",
+    "The integrated 35 mm pole socket lets a single SB15m act as a sub-on-stick base for one XT or two KIVA tops in compact deployments."
+  ],
+  "source_manual": "SB15m User Manual (EN), v4.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB15m/EN/Owner's Manual/SB15m_UM_RM.zip"
+}

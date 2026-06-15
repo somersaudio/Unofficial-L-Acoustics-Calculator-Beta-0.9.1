@@ -1,0 +1,77 @@
+{
+  "enclosure": "ARCS Wide/Focus",
+  "product": "ARCS WIFO (ARCS WIDE + ARCS FOCUS) — discontinued/legacy constant-curvature WST line source enclosures",
+  "type": "line source",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000 ([ARCS_WIFO] preset, -10 dB)",
+    "max_spl_db": 139,
+    "max_spl_note": "Per-variant peak SPL at 1 m, free field, pink noise crest factor 4: ARCS Wide 137 dB, ARCS Focus 139 dB (both [ARCS_WIFO] preset). Extends to 32 Hz when paired with SB18m subwoofers.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Constant-curvature WST: ARCS Wide 30 deg x 90 deg (H x V), ARCS Focus 15 deg x 90 deg (-6 dB). Total array coverage scales with element count: N x 30 deg for Wide, N x 15 deg for Focus.",
+    "components": "2-way passive: 1 x 12\" weather-resistant bass-reflex LF + 1 x 3\" diaphragm compression driver on DOSC waveguide. RMS power handling 450 W."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive (single amplifier channel per enclosure, PA signal)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "per_amplifier_note": "App input specifies LA4 = 4 (one enclosure per output channel). Manual also documents LA8 driving up to 8 (two enclosures paralleled per channel at 4 ohms); LA12X is listed as a compatible controller.",
+    "preset_names": [
+      "ARCS_WIFO",
+      "ARCS_WIFO_FI",
+      "SB18_60",
+      "SB18_60_C"
+    ],
+    "preset_note": "[ARCS_WIFO] = reference response for medium-throw arrays; [ARCS_WIFO_FI] = short-throw / single-enclosure (fill) response. [SB18_60] and cardioid [SB18_60_C] apply to paired SB18m subwoofers, not the ARCS enclosure itself."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4): 1x IN, 1x LINK (daisy-chain). Internal pinout uses pins 1+/1- only; pins 2+/2- not used.",
+    "breakouts": "DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON) for LA8 fan-out; SP-Y1 (4-point speakON to 2x 2-point speakON) with CC4FP adapter for splitting LA4/LA4X channel pairs."
+  },
+  "physical": {
+    "weight_kg": 38,
+    "weight_note": "Net weight per variant: ARCS Wide 36 kg / 79 lb, ARCS Focus 38 kg / 84 lb.",
+    "dimensions_mm": "365/140 x 759 x 444 (W front/rear x H x D) — trapezoidal cabinet, 365 mm wide front face tapering to 140 mm rear",
+    "protection_rating": "IP55",
+    "cabinet": "Baltic birch plywood; steel grille with anti-corrosion coating and Airnet acoustically neutral fabric; finishes Dark Grey Brown (Pantone 426C), Pure White (RAL 9010) or custom RAL."
+  },
+  "deployment": {
+    "modes": [
+      "flown (horizontal or vertical array)",
+      "ground-stacked (on ground or on SB18m subwoofers)",
+      "pole-mounted"
+    ],
+    "max_per_flown_array": "Up to 8 ARCS Wide/Focus flown on WIFOBUMP frame (vertical); 4 per WIFOLIFT and up to 5-6 per WIFOLIFTBAR (horizontal). Max 4 ARCS Wide/Focus flown beneath SB18m in a hybrid vertical array.",
+    "inter_element_angles": "Inter-element splay is set per Soundvision modeling using WIFOTILT site-angle reference holes; no fixed discrete-angle table for the coupling plane (constant-curvature coupling is inherent to the cabinet geometry).",
+    "rigging_accessories": [
+      "WIFORIG coupling bars (2 supplied per enclosure)",
+      "WIFOBUMP flying frame (vertical array)",
+      "WIFOLIFT horizontal flying bar",
+      "WIFOLIFTBAR horizontal flying bar",
+      "WIFOTILT stacking/tilt accessory (up to 4 on SB18m)",
+      "WIFOSOCK pole-mount adapter",
+      "CLAMP250 array clamp",
+      "rigging rails"
+    ]
+  },
+  "usage": [
+    "Legacy constant-curvature WST enclosure for medium-throw rental and install work where a compact array must cover a wide angle with few boxes; total horizontal spread is N x 30 deg (Wide) or N x 15 deg (Focus).",
+    "Choose ARCS Wide for broad coverage and preserved sightlines, ARCS Focus for tighter coverage with longer throw and ~2 dB more peak SPL within the same cabinet footprint.",
+    "Each enclosure needs one amplifier channel: an LA4/LA4X drives up to 4 boxes (one per output), while an LA8 drives up to 8 (two paralleled per output at 4 ohms).",
+    "Extend low end with SB18m subwoofers (down to 32 Hz); typical splits like 3x ARCS + 1x SB18m on an LA4X or 4x ARCS + 4x SB18m on an LA8, with reversed subs on OUT 1 for cardioid.",
+    "Load the [ARCS_WIFO] preset for multi-box medium-throw arrays and [ARCS_WIFO_FI] for single-enclosure or short-throw fill duty.",
+    "Deploy flown (WIFOBUMP/WIFOLIFT/WIFOLIFTBAR, max 8 per array), ground-stacked on SB18m via WIFOTILT (max 4), or pole-mounted via WIFOSOCK (1); always confirm rigging safety factor in Soundvision before flying."
+  ],
+  "source_manual": "ARCS Wide/Focus User Manual (EN), version 4.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCS%20WIFO/documents.zip#documents/ARCSWIFO_UM_EN.pdf"
+}

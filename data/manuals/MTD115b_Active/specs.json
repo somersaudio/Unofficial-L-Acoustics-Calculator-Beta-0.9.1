@@ -1,0 +1,72 @@
+{
+  "enclosure": "MTD115b (Active)",
+  "product": "MTD115b (L-Acoustics MTD Line coaxial loudspeaker; \"Active\" denotes bi-amplified wiring mode of the same enclosure, not a separate self-powered product)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "65-14000 (+/-3 dB, LLC FRONT); usable 50-16000 (-10 dB)",
+    "max_spl_db": 131,
+    "max_spl_note": "131 dB peak (122 dB cont / 128 dB peak in FRONT mode; 125 dB cont / 131 dB peak in X-OVER mode), unweighted at 1 m under freefield with preset EQ. Active-mode sensitivity (2.83 Vrms / 1 m): LF 96 dB SPL (65 Hz-1.2 kHz), HF 106 dB SPL (1.2-14 kHz).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "85 degrees (+/-20 degrees) axi-symmetrical conical (identical horizontal and vertical coverage)",
+    "components": "Coaxial: 1x 15 in weather-resistant LF driver (3 in voice coil) + 1x 1.4 in exit HF compression driver (titanium diaphragm, 3 in voice coil) mounted coaxially; active crossover 1.2 kHz, 24 dB/oct Linkwitz-Riley. Bass-reflex loaded enclosure.",
+    "power_handling_note": "Active mode (long-term, 6 dB crest pink noise): LF 265 Wrms / 1060 Wpeak at 8 ohms; HF 150 Wrms / 600 Wpeak at 8 ohms."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "Bi-amplified (active) 2-way, one amp channel per section (LF + HF)",
+      "Driven via LLC115b-2w mono analog line-level controller with sense-return protection"
+    ],
+    "recommended_amplifiers": [
+      "LA4"
+    ],
+    "recommended_amplifiers_note": "Inputs record maps this archive enclosure to the current LA4 amplifier (2 channels per enclosure in active mode). The original V1.2 operator manual specifies legacy L-Acoustics LAa-series amps (LA15a/LA17a/LA24a/LA48a) at 32 dB gain with MLS load-matching switches; per-section recommended amplifier power is ~530 W (LF) and ~600 W (HF) into 8 ohms.",
+    "per_amplifier": {
+      "LA4": 2
+    },
+    "preset_names": [
+      "FRONT",
+      "MONITOR",
+      "X-OVER"
+    ],
+    "preset_names_note": "These are the three LLC115b-2w analog controller modes, not DSP presets: FRONT = 45 Hz HPF + LF shelving EQ (FOH/full-range); MONITOR = 45 Hz HPF (floor monitor); X-OVER = 100 Hz HPF for use with subwoofers. Controller also crossover-filters the bi-amp LF/HF feeds at 1.2 kHz (LR24) and generates a sub feed (25/26/40 Hz LR24 HPF for SB218/SB118/SB115, 100 Hz LR24 LPF)."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), internally wired in parallel for loop-through. In active mode each connector carries both sections: pins 1+/1- = LF, 2+/2- = HF.",
+    "controller_connection": "LLC115b-2w mono controller: single XLR line input on front panel; rear-panel LF and HF XLR outputs feed two amp input channels; amp outputs return to the controller speakON Sense Return input (LF = 1+/1-, HF = 2+/2-) for thermal and cone-excursion protection. Front panel doubles as loudspeaker patch panel."
+  },
+  "physical": {
+    "weight_kg": 31.5,
+    "dimensions_mm": "580 H x 440 W (front) x 475 D; rear width 167 mm (truncated-wedge shape, 41 degree trap angle from vertical for floor-monitor use)",
+    "shipping_weight_kg": 34.5,
+    "cabinet": "18 mm / 30 mm Baltic birch plywood, internal steel bracing, sealed/screwed/rabbeted joints; Maroon-gray finish; black epoxy perforated steel grille with acoustically transparent foam",
+    "protection_rating_note": "No formal IP rating stated; LF driver is weather-resistant per manual."
+  },
+  "deployment": {
+    "modes": [
+      "Floor monitor (rests on rear face, baffle at 41 degrees from vertical)",
+      "Pole mount (36 mm / 1.42 in socket on bottom)",
+      "Overhead/wall/scaffold mount via ETR2 U-bracket (horizontal orientation only)",
+      "Omnimount-ready via four threaded rear inserts",
+      "Ground-stacked or flown over subwoofers"
+    ],
+    "rigging_accessories": [
+      "ETR2 adjustable U-bracket (vertical-axis suspension; WLL with safety factor >12)",
+      "PION1 single-stud Aeroquip fly-track fitting-to-ring (secondary safety attachment only, one per enclosure)",
+      "Integrated flying hardware / handles / pole-mount socket"
+    ],
+    "inter_element_angles_note": "MTD enclosures are intended for distributed (multiple-source) sound design rather than WST coupled arrays; the manual gives guidelines for 2- and 4-box arrays (e.g. 0.5 m spacing for coupling) but no fixed inter-element angle set.",
+    "max_per_flown_array_note": "Not specified; arrays up to four enclosures are illustrated for coverage/SPL, not as a rigging limit."
+  },
+  "usage": [
+    "Switchable active/passive coaxial 15 in + 1.4 in full-range box; in Active mode it is bi-amped, so plan two amplifier channels per cabinet (2x LA4 channels in the app's mapping) feeding the LF and HF sections separately.",
+    "Active mode bypasses the passive crossover and uses a 1.2 kHz 24 dB/oct Linkwitz-Riley split with independent LF/HF limiting via the LLC115b-2w controller, giving tighter protection and more HF headroom than passive mode - use it when you want maximum control and SPL from a single box.",
+    "Choose the controller mode to match the job: MONITOR for stage wedges (the 41 degree wedge geometry is built in), FRONT for full-range FOH/fill, and X-OVER (100 Hz HPF) whenever it is paired with subs.",
+    "Extend low end with SB115, SB118, or SB218 subwoofers (typically 1:1) - the controller sub feed adds about 6 dB of LF contour and applies the correct HPF per sub model.",
+    "Best suited to distributed/delay rings, surround and effect channels, under-balcony and front fill, and medium-scale FOH in theatres, clubs, and corporate rooms rather than long-throw coupled arrays.",
+    "Requires 32 dB-gain amplification for the sense-return protection to track correctly; keep speaker runs short / use adequate gauge to maintain damping factor >20. Note this is an archived (discontinued) product."
+  ],
+  "source_manual": "L-Acoustics MTD Line (MTD108a, MTD112b, MTD115b) Operator Manual V1.2, Section 2.4 / 8.5 (EN)",
+  "official_pdf": "https://www.manualslib.com/manual/1544004/L-Acoustics-Mtd-Series.html"
+}

@@ -1,0 +1,80 @@
+{
+  "enclosure": "X4i",
+  "product": "X4i",
+  "type": "coaxial",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "65 Hz - 20 kHz with [X4_60] preset; 120 Hz - 20 kHz with standard [X4] preset (both -10 dB)",
+    "max_spl_db": 116,
+    "max_spl_note": "116 dB peak with [X4] preset; 110 dB with [X4_60] preset. Peak at 1 m, free field, pink noise crest factor 4.",
+    "nominal_impedance_ohms": 16,
+    "directivity": "110 degrees axisymmetric (-6 dB), free of secondary lobes across the band",
+    "components": "Two-way passive coaxial: 1x 4\" neodymium LF/mid driver with a coaxially loaded 1.4\" diaphragm neodymium HF compression driver; internal passive crossover with custom filters; closed (sealed) acoustical load"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Passive single-channel drive (one amplifier output per enclosure, up to 4 X4i in parallel per output)"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 24,
+      "LA7.16(i)": 64,
+      "LA4X": 16,
+      "LA2Xi_SE": 16,
+      "LA2Xi_PBTL": 16
+    },
+    "per_output_max": "4 X4i per output (6 per output on LA12X)",
+    "preset_names": [
+      "X4",
+      "X4_60",
+      "X4_MO"
+    ],
+    "preset_note": "[X4] is the full-range reference preset for short-throw use; [X4_60] extends the low-frequency limit to 65 Hz for stand-alone or separated-subwoofer use; [X4_MO] is a stage-monitor preset. A low-latency variant of [X4_MO] reduces latency to ~1.18 ms (LA8/LA7.16i) or ~0.84 ms (LA2Xi/LA4X/LA12X). Companion sub presets: [SB6_60/100/200] and [SB10_60/100/200]."
+  },
+  "connection": {
+    "input_connector": "2x 2-point screw terminals (IN and LINK) inside a connector sealing plate fitted with two cable glands for 2.5 mm2 cable",
+    "loop_through": "LINK terminal allows daisy-chaining (parallel) enclosures; unused gland is closed with a protective plug",
+    "internal_pinout": "L-Acoustics 2-way passive pinout: IN+ / IN- to transducer +/-"
+  },
+  "physical": {
+    "weight_kg": 1,
+    "dimensions_mm": "116 (W) x 116 (H) x 109 (D), front baffle approx. 99 mm deep / 116 x 116 x 109 mm",
+    "dimensions_note": "Compact shallow profile, less than 10 cm / 4 in deep",
+    "protection_rating": "IP55 (with connector sealing plate fitted)",
+    "cabinet": "Premium grade Baltic birch plywood; coated steel grill with acoustically neutral 3D fabric",
+    "finish": "Dark grey brown Pantone 426C, pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Wall mount",
+      "Ceiling mount",
+      "Pole / microphone-stand mount",
+      "Surface / shelf placement",
+      "Stage monitor",
+      "Recessed in-wall / in-tile (via X4r variants)"
+    ],
+    "rigging_accessories": [
+      "X-U4i adjustable U-bracket (wall, ceiling, or pole mount with tilt; 2 M5 side inserts)",
+      "X-B4i bracket (wall, ceiling, pole, or surface base with tilt; 2 M5 side inserts)",
+      "X4i-onCW on-wall / on-ceiling interface with silent blocks for vibration isolation (3 M6 rear inserts)",
+      "Secondary safety via 1 M6 rear insert"
+    ],
+    "mic_stand": "Brackets accept European 10 mm threaded axis; US stands via 3/8\"-16 male to 5/8\"-27 female adapter and locking ring"
+  },
+  "usage": [
+    "Installation-specific 4\" miniature coaxial point source for short-throw fill and discreet integration where larger boxes will not fit - theaters, houses of worship, corporate spaces, studios, museums, and hospitality venues.",
+    "Each X4i is a single-channel passive load (16 ohm); drive up to 4 per amp output (6 on LA12X), for totals of 16 on LA2Xi/LA4X, 24 on LA12X, and 64 on LA7.16i.",
+    "Use the [X4] preset for full-bandwidth short-throw response; switch to [X4_60] to push the low-frequency limit to 65 Hz when running stand-alone or separated from the sub.",
+    "Pair with SB6i or SB10i subs for distributed background-music or full-range hospitality systems, matching the X4i preset to the sub crossover preset ([SB6/SB10_60/100/200]) and applying the listed inter-element delays.",
+    "Deploy as a low-profile stage monitor with the [X4_MO] preset, choosing the low-latency variant when monitoring latency matters.",
+    "IP55 rating (with the sealing plate fitted), white/RAL finishes, and the shallow sub-10 cm depth make it suitable for both indoor and weather-exposed architectural installs."
+  ],
+  "source_manual": "X4i Owner's Manual (EN) version 6.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X4i/EN/Owner's Manual/X4i_OM_EN.pdf"
+}

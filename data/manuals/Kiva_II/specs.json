@@ -1,0 +1,82 @@
+{
+  "enclosure": "Kiva II",
+  "product": "KIVA II",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "70 - 20000",
+    "max_spl_db": 138,
+    "nominal_impedance_ohms": 16,
+    "directivity": "100 degrees horizontal (constant); vertical coverage set by element count and array curvature",
+    "components": "2x 6.5 in neodymium LF (bass-reflex loaded), 1x 1.75 in neodymium compression driver HF on DOSC waveguide with L-Fins; V-shaped coplanar transducer arrangement",
+    "max_spl_note": "Peak at 1 m, free field, pink noise crest factor 4, [KIVA II] preset"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standalone full-range ([KIVA II])",
+      "Field-installation / two-input variant ([KIVA II_FI])",
+      "With subwoofer (SB15m or SB18) using SB presets"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16",
+      "LA4X",
+      "LA8",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 24,
+      "LA7.16(i)": 32,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 4
+    },
+    "preset_names": [
+      "[KIVA II]",
+      "[KIVA II_FI]",
+      "[SB15_100]",
+      "[SB18_60]"
+    ],
+    "amplifier_note": "Driven by LA2Xi / LA4X / LA8 / LA12X amplified controllers; LA2Xi yields reduced max SPL / drive capacity. One amp channel feeds one enclosure."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK",
+    "pinout": "Passive 2-way: points 1+/1- carry the full enclosure; points 2+/2- not linked (pass-through)",
+    "breakouts": "SP cables (4 mm2), SP-Y1 splitter, DOSUB-LA8 and custom 4-point speakON cables for mixed/sub configurations"
+  },
+  "physical": {
+    "weight_kg": 14,
+    "dimensions_mm": "520 W x 175 H x 357 D",
+    "protection_rating": "IP55",
+    "cabinet": "Composite sandwich structure with composite anti-corrosion grill and acoustically neutral 3D fabric; finishes Pantone 426C dark grey-brown, RAL 9010 pure white, or custom RAL on order; high-grade steel rigging components"
+  },
+  "deployment": {
+    "modes": [
+      "Flown (line array)",
+      "Ground-stacked",
+      "Pole-mounted",
+      "Ceiling-mounted",
+      "Pull-back configurations"
+    ],
+    "max_per_flown_array": "8 safe limit, 20 maximum limit (KIBU II or KIBU-SB)",
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10, 12.5, 15 degrees",
+    "rigging_accessories": [
+      "KIBU II flying frame",
+      "KIBU-SB rigging frame (fly/stack with SB15m)",
+      "KIET II ceiling/pole-mount plate (up to 3 enclosures)",
+      "KIVA-PULLBACK pull-back accessory (up to 9 Kiva II)"
+    ],
+    "deployment_note": "3-point captive rigging system (rigging arm + spring-loaded pin at rear, two front rigging axis/lodging pairs). Ceiling-mount limit 3; pole-mount limit 3 (2 on SB15m). Pull-back angle must not exceed 90 degrees negative site angle; always validate in Soundvision."
+  },
+  "usage": [
+    "Long-throw, ultra-compact variable-curvature line source for production work beyond about 35 m, suited to clear vocal reinforcement where sightlines and visual footprint matter (theatre, worship, orchestral, corporate).",
+    "Run one amplifier output per enclosure; a single LA12X carries up to 24 Kiva II and an LA4X up to 8, so a 12-box flown array maps cleanly onto a half-loaded LA12X.",
+    "Pair with SB15m or SB18 subwoofers using the [SB15_100] / [SB18_60] presets to extend the low end (down to roughly 40 Hz with SB15m); the standalone bandwidth is 70 Hz - 20 kHz.",
+    "Fly with KIBU II or KIBU-SB up to a safe limit of 8 boxes (20 maximum under best mechanical conditions), choosing inter-element angles from the fixed 0-15 degree set for vertical shaping.",
+    "For installs, use KIET II to pole-mount or ceiling-suspend up to 3 enclosures, or KIVA-PULLBACK for tight downfill geometry, keeping pull-back within a 90 degree negative site angle.",
+    "IP55 rating and the 14 kg composite cabinet make it practical for weight-restricted venues and outdoor or semi-exposed installations; always confirm array safety in Soundvision before rigging."
+  ],
+  "source_manual": "Kiva II Owner's Manual (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KIVA II/EN/Owner's Manual/Kiva_II_OM_EN.pdf"
+}

@@ -1,0 +1,93 @@
+{
+  "enclosure": "A15 Wide/Focus",
+  "product": "A15 Wide + A15 Focus (L-Acoustics A15, medium-throw line source; Wide and Focus are coverage variants of the same enclosure)",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "Focus: 41-20000; Wide: 42-20000 (usable bandwidth, -10 dB, [A15] preset); extends to 29 Hz when paired with KS21",
+    "max_spl_db": 144,
+    "max_spl_note": "A15 Focus 144 dB and A15 Wide 141 dB (peak at 1 m, free field, pink noise crest factor 4, [A15] preset)",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Enclosure (WST constant curvature): Wide 30 deg, Focus 10 deg (-6 dB). Horizontal directivity is Panflex/L-Fins selectable: 70 deg or 110 deg symmetric, or 90 deg asymmetric.",
+    "components": "LF: 1 x 15-inch neodymium cone driver (bass-reflex, L-Vents). HF: 1 x 3-inch diaphragm neodymium compression driver on DOSC waveguide with Panflex (L-Fins). 2-way passive design."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "normal latency",
+      "low latency (for [A15_MO] monitor preset and compatible sub channel sets)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA12X",
+      "LA7.16i",
+      "LA2Xi",
+      "LA8 (legacy)"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 10,
+      "LA4X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_BTL": 2
+    },
+    "per_amplifier_note": "Manual drive-capacity table lists LA4X at 1 enclosure per output / 4 total and LA12X at 3 per output / 12 total. Same [A15] preset drives all Wide/Focus directivity settings.",
+    "preset_names": [
+      "[A15]",
+      "[A15_FI]",
+      "[A15_MO]",
+      "[A15_MO] low-latency",
+      "[KS21_60]",
+      "[KS21_60_C]",
+      "[KS21_60_Cx]"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), used interchangeably as IN or LINK",
+    "internal_pinout": "speakON 1+/1- carry the passive enclosure signal; 2+/2- not linked",
+    "breakouts": "SP-Y1 breakout (4-point speakON to 2 x 2-point speakON, with CC4FP adapter) for two passive enclosures; DOSUB-LA8 (8-point PA-COM to 4 x 2-point speakON) for four passive enclosures"
+  },
+  "physical": {
+    "weight_kg": 33,
+    "weight_note": "A15 Wide 33 kg / 73 lb; A15 Focus 35 kg / 77 lb (net)",
+    "dimensions_mm": "Width (front) 764 (rear ~347-431); height 427 (Focus) / 424 (Wide); depth ~522",
+    "protection_rating": "IP55",
+    "cabinet": "Premium grade Baltic beech and birch plywood, coated steel grille with acoustically neutral 3D fabric, dark grey brown Pantone 426 C finish; rigging components in high-grade steel with anti-corrosion coating"
+  },
+  "deployment": {
+    "modes": [
+      "flown vertical line source array",
+      "flown radial (horizontal) array",
+      "flown single enclosure",
+      "ground-stacked on KS21 subwoofer",
+      "ground-stacked alone",
+      "pole-mounted (single enclosure)",
+      "stage monitor"
+    ],
+    "max_per_flown_array": "Vertical array on A15-BUMP (+ optional M-BAR): max 8; on A15-RIGBAR: max 4. Radial array: up to 9 with 3x A15-LIFT. Safe limits are lower and configuration-dependent (verify in Soundvision).",
+    "inter_element_angles": "Splay angles are configuration-dependent and set via the A15-BUMP/A15-LIFT hole patterns; determine exact values in Soundvision rather than from a fixed list",
+    "rigging_accessories": [
+      "A15-BUMP (flying frame)",
+      "M-BAR (frame extension bar)",
+      "A15-RIGBAR (rigging bar / pullback)",
+      "A15-LIFT (horizontal/radial deployment)",
+      "X-BAR (single-enclosure rigging bar)",
+      "A-TILT (stack onto KS21 with site-angle adjustment)",
+      "KS21-OUTRIG (stability bars, mandatory when stacking A15 on KS21)",
+      "A-MOUNT (35 mm / 1-3/8 in pole mount, single enclosure)",
+      "KS21-CHARIOT",
+      "K2-JACK",
+      "CLAMP250"
+    ]
+  },
+  "usage": [
+    "Medium-throw line source intended for production and concert work; flown or stacked in mixed Wide/Focus columns where Focus (10 deg) handles longer projection (up to ~45 m) and Wide (30 deg) fills broad near-to-mid coverage.",
+    "Each enclosure is a single passive 8-ohm box needing one amplifier channel; budget output count by amp: up to 12 on an LA12X (3 per output), up to 10 on an LA7.16i, and 4 on an LA4X or LA2Xi (SE), dropping to 2 on LA2Xi in bridged mode.",
+    "Pair with KS21 subwoofers (recommended roughly 1 sub per enclosure) to reinforce the low-frequency contour and extend the system bandwidth down to about 29 Hz; remember to apply the published pre-alignment delay between the A15 and sub presets.",
+    "Use Panflex to match horizontal coverage to the room: pick 70 deg or 110 deg symmetric, or 90 deg asymmetric, all driven by the same [A15] preset so no re-tuning is needed when changing fins.",
+    "Flexible single-box roles: X-BAR for a flown point source, A-MOUNT for pole-mounted delay/fill, or [A15_MO] (with low-latency option) for stage monitors; a custom preset is required if a monitor is combined with a sub.",
+    "Respect mechanical limits before flying: max 8 per A15-BUMP vertical array (4 on A15-RIGBAR) and use KS21-OUTRIG whenever A15 are stacked on KS21; always confirm safe element counts and splay angles in Soundvision."
+  ],
+  "source_manual": "A15 Owner's Manual (EN) version 3.2",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15 Wide/EN/Owner's Manual/A15_OM_EN.pdf"
+}

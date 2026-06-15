@@ -1,0 +1,84 @@
+{
+  "enclosure": "12XT (Passive)",
+  "product": "12XT",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000",
+    "frequency_range_note": "Usable bandwidth at -10 dB with [12XTP_FR]/[12XTA_FR] preset; extendable down to 32 Hz in LOW-EXTENSION mode with the SB18 subwoofer",
+    "max_spl_db": 133,
+    "max_spl_note": "133 dB peak at 1 m, free field, 10 dB crest-factor pink noise with [12XTA_FI] preset (datasheet figure spans the active/passive cabinet)",
+    "nominal_impedance_ohms": 8,
+    "directivity": "90 degree axi-symmetric (nominal at -6 dB)",
+    "components": "1 x 12 in weather-resistant LF transducer coaxially loaded with 1 x 3 in diaphragm compression driver, in a bass-reflex tuned Baltic birch cabinet; passive mode uses an onboard third-order crossover network"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "FULL RANGE",
+      "HIGH-PASS",
+      "LOW-EXTENSION"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "12XTP_FR",
+      "12XTP_FI",
+      "12XTP_MO",
+      "12XTP_FR_100",
+      "12XTP_FI_100",
+      "12XTP_MO_100"
+    ],
+    "preset_note": "FULL RANGE uses the base [12XTP_FR/FI/MO] presets; HIGH-PASS adds the _100 variants (100 Hz high-pass) for SB18 pairing; LOW-EXTENSION requires a custom preset built in LA Network Manager. FRONT/FILL/MONITOR variants target FOH, distributed-fill, and half-space (floor/wall/ceiling) use respectively."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON, wired in parallel (interchangeable IN/LINK for daisy-chaining a second 12XT)",
+    "wiring_passive": "pin 1+/1- carries the full-range input signal; pins 2+/2- not used in passive mode",
+    "recommended_cables": [
+      "SP.7",
+      "SP10",
+      "SP25"
+    ],
+    "amp_to_cabinet_note": "Each PASSIVE 12XT connects to one LA4/LA4X output channel (channels 1-4 all usable in passive mode)"
+  },
+  "physical": {
+    "weight_kg": 29,
+    "dimensions_mm": "540 x 410 x 389 (H x W x D)",
+    "cabinet": "18, 24 and 30 mm Baltic birch plywood, wedge-shaped with 30 and 60 degree fixed tilt angles",
+    "finish": "Grey-brown RAL 8019",
+    "grille": "Polyester-powder-coated steel grille with acoustically transparent Airnet cloth",
+    "weather_note": "Weather-resistant 12 in LF transducer"
+  },
+  "deployment": {
+    "modes": [
+      "Stacked/floor monitor with 30 or 60 degree wedge angle",
+      "Pole-mounted via integrated 35 mm pole socket",
+      "Wall or ceiling mount with ETR12-2 U-bracket",
+      "Wall or ceiling mount with Omnimount 120.0 series (four M8 inserts)",
+      "Flown with XTLIFTBAR rigging accessory"
+    ],
+    "rigging_accessories": [
+      "ETR12-2 mounting bracket",
+      "XTLIFTBAR",
+      "Omnimount 120.0 series",
+      "Integrated pole-mount socket and handles",
+      "M8 safety eyebolt (rear M8 insert)"
+    ],
+    "rigging_note": "ETR12-2 general standard limit is one 12XT per bracket; consult the XT and P rigging procedures manual"
+  },
+  "usage": [
+    "Multipurpose 90-degree coaxial point-and-shoot cabinet for FOH, distributed fill, and stage/floor monitoring; the wedge cabinet gives 30/60-degree monitor tilt without extra hardware.",
+    "Set the rear ACTIVE/PASSIVE switch to PASSIVE and load a matching [12XTP_*] preset - mismatching the switch and preset can destroy the transducers and voids warranty.",
+    "In passive mode one LA4/LA4X drives up to four 12XT (one per channel, channels 1-4), each presenting an 8-ohm load, making it an efficient choice for distributed installs.",
+    "Use the FULL RANGE [12XTP_FR/FI/MO] presets for standalone full-bandwidth (55 Hz-20 kHz) operation; pick FRONT for FOH voicing, FILL for flat free-field response, MONITOR for half-space floor/wall/ceiling placement.",
+    "To extend low end, run HIGH-PASS (_100) presets with an SB18 sub, or LOW-EXTENSION mode (custom preset) which puts up to two 12XT and two SB18 on one LA4/LA4X and reaches down to 32 Hz; recommended ratio is one 12XT per SB18.",
+    "Daisy-chain a second cabinet through the parallel 2x 4-point speakON connectors using SP.7/SP10/SP25 cables, keeping in mind a maximum of one passive 12XT per amplifier output channel."
+  ],
+  "source_manual": "12XT Coaxial Enclosure User Manual (EN), version 1.4",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
+}

@@ -1,0 +1,88 @@
+{
+  "enclosure": "L2 / L2D",
+  "product": "L2 + L2D (L-Acoustics L Series progressive curvature WST line source system)",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "45 - 20000 (usable bandwidth, -10 dB); extends to 25 Hz when paired with KS28 subwoofers",
+    "max_spl_db": 155,
+    "max_spl_note": "155 dB peak for a full L2 enclosure and 151 dB for a full L2D (preset [L2 70]/[L2D 70], 1 m, free field, pink noise crest factor 4). A single top module alone reaches about 147 dB.",
+    "nominal_impedance_ohms": 8,
+    "impedance_note": "8 ohms per section (LC / LF / HF each 8 ohms); the enclosure presents 16 amplifier-driven channels",
+    "directivity": "Vertical 10 degrees fixed per L2 element (progressive curvature, no inter-element angles); L2D adds a downfill section giving 60 degrees total. Horizontal is set per Panflex module to 70 degrees symmetric, 110 degrees symmetric, or 90 degrees asymmetric (35/55 or 55/35); the L2D lower two modules are fixed progressive 110-140 degrees. Selectable cardioid or supercardioid LF polar pattern.",
+    "components": "4 x 12-inch LC (low-frequency cardioid, side-mounted) neodymium cone, 8 x 10-inch LF neodymium cone, and 8 x 3-inch HF neodymium-diaphragm compression drivers on DOSC waveguides. LC/LF loaded bass-reflex with L-Vents; HF via DOSC waveguide with Panflex/L-Fins."
+  },
+  "amplification": {
+    "amp_channels_required": 16,
+    "operating_modes": [
+      "16-channel active (LC/LF/MF/HF, 4 channels each across 4 modules)"
+    ],
+    "recommended_amplifiers": [
+      "LA7.16",
+      "LA7.16i"
+    ],
+    "per_amplifier": {
+      "LA7.16(i)": 1
+    },
+    "preset_names": [
+      "L2 70",
+      "L2 90",
+      "L2 110",
+      "L2 70_S",
+      "L2 90_S",
+      "L2 110_S",
+      "L2D 70",
+      "L2D 90",
+      "L2D 110",
+      "L2D 70_S",
+      "L2D 90_S",
+      "L2D 110_S",
+      "KS28 L2",
+      "KS28 L2_C",
+      "KS28 L2_Cx"
+    ],
+    "preset_note": "Base presets set horizontal directivity (70/90/110); the _S suffix selects supercardioid LF instead of the default cardioid. KS28 L2xxx presets couple subwoofers (_C / _Cx variants for cardioid sub configurations). Soundvision Autofilter is strongly recommended to generate per-element electronic settings."
+  },
+  "connection": {
+    "input_connector": "1 x 37-point male connector (32 points used), carrying all 16 amplifier channels",
+    "cabling": "SC32 (37-point F to 37-point M, 32 points, touring) and SC32 BE (37-point F to bare-end, install) loudspeaker cables; SC32P 0.3 m extension adaptor. One LA-RAK III touring rack (3x LA7.16 + LA-POWER II + LA-PANEL III + 2x LS10) drives up to four L2/L2D elements."
+  },
+  "physical": {
+    "weight_kg": 158,
+    "weight_note": "L2 = 158 kg (348 lb), L2D = 149 kg (328 lb), net",
+    "dimensions_mm": "L2: 850 (D) x 559 (W) x 1197 (H); L2D: 850 (D) x 559 (W) x 1252 (H)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood; coated steel grille with acoustically neutral 3D fabric; high-grade steel rigging with anti-corrosion coating. Finish dark grey-brown Pantone 426 C (also pure white RAL 9010, custom on order)."
+  },
+  "deployment": {
+    "modes": [
+      "flown (J-shaped line source via captive rigging)",
+      "stacked (single element on chariot)"
+    ],
+    "max_per_flown_array": "Up to 4 L2, or 3 L2 + 1 L2D, per flown array (safe limit with L2-BUMP)",
+    "inter_element_angles": "None - progressive mechanical curvature locks elements at fixed angles automatically; the captive 4-point rigging eliminates manual inter-element splay",
+    "array_note": "L2 and L2D share the same captive rigging and intermix in one array. L2D provides the array downfill. With LA-RAKMOUNT + 2x L2-BAR an LA-RAK III can be flown atop the array (4 L2 + 1 rack, or 3 L2 + 1 L2D + 1 rack).",
+    "rigging_accessories": [
+      "L2-BUMP (flying frame for L2/L2D)",
+      "L2-BAR (extension bar)",
+      "L2-RIGBAR (rigging bar / pullback)",
+      "LA-RAKMOUNT (rack mounting cradles)",
+      "LA-SLING2T (2-leg lifting chain)",
+      "L2-ROLL (lift-and-roll, with L2-RIGBAR)",
+      "L2-CHARIOT / L2D-CHARIOT (single-element transport carts)",
+      "K2-JACK (tilt screw jacks for ground stacking)",
+      "DELTA 1.5T (azimuth tuning)",
+      "L2-LASERMOUNT"
+    ]
+  },
+  "usage": [
+    "Long-throw main PA element for medium-to-large touring and installed systems, where its fixed-curvature design lets an array be built without measuring or setting any inter-element angles, speeding rig and de-rig.",
+    "Each L2 or L2D requires its own dedicated LA7.16/LA7.16i (16 channels, one amp per box); plan amp inventory at a strict 1:1 box-to-amplifier ratio, with an LA-RAK III housing three amps for up to four elements.",
+    "Pair with KS28 subwoofers (driven by LA12X/LA2Xi) for full sub-low extension to 25 Hz; use the KS28 L2 presets and place subs behind the hang (preferred) or beside it, and reverse one box per group of four for a cardioid sub array.",
+    "Exploit the side-firing 12-inch LC drivers for broadband cardioid or supercardioid low-frequency control - keep the same LF polar pattern (cardioid vs the _S supercardioid presets) across the whole system.",
+    "Tune horizontal coverage per Panflex module (70/90/110 degrees) to shape audience coverage; note the L2D's lower section is a fixed progressive 110-140 degree downfill on the 110 electronic setting.",
+    "Always model in Soundvision before flying - mechanical safety, array limits (up to 4 elements), and per-element electronic settings cannot be determined by hand; use Autofilter then load via LA Network Manager."
+  ],
+  "source_manual": "L2 Owner's Manual (EN) version 5.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/L2/EN/Owner's Manual/L2_OM_EN.pdf"
+}

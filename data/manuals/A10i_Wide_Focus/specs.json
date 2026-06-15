@@ -1,0 +1,84 @@
+{
+  "enclosure": "A10i Wide/Focus",
+  "product": "A10i (A10i Wide and A10i Focus — same enclosure, two directivity variants)",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "66 Hz - 20 kHz (Focus); 67 Hz - 20 kHz (Wide), usable bandwidth -10 dB",
+    "max_spl_db": 140,
+    "max_spl_note": "140 dB for A10i Focus, 137 dB for A10i Wide ([A10] preset); peak at 1 m, free field, pink noise crest factor 4. Max SPL with LA2Xi differs — see LA2Xi spec sheet.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Fixed enclosure coverage 10° (Focus) or 30° (Wide); Panflex L-Fins set horizontal pattern to 70° or 110° symmetric, or 90° asymmetric (35°/55° or 55°/35°)",
+    "components": "2-way passive constant-curvature WST. LF: 1 x 10\" cone driver (bass-reflex, L-Vents). HF: 1 x 2.5\" diaphragm neodymium compression driver on DOSC waveguide with L-Fins."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Single passive enclosure driven from one amplifier output via the [A10] preset",
+      "[A10_FI] preset variant for filtered/dual-input routing (OUT 1-2 on IN A, OUT 3-4 on IN B)",
+      "Panflex directivity (70° / 110° / 90° asymmetric) selected mechanically at the L-Fins; the same [A10] preset drives all fin settings and both Wide and Focus enclosures"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X",
+      "LA8 (legacy)"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 16,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "preset_names": [
+      "[A10]",
+      "[A10_FI]"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in connection; the + and - terminal sets are interchangeable as IN or LINK",
+    "sealing": "Connector sealing plate with cable gland for weather-protected installs",
+    "breakouts": "custom 2-point speakON cable (2.5 mm2 gauge) to bare-wire cable available for connection from L-Acoustics amplified controllers"
+  },
+  "physical": {
+    "weight_kg": 19,
+    "weight_note": "19 kg / 42 lb (A10i Focus); 18 kg / 40 lb (A10i Wide)",
+    "dimensions_mm": "Focus: 569 W x 350 H x 294 D (approx, mm); Wide: 569 W x 347 H x 180 D (approx, mm) — front face ~569 wide, depth varies between variants",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade Baltic beech and birch plywood; coated steel grille with acoustically neutral 3D fabric; finishes: dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on special order"
+  },
+  "deployment": {
+    "modes": [
+      "Flown vertical line source (A10i Wide and/or Focus combined)",
+      "Flown radial/horizontal array with A10i-LIFT",
+      "Ground-stacked with adjustable site angle",
+      "Stacked on KS21i subwoofer",
+      "Wall- or ceiling-mounted with fixed or adjustable site angle",
+      "Single-box point source for front-fill, delay, or fill duty"
+    ],
+    "max_per_flown_array": "Same A10i-LIFT pickup point applies to radial arrays of up to 6 enclosures; arrays of 7+ enclosures follow a separate procedure (see owner's manual)",
+    "inter_element_angles": "Vertical line-source inter-element angle 0° to -25° in 2.5° steps via LINK plates; A10iFOCUS-LINK adds a 5° splay between two Focus boxes; bracket/tilt site angles range -30° to +30°",
+    "rigging_accessories": [
+      "A10i-BUMP (array frame)",
+      "A10i-RIGBAR (rigging bar / pullback)",
+      "A10i-LIFT (horizontal/radial deployment element)",
+      "A10-Ui (U-bracket, replaces discontinued A-U10i)",
+      "A10iWIDE-LINK / A10iFOCUS-LINK and matching ENDLINK plates",
+      "Ai-FIXBRACKET, A10i-FIXBRACKET, A10i-TILTBRACKET, A10i-TILT",
+      "A10i-ULINK II / A10iKS21i-ULINK II, KS21i-SLINK / -ENDSLINK plates",
+      "M6 inserts for rigging plates/accessories, M8 inserts for A10-Ui, one DIN580-compatible M8 safety insert"
+    ]
+  },
+  "usage": [
+    "Medium-throw installation line source rated for coverage out to about 35 m, well suited to theaters, houses of worship, clubs, schools, and sports venues.",
+    "Each box is a single passive 8-ohm load needing one amplifier channel: budget up to 12 per LA12X, 16 per LA7.16i, 8 per LA4X or LA2Xi (single-ended), but only 2 per LA2Xi in bridged (BTL) mode.",
+    "Mix Wide (30°) and Focus (10°) enclosures in one column to tailor SPL mapping and throw, and use Panflex L-Fins to set horizontal coverage to 70°, 110°, or 90° asymmetric without changing presets.",
+    "Pair with KS21i subwoofers to reinforce low end and extend the system response down to roughly 31 Hz for fuller-range program material; on its own A10i favors vocal and light-LF music content.",
+    "Deploy flown vertically, in radial arrays via A10i-LIFT (keep arrays to 6 boxes per shared pickup point), ground-stacked, on KS21i, or wall/ceiling-mounted; a single box also works as a configurable-directivity front-fill or delay.",
+    "Load the [A10] preset for plug-and-play operation; [A10_FI] is available for filtered/dual-input routing. IP55 rating plus the sealing-plate cable gland make it suitable for protected outdoor and demanding install environments."
+  ],
+  "source_manual": "A10i Owner's Manual (EN) version 5.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10i%20Wide/EN/Owner's%20Manual/A10i_OM_EN.pdf"
+}

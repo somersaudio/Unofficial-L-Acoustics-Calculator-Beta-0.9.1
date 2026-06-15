@@ -1,0 +1,78 @@
+{
+  "enclosure": "Kiva",
+  "product": "KIVA (original/legacy, discontinued) — successor is KIVA II",
+  "type": "line source",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "80-20000",
+    "max_spl_db": 130,
+    "nominal_impedance_ohms": 16,
+    "directivity": "100 degrees symmetric horizontal (above 500 Hz); vertical coverage set by element count and array curvature",
+    "components": "LF: 2 x 6.5 in weather-resistant cone drivers, bass-reflex loaded; HF: 1 x 1.5 in diaphragm compression driver on a DOSC waveguide",
+    "max_spl_note": "130 dB peak at 1 m, free field, 10 dB crest-factor pink noise with [KIVA] preset (per original Kiva manual). Note: original Kiva manual specifies 8 ohm nominal impedance; the 16 ohm value reflects the application configuration."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "passive 2-way, single amplifier channel per enclosure"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA8",
+      "LA4X",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA4": 8
+    },
+    "preset_names": [
+      "[KIVA]",
+      "[KIVA_FI]",
+      "[KIVA_SB15]"
+    ],
+    "preset_note": "[KIVA] is the full-range medium/long-throw line-source preset; [KIVA_FI] is the front-fill/short-throw variant; [KIVA_SB15] is a hybrid preset combining Kiva with the SB15m subwoofer. SB15_100 / SB18_60 (and cardioid _C variants) are the companion subwoofer presets.",
+    "rms_power_handling_w": 120
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel and interchangeable as IN or LINK; pinout uses point 1 (1+/1-) for the passive enclosure, points 2 not linked",
+    "breakouts": "SP-Y1 (4-point speakON to 2x 2-point speakON, with CC4FP adapter) for two passive enclosures; DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON) for four enclosures off an LA8/PA-COM output"
+  },
+  "physical": {
+    "weight_kg": 13,
+    "dimensions_mm": "520 W x 175 H x 358 D (20.5 x 6.9 x 14.1 in)",
+    "cabinet": "Composite sandwich structure with ZAMAC back plate",
+    "front": "Plastic grill with Airnet acoustically neutral fabric",
+    "finish": "Grey brown RAL 8019 or Pure white RAL 9010, custom RAL on special order",
+    "rigging_material": "High-strength steel with anti-corrosion coating",
+    "protection_rating_note": "No IP rating stated for the original Kiva enclosure (weather-resistant transducers); the companion SB15m is rated IP45"
+  },
+  "deployment": {
+    "modes": [
+      "flown line-source array (KIBU II or KIBU-SB frame)",
+      "ground-stacked (KIBU-SB)",
+      "ceiling-mounted (KIET II, up to 3 enclosures)",
+      "pole-mounted (KIET II on 35 mm pole, up to 3 enclosures)",
+      "pullback configuration (KIVA-PULLBACK with KIBU II/KIBU-SB)"
+    ],
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10, 12.5, 15 degrees",
+    "max_per_flown_array": "20 maximum (12 safe limit) flown on KIBU II or KIBU-SB; pullback limited to 9; stacked limited to 9 (4 safe)",
+    "rigging_accessories": [
+      "KIBU II (flying/stacking frame for Kiva II/Kiva)",
+      "KIBU-SB (frame for flying or stacking Kiva II/Kiva with SB15m)",
+      "KIET II (ceiling or pole-mount plate, 3 enclosures max)",
+      "KIVA-PULLBACK (pullback accessory)",
+      "Captive 3-point rigging system integrated in the enclosure"
+    ],
+    "deployment_note": "Flown/stacked array limits are taken from the shared KIVA II rigging manual, which explicitly covers both KIVA II and the original KIVA on the KIBU II/KIBU-SB/KIET II hardware."
+  },
+  "usage": [
+    "Ultra-compact passive line-source element for vocal-clarity applications where sightlines and visual footprint matter: theatres, houses of worship, corporate and orchestral events, plus fill/delay duties on larger systems.",
+    "Each enclosure is passive and 2-way, so it consumes a single amplifier channel; an LA4 drives up to 8 Kiva per controller, maximizing enclosure density per rack.",
+    "Use [KIVA] for medium-to-long-throw main hangs and [KIVA_FI] when deploying short-throw front-fill or distributed elements that need independent per-channel control.",
+    "Pair with the SB15m subwoofer (via [KIVA_SB15] hybrid preset, sub on OUT1) to extend low-end down toward 40 Hz, or with SB18 (60 Hz) for fuller program material; on its own the enclosure rolls off around 80 Hz.",
+    "Fly up to 20 elements (12 safe) on KIBU II/KIBU-SB with inter-element angles up to 15 degrees for tight audience-geometry shaping; ceiling/pole installs via KIET II cap out at 3 enclosures.",
+    "Legacy archive product superseded by KIVA II (which moves to 16 ohm, 1.75 in HF, higher 138 dB SPL); plan Kiva deployments around LA4/LA8-era controllers and 8 ohm-native presets even though the app models it at 16 ohm."
+  ],
+  "source_manual": "KIVA / SB15m User Manual (EN) version 1.2",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KIVA%20II/EN/Owner's%20Manual/Kiva_II_OM_EN.pdf"
+}

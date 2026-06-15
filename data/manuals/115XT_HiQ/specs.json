@@ -1,0 +1,77 @@
+{
+  "enclosure": "115XT HiQ",
+  "product": "L-Acoustics 115XT HiQ (coaxial stage monitor, XT/P series — discontinued/legacy)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "50 - 20000",
+    "max_spl_db": 139.5,
+    "max_spl_note": "139.5 dB peak with the MONITOR preset (half-space loading); 136.5 dB with the FILL preset (free field). Measured at 1 m with 10 dB crest-factor pink noise.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "50° axi-symmetric (-6 dB), constant-directivity conical waveguide",
+    "components": "Coaxial 2-way: 1x 15\" weather-resistant LF transducer in a bass-reflex tuned enclosure (8 Ω, 450 W RMS LF), coaxially loaded with a 1x 3\" diaphragm compression driver on a conical waveguide (8 Ω, 125 W RMS HF). Active 2-way filtering."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "FULL RANGE (standalone, 50 Hz - 20 kHz)",
+      "HIGH-PASS (100 Hz high-pass, for use with subwoofers)"
+    ],
+    "recommended_amplifiers": [
+      "LA4X",
+      "LA8",
+      "LA4"
+    ],
+    "per_amplifier": {
+      "LA4": 2
+    },
+    "preset_names": [
+      "HIQ_FR",
+      "HIQ_FI",
+      "HIQ_MO",
+      "HIQ_FR_100",
+      "HIQ_FI_100",
+      "HIQ_MO_100"
+    ],
+    "preset_note": "FULL RANGE presets: HIQ_FR (FRONT/FOH standalone), HIQ_FI (FILL/free field), HIQ_MO (MONITOR/half-space). HIGH-PASS variants add a 100 Hz high-pass for subwoofer pairing: HIQ_FR_100, HIQ_FI_100, HIQ_MO_100. Loaded via the LA-controller front panel or LA Network Manager."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel for loop-through/parallel connection of a second enclosure",
+    "wiring": "1+/1- = LF, 2+/2- = HF",
+    "recommended_cables": "SP.7 / SP10 / SP25 for LA4/LA4X; DOFILL-LA8 (extended with DO.7 / DO10 / DO25) for LA8"
+  },
+  "physical": {
+    "weight_kg": 28.5,
+    "dimensions_mm": "365 x 580 x 440 (H x W x D)",
+    "cabinet": "18, 24 and 30 mm Baltic birch plywood, wedge-shaped, RAL 8019 Grey Brown finish",
+    "front": "Polyester-coated steel grill with acoustically transparent Airnet fabric",
+    "handles": "Integrated into the cabinet"
+  },
+  "deployment": {
+    "modes": [
+      "Floor wedge monitor (two fixed wedge angles: 30° and 60° from vertical)",
+      "Pole-mount (35 mm / 1.4 in integrated socket)",
+      "Wall or ceiling mount (ETR15 accessory, 0-360° in 10° steps)",
+      "Flown (XTLIFTBAR accessory)",
+      "Stacked"
+    ],
+    "inter_element_angles": "XTLIFTBAR: azimuth in 10° steps, site at -14°/-7°/0°/+7°/+14°",
+    "rigging_accessories": [
+      "ETR15 wall/ceiling bracket",
+      "XTLIFTBAR fly bar",
+      "M8 safety eyebolt insert (rear face)",
+      "35 mm pole socket (integrated)"
+    ],
+    "rigging_note": "Refer to the XT and P rigging procedures manual for XT-range-specific procedures."
+  },
+  "usage": [
+    "Compact coaxial enclosure that doubles as a wedge-shaped floor stage monitor and a short/long-throw fill or FOH point source, with the coaxial 15\"/3\" arrangement giving a smooth 50° axi-symmetric pattern and strong feedback rejection.",
+    "Each enclosure needs 2 amp channels (one LF, one HF). On an LA4/LA4X drive up to 2 cabinets per amp (channels 1 and 3); on an LA8 drive up to 4 cabinets, parallelling a second box per channel pair.",
+    "For monitor use load the MONITOR preset (half-space EQ, highest output at 139.5 dB peak); for free-field distributed fills use the FILL preset, and for standalone FOH use the FRONT preset.",
+    "When paired with subwoofers, switch to a HIGH-PASS preset (e.g. HIQ_FR_100) so the cabinet rolls off at 100 Hz and hands LF duty to the subs.",
+    "Mounts flexibly: pole-mount via the 35 mm socket, wall/ceiling via ETR15, fly via XTLIFTBAR, or floor-stack at the built-in 30°/60° wedge angles; add the M8 eyebolt for safety when flown.",
+    "Legacy/discontinued product — superseded in the current catalog; verify firmware preset library version (1.3 to 2.0 optimized the MONITOR presets) and confirm spare-part availability before specifying for new installs."
+  ],
+  "source_manual": "115XT HiQ Coaxial Stage Monitor User Manual (EN), version 1.4",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XTHiQ/documents.zip"
+}

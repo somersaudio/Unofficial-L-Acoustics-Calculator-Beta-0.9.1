@@ -1,0 +1,72 @@
+{
+  "enclosure": "Kilo",
+  "product": "Kilo (KILO) - low-frequency extension of the legacy KIVA / KILO line source system",
+  "type": "subwoofer",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "50 Hz low-frequency limit (-10 dB, [KIVA_KILO] preset); 100 Hz upper limit in standalone [KILO] preset",
+    "max_spl_db": 129,
+    "max_spl_note": "129 dB peak at 1 m, free field, 10 dB crest-factor pink noise with [KIVA_KILO] preset",
+    "nominal_impedance_ohms": 16,
+    "nominal_impedance_note": "Manual specification lists 8 ohms nominal per enclosure; app model uses 16 ohms for solver loading",
+    "directivity": "Bass-reflex low-frequency element; contributes to the line-source array directivity rather than defining its own pattern. As part of the KIVA line source the array provides 100 degree horizontal coverage with vertical coverage set by element count and inter-element angles (0 to 15 degrees).",
+    "components": "1 x 12-inch neodymium weather-resistant transducer in a dual bass-reflex enclosure",
+    "rms_power_handling_w": 310
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "SB / subwoofer output (low-frequency extension within a KIVA line source)",
+      "Passive single-driver enclosure driven from one amplifier output channel"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8"
+    ],
+    "per_amplifier": {
+      "LA4": 8
+    },
+    "per_amplifier_note": "LA4/LA4X: up to 2 KILO in parallel per output channel, 8 total per controller. LA8: up to 3 KILO in parallel per output channel, 12 total per controller.",
+    "preset_names": [
+      "KILO",
+      "KIVA_KILO"
+    ]
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), interchangeable IN/LINK wired in parallel for daisy-chaining",
+    "pinout_note": "Driver wired on points 1+/1-; points 2+/2- not used",
+    "breakouts": "DOSUB-LA8 (8-point PA-COM to 4x speakON) for LA8 PA-COM output; SP-Y1 (4-point to 2x 2-point speakON, with CC4FP adapter) to split two channels"
+  },
+  "physical": {
+    "weight_kg": 19,
+    "dimensions_mm": null,
+    "dimensions_note": "Dimensional drawing appears only as an image in the user manual specifications appendix and is not present as extractable text; numeric H x W x D not stated in the document body",
+    "cabinet": "Baltic birch plywood",
+    "finish": "Grey brown (RAL 8019) or pure white (RAL 9010); custom RAL on special order",
+    "front": "Steel grill with anti-corrosion coating and Airnet acoustically neutral fabric"
+  },
+  "deployment": {
+    "modes": [
+      "Flown as the low-frequency element interleaved within a KIVA WST line source array",
+      "Configurable inter-element angles within the captive rigging frame"
+    ],
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10, 12.5, 15 degrees",
+    "rigging_accessories": [
+      "Captive 3-point rigging system (integrated)",
+      "High-strength steel rigging components with anti-corrosion coating",
+      "Refer to the KIVA KILO SYSTEM rigging manual for procedures and array limits"
+    ],
+    "recommended_ratio": "3 KIVA : 1 KILO (add 1 SB18 per group for 32 Hz extension: 3 KIVA : 1 KILO : 1 SB18)"
+  },
+  "usage": [
+    "Use KILO purely as a low-frequency extension for KIVA arrays; it pulls the system bottom end down to 50 Hz and is not a standalone full-range box.",
+    "Interleave roughly one KILO for every three KIVA enclosures in the array, which is the ratio L-Acoustics designed the system tuning around.",
+    "Each KILO needs one amplifier channel of subwoofer-type drive: an LA4/LA4X handles up to 8 KILO (two paralleled per channel) and an LA8 up to 12 (three per channel).",
+    "Load the [KILO] preset for a 100 Hz crossover when running KILO on its own channel, or the [KIVA_KILO] hybrid preset to drive a KIVA+KILO group from a single four-output controller.",
+    "When deeper sub extension is needed, add SB18 subwoofers (3 KIVA : 1 KILO : 1 SB18) to reach 32 Hz; the hybrid preset cannot set delay/polarity on the sub channel, so build a custom preset if alignment control is required.",
+    "On the SP-Y1 split cabling, always land the KILO on the CH(1) connector so the [KIVA_KILO] routing maps correctly; mind that this is an archived enclosure compatible only with LA4/LA4X/LA8."
+  ],
+  "source_manual": "KIVA KILO System User Manual (EN), Version 3.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kilo/documents.zip"
+}

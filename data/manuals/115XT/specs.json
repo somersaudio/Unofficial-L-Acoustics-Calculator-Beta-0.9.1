@@ -1,0 +1,79 @@
+{
+  "enclosure": "115XT",
+  "product": "115XT (legacy L-Acoustics XT LINE coaxial loudspeaker; discontinued. Distinct from 115XT HiQ. Shares its Operator Manual with the 112XT and 115XT HiQ.)",
+  "type": "coaxial",
+  "status": "discontinued",
+  "electroacoustic": {
+    "frequency_range_hz": "60 - 18000 (±3 dB); usable bandwidth 50 - 18000 (-10 dB)",
+    "max_spl_db": 132,
+    "max_spl_note": "Peak SPL @ 1 m, single enclosure, 3W preset. FRONT preset: 122 dB cont / 128 dB peak; FILL preset: 124 dB cont / 130 dB peak; 3W preset: 126 dB cont / 132 dB peak.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Axi-symmetrical 80° conical (±20°), identical horizontal and vertical coverage; crossover 1 kHz, 24 dB/oct Linkwitz-Riley",
+    "components": "1x 15\" weather-resistant LF cone (3\" voice coil) coaxially loading 1x 1.4\" exit neodymium HF compression driver (titanium diaphragm, 3\" voice coil); bass-reflex loaded. LF section: 250 Wrms / 1000 Wpeak (8 ohm). HF section: 85 Wrms / 350 Wpeak (8 ohm)."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "Active 2-way (LF + HF, one amp channel each)",
+      "Active 3-way with companion subwoofer (3W closely-coupled or 3WX flown-top/ground-sub)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X"
+    ],
+    "per_amplifier": {
+      "LA4": 4
+    },
+    "preset_names": [
+      "115XT FOH (FRONT)",
+      "115XT FIL (FILL)",
+      "115XT MON (MONITOR)",
+      "115 SB115 / 115 X 115",
+      "115 SB118 / 115 X 118",
+      "115 SB218 / 115 X 218",
+      "115 DVSUB / 115 X dVS"
+    ],
+    "preset_note": "Legacy presets per the XT Operator Manual were authored for outboard processors (BSS Minidrive, XTA, Lake/Dolby). In the current L-Acoustics LA-network ecosystem the 115XT is driven by an LA4/LA4X amplified controller; one LA4 powers up to 4 enclosures.",
+    "recommended_amplifiers_note": "Modern L-Acoustics mapping uses the LA4/LA4X amplified controller. The original-era manual cited LA15a/LA17a/LA24a/LA48a analog amplifiers, all long discontinued."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), internally wired in parallel for loop-through / parallel operation. Pinout: 1+/1- = LF, 2+/2- = HF.",
+    "cabling": "Supplied/recommended with 4-conductor SP-series speakON cables (4 mm² / 11 AWG): SP.7 link (0.7 m), SP7 (7 m), SP25 (25 m); CC4FP female/female barrel adapter."
+  },
+  "physical": {
+    "weight_kg": 29.5,
+    "dimensions_mm": "580 H x 446 W (front) / 169 W (rear) x 478 D",
+    "shipping_weight_kg": 34.5,
+    "cabinet": "18 mm and 30 mm Baltic birch plywood with internal steel bracing; sealed, screwed and rabbeted joints",
+    "finish": "Maroon-gray high-resilient paint",
+    "grille": "Black powder-coated 1.5 mm perforated steel with acoustically-transparent grille cloth",
+    "shape": "Truncated wedge with curved front profile; 41° baffle angle when laid on rear side for floor-monitor use"
+  },
+  "deployment": {
+    "modes": [
+      "Floor monitor (wedge, 41°)",
+      "Pole-mount on subwoofer or stand (36 mm / 1.42\" sockets, top and bottom)",
+      "Flown via ETR115XT adjustable U-bracket (horizontal or vertical, 10° resolution)",
+      "Single-point flown via XTLIFTBAR (5 pick points for tilt)",
+      "Stacked / installed (wall or ceiling)"
+    ],
+    "max_per_flown_array": "Up to 2 enclosures flown vertically (horizontal orientation) from one rigging point using ETR115XT + CPL115XT",
+    "rigging_accessories": [
+      "ETR115XT (adjustable U-bracket)",
+      "CPL115XT (coupling adapter bars, 2 pcs, to array two 115XT)",
+      "XTLIFTBAR (single-point liftbar)",
+      "PION2 (double-stud Aeroquip fitting for side flytrack, secondary safety only)"
+    ],
+    "safety_factor": "Ultimate safety factor >12 for the 115XT and all listed rigging accessories"
+  },
+  "usage": [
+    "Active two-way 15\"/1.4\" coaxial point source for distributed sound reinforcement: delay rings, surround/effects channels, fill, and speech delays in convention and sports venues.",
+    "Each cabinet needs 2 amp channels (LF + HF); a single LA4/LA4X drives up to 4 enclosures, so a 4-box system fits one amplified controller.",
+    "Wedge format with a 41° baffle plus the MONITOR preset makes it a high-output stage floor monitor; the coaxial design gives even, lobe-free coverage and good feedback rejection.",
+    "For full-range music use the FRONT preset (shelved contours); use the FILL preset for flat response in speech and close-proximity fill.",
+    "Pair with an SB115, SB118, SB218 or dV-SUB sub for 3-way operation: pick 3W presets (100 Hz crossover) for closely-coupled stacks or 3WX presets (80 Hz LP on sub, 115XT extended to 50 Hz) when the top is flown over ground subs.",
+    "Up to two boxes can be arrayed vertically for extra SPL/coverage; nominal 8-ohm load per enclosure, so parallel pairs present 4 ohms - keep cable runs short to preserve damping factor."
+  ],
+  "source_manual": "112XT / 115XT / 115XT HiQ XT LINE Operator Manual V2 (EN) and 115XT Datasheet (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XT/documents.zip"
+}

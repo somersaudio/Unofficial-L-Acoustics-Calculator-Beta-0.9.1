@@ -1,0 +1,78 @@
+{
+  "enclosure": "KS28",
+  "product": "L-Acoustics KS28",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "25 Hz - 100 Hz (low frequency limit 25 Hz at -10 dB; upper limit set by preset to 60 Hz or 100 Hz)",
+    "max_spl_db": 143,
+    "max_spl_note": "143 dB peak at 1 m, half-space, pink noise crest factor 4, [KS28_100] preset",
+    "nominal_impedance_ohms": 4,
+    "directivity": "Selectable standard (omnidirectional) or cardioid, set by physical arrangement plus matching preset",
+    "components": "2 x 18-inch neodymium direct-radiating transducers with aluminium die-cast baskets, bass-reflex enclosure with L-Vents laminar-vented ports"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Standard (omnidirectional)",
+      "Cardioid (4-element block, 1 reversed)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA2Xi"
+    ],
+    "per_amplifier": {
+      "LA12X": 4,
+      "LA2Xi_SE": 4,
+      "LA2Xi_PBTL": 1
+    },
+    "preset_names": [
+      "KS28_60",
+      "KS28_100",
+      "KS28_60_C",
+      "KS28_100_C",
+      "KS28_60_Cx",
+      "KS28_100_Cx"
+    ],
+    "preset_note": "Each enclosure uses one amplifier output channel (one SB signal channel). LA12X drives up to 4 KS28 (one per output). LA2Xi drives 4 in SE mode or 1 in PBTL bridged mode. Standard presets (_60/_100) and cardioid presets (_C/_Cx) each set the upper limit to 60 Hz or 100 Hz for coupling with the main system."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) input; pinout 1+/1- carry the LF transducers (2+/2- not linked)",
+    "breakouts": "Compatible with SP-Y1 (4-point speakON to 2x 2-point speakON via CC4FP adapter) and DOSUB-LA8 breakout (8-point PA-COM to 4x 2-point speakON, or to 1x 4-point + 2x 2-point speakON)"
+  },
+  "physical": {
+    "weight_kg": 79,
+    "dimensions_mm": "1340 (W) x 719 (H) x 702 (D)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium-grade beech and birch plywood with internal stiffeners; steel front grille with anti-corrosion coating and acoustically neutral 3D fabric; dark grey brown PANTONE 426 C finish"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (horizontal or vertical, upright or on-end, in blocks)",
+      "Flown in vertical arrays using KS28-BUMP",
+      "Standard arrangement",
+      "Cardioid arrangement (block of 4, one element reversed)"
+    ],
+    "max_per_flown_array": "16 x KS28 (with KS28-BUMP); enclosure safety label also rates 16 KS28",
+    "rigging_accessories": [
+      "KS28-BUMP (lifting/flying beam for up to 16 KS28)",
+      "LA-SLING2T (2-leg lifting chain, 8 mm, DIN EN 818-4)",
+      "Flush-fitting 2-point rigging system integrated in cabinet",
+      "6 ergonomic handles (3 per side)",
+      "2 ground runners with top tracks for stacking",
+      "8 L-shaped side runners for upright stacking",
+      "KS28-PLA front dolly, KS28-CHARIOT (up to 4 units), KS28-COV / KS28-CHARIOTCOV covers"
+    ],
+    "grouping_note": "Keep enclosures side by side; if not possible, max distance between adjacent acoustic centers is 2.8 m at 60 Hz upper limit or 1.7 m at 100 Hz upper limit. Verify any non-standard array mechanically in Soundvision."
+  },
+  "usage": [
+    "Reference high-output subwoofer for extending the low end of large-format L-Acoustics line source systems (e.g. K-series) in touring and large installs.",
+    "Each KS28 needs one amplifier output: budget one LA12X or LA2Xi (SE mode) per four cabinets, or run a single cabinet bridged on LA2Xi PBTL when maximum headroom per box is wanted.",
+    "Pick the _60 preset family when crossing low to the mains and _100 when more sub bandwidth is needed; both keep the -10 dB point at 25 Hz.",
+    "For directional bass, deploy in cardioid blocks of four with one reversed cabinet and load the _C or _Cx preset on the reversed unit to reject rear-stage SPL.",
+    "Place cabinets directly side by side for proper coupling; if gaps are unavoidable, respect the 2.8 m (60 Hz) or 1.7 m (100 Hz) max acoustic-center spacing.",
+    "Fly up to 16 units on KS28-BUMP or ground-stack horizontally/vertically; always validate non-standard flown or stacked arrays in Soundvision before rigging."
+  ],
+  "source_manual": "KS28 Owner's Manual (EN)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS28/EN/Owner's Manual/KS28_OM_EN.pdf"
+}

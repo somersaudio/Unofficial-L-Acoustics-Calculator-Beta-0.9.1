@@ -1,0 +1,83 @@
+{
+  "enclosure": "K2",
+  "product": "K2 (K2 WST)",
+  "type": "line source",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "35 Hz - 20 kHz (-10 dB, [K2 70] preset)",
+    "max_spl_db": 147,
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal: 70 or 110 deg symmetric, or 90 deg asymmetric (35/55 or 55/35) via Panflex adjustable fins, adjustable down to 300 Hz. Vertical: dependent on number of elements and array curvature.",
+    "components": "LF: 2 x 12in cone drivers; MF: 4 x 6.5in cone drivers; HF: 2 x 3in diaphragm compression drivers on individual DOSC waveguides. Acoustical load: LF bass-reflex with L-Vents, MF bass-reflex, HF DOSC waveguide with Panflex.",
+    "impedance_detail": "LF: 2 x 8 ohm, MF: 8 ohm, HF: 16 ohm (3-way active, 4 input sections)"
+  },
+  "amplification": {
+    "amp_channels_required": 4,
+    "operating_modes": [
+      "3-way active, quad-amplified (4 channels per enclosure: 2x LF, 1x MF, 1x HF)"
+    ],
+    "recommended_amplifiers": [
+      "LA12X",
+      "LA7.16i",
+      "LA7.16",
+      "LA4X"
+    ],
+    "per_amplifier": {
+      "LA12X": 3,
+      "LA7.16(i)": 4,
+      "LA4X": 1
+    },
+    "preset_names": [
+      "K2 70",
+      "K2 90",
+      "K2 110",
+      "KARAIIDOWNK2",
+      "KARAIIDOWNK2 70",
+      "KARAIIDOWNK2 90"
+    ],
+    "amp_channels_required_note": "Each K2 requires a full set of 4 amplified channels; per-enclosure counts above reflect how many complete K2 a single controller can drive (LA12X drives 3 K2 across its 4 channels via shared LF, LA7.16i/LA7.16 drive 4, LA4X drives 1)."
+  },
+  "connection": {
+    "input_connector": "2 x 8-point PA-COM (1x IN, 1x LINK, interchangeable). PA-COM pinout A/B = left LF, C/D = right LF, E/F = MF, G/H = HF.",
+    "breakouts": "DO cables (8-point PA-COM, 4 mm2 gauge) for inter-enclosure links; DOSUB-LA8 breakout (8-point PA-COM to 4x 2-point speakON) for passive subs; DOFILL-LA8 and DO3WFILL breakouts for active fill enclosures; SC32-4DO for multi-enclosure distribution."
+  },
+  "physical": {
+    "weight_kg": 56,
+    "dimensions_mm": "1338 (W) x 400 (H) x 286-354 (D, tapered)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium grade Baltic birch plywood; die-cast aluminum side panels; coated steel front grille with acoustically neutral 3D fabric; high-grade steel rigging with anti-corrosion coating; finish dark grey brown Pantone 426 C."
+  },
+  "deployment": {
+    "modes": [
+      "flown (line array via K2-BUMP)",
+      "flown under K1 (via K2-LINK)",
+      "ground-stacked",
+      "flown with Kara II downfill (via KARADOWNK2)"
+    ],
+    "max_per_flown_array": "K2-BUMP: 16 safe / 24 maximum; K2-LINK under K1-BUMP: 16 safe / 24 max; K2-RIGBAR: 12; pullback (K2-BUMP + K2-BAR or K2-RIGBAR): 12 safe / 16 max; with Kara II downfill (KARADOWNK2): up to 6 Kara II",
+    "inter_element_angles": "0.25, 1, 2, 3, 4, 5, 7.5, 10 degrees",
+    "rigging_accessories": [
+      "K2-BUMP (flying frame)",
+      "K2-BAR",
+      "K2-RIGBAR",
+      "K2-LINK (rear attachment of K2 under K1)",
+      "K1-DELTA",
+      "KARADOWNK2 (Kara II downfill interface)",
+      "K2-RAKMOUNT (rack stacking on flown array)",
+      "K2-LASERMOUNT",
+      "K2-CHARIOT (transport chariot for 4 K2)",
+      "K2-CHARIOTCOV"
+    ],
+    "rigging_system": "4-point captive rigging system with visual safety; two large side handles"
+  },
+  "usage": [
+    "Long-throw, full-range line source element for large-scale touring, festivals, and sporting events; built around the K1 acoustic signature in a lighter (56 kg) and more flexible enclosure that delivers up to 147 dB.",
+    "Each enclosure is 3-way active and quad-amplified (4 channels: 2 LF, 1 MF, 1 HF), so plan amp inventory accordingly: one LA12X drives 3 K2, one LA7.16i/LA7.16 drives 4 K2, and one LA4X drives a single K2.",
+    "Use Panflex to set horizontal coverage per box: 70 or 110 deg symmetric, or 90 deg asymmetric, with a matching preset ([K2 70], [K2 90], [K2 110]) required for each fin setting; coverage settings can be mixed within one array to fit audience geometry.",
+    "Pair with subwoofers to extend LF: K1-SB at a recommended 3 K2 : 1 K1-SB ratio (using [K1SB_X K2], no added delay between K2 and K1-SB), or KS28/CS1 at roughly 3 K2 : 2 subs for deeper extension down toward 25 Hz.",
+    "Flown arrays use the K2-BUMP (16 safe / 24 maximum K2), or hang under a K1 array via K2-LINK; pullback configurations cap at 12 (safe) / 16 K2 and a Kara II downfill of up to 6 boxes can be added via KARADOWNK2.",
+    "Connect with 2x 8-point PA-COM (IN/LINK interchangeable) carrying all four sections; verify the total connected enclosures per controller output stays within limits and always validate array mechanical safety in Soundvision."
+  ],
+  "source_manual": "K2 Owner's Manual (EN) version 4.0",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K2/EN/Owner's Manual/K2_OM_EN.pdf"
+}

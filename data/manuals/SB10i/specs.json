@@ -1,0 +1,78 @@
+{
+  "enclosure": "SB10i",
+  "product": "L-Acoustics SB10i (ultra-compact subwoofer)",
+  "type": "subwoofer",
+  "status": "current",
+  "electroacoustic": {
+    "frequency_range_hz": "25-200 (low frequency limit -10 dB: 25 Hz with SB10_60, 27 Hz with SB10_100, 29 Hz with SB10_200; upper limit 60/100/200 Hz set by preset)",
+    "max_spl_db": 124,
+    "max_spl_note": "Peak at 1 m, half-space, pink noise crest factor 4. Per preset (LA4X/LA7.16i/LA12X or LA2Xi bridge): SB10_60 = 119 dB, SB10_100 = 122 dB, SB10_200 = 124 dB. With LA2Xi single-ended: 119/120/122 dB.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Omnidirectional in standard configuration (nominal directivity -6 dB rated as standard configuration)",
+    "components": "1 x 10\" cone driver in a bass-reflex enclosure with L-Vents laminar vents"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "LA2Xi single-ended (SE)",
+      "LA2Xi bridged (BTL)",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "recommended_amplifiers": [
+      "LA2Xi",
+      "LA4X",
+      "LA7.16i",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA12X": 12,
+      "LA7.16(i)": 32,
+      "LA4X": 8,
+      "LA2Xi_SE": 8,
+      "LA2Xi_BTL": 2
+    },
+    "per_amplifier_note": "Per-output / total drive capacity: LA2Xi 2/8 (SE), 1/2 (BTL); LA4X 2/8; LA7.16i 2/32; LA12X 3/12. Reduced max SPL/drive capacity applies when using LA2Xi.",
+    "preset_names": [
+      "SB10_60",
+      "SB10_100",
+      "SB10_200"
+    ]
+  },
+  "connection": {
+    "input_connector": "1x 4-point terminal block with push-in (push-cage) connection; internal pinout IN+/IN- to transducer LF+/LF-",
+    "wiring_note": "Connector sealing plate (provided) has two cable glands (input and link to next enclosure), compatible with cables up to 2 x 2.5 mm2 gauge; for IP55-rated installation use. Amplifier-side connection uses terminal block output (LA2Xi SE / LA7.16i) or bridged terminal block output (LA2Xi BTL) with 2.5 mm2 cable."
+  },
+  "physical": {
+    "weight_kg": 14,
+    "dimensions_mm": "539 x 539 x 178 (W x H x D; front face 539 x 539, depth 178 mm)",
+    "protection_rating": "IP55",
+    "cabinet": "Premium grade Baltic birch plywood; coated steel grill with acoustically neutral 3D fabric; finishes dark grey brown Pantone 426 C, pure white RAL 9010, or custom RAL on special order; rotatable front logo"
+  },
+  "deployment": {
+    "modes": [
+      "ground-stack (four removable hand-tightened runners provided)",
+      "on-wall mount (SB10i-onCW)",
+      "on-ceiling mount (SB10i-onCW)",
+      "in-wall / in-ceiling / in-tile recessed integration (SB10r versions)"
+    ],
+    "rigging_accessories": [
+      "SB10i-onCW on-wall/on-ceiling mounting interface (two surface-mounting plates, four silent blocks, fasteners; net weight 1 kg)",
+      "4 removable ground-stack runners (provided)",
+      "12 x M6 inserts on the bottom for accessories",
+      "M6x35 Torx screws (x4) for SB10i-onCW",
+      "placeholder screws for unused inserts (to prevent acoustic leaks)"
+    ]
+  },
+  "usage": [
+    "Ultra-compact 10\" subwoofer for discreet fixed-install work (residential, hospitality, retail, museums); extends LF down to 25 Hz for small point-source or colinear main systems.",
+    "Drive one channel per cabinet from any of LA2Xi, LA4X, LA7.16i, or LA12X; an LA12X carries up to 12 enclosures (3 per output), an LA7.16i up to 32 (2 per output), an LA4X up to 8, and an LA2Xi up to 8 in SE or just 2 in bridged mode.",
+    "Choose preset by integration goal: SB10_60 (60 Hz upper limit) when run separated from the mains for the widest bandwidth, SB10_100 or SB10_200 for coupled configurations needing more output (up to 124 dB) and higher crossover.",
+    "Expect reduced max SPL and drive capacity when powered by LA2Xi versus the larger controllers; size the amplifier accordingly for level-critical rooms.",
+    "Mount on-wall or on-ceiling with the SB10i-onCW interface, ground-stack on the supplied runners, or specify SB10r recessed variants for fully hidden in-wall/in-ceiling/in-tile integration.",
+    "IP55-rated with a sealing plate and dual cable glands (up to 2 x 2.5 mm2), so it suits damp or semi-exposed installs; always refit placeholder screws in unused M6 inserts to avoid acoustic leaks."
+  ],
+  "source_manual": "SB10i Owner's Manual (EN) version 2.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB10i/EN/Owner's Manual/SB10i_OM_EN.pdf"
+}
