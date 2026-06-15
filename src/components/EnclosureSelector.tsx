@@ -525,13 +525,11 @@ export default function EnclosureSelector({
             return (
               <div
                 key={`${request.enclosure.enclosure}-${index}`}
-                className="relative rounded-lg border py-1 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
+                className="relative flex items-center gap-3 rounded-lg border py-1 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
               >
-                {/* Top line: image, weight, name, quantity, remove */}
-                <div className="flex items-center gap-3">
-                {/* Enclosure Image */}
+                {/* Enclosure Image — spans the row height; grows taller when a second control line is present */}
                 {imageUrl && (
-                  <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded">
+                  <div className={`w-[88px] flex-shrink-0 overflow-hidden rounded ${hasBottomRow && request.quantity > 1 ? "h-[72px]" : "h-[50px]"}`}>
                     <img
                       src={imageUrl}
                       alt={request.enclosure.enclosure}
@@ -539,6 +537,10 @@ export default function EnclosureSelector({
                     />
                   </div>
                 )}
+                {/* Right column: stacked control lines */}
+                <div className="flex-1">
+                {/* Top line: weight, name, quantity, remove */}
+                <div className="flex items-center gap-3">
                 {(() => {
                   const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
                   const encW = encRig?.weight_kg;
@@ -639,11 +641,12 @@ export default function EnclosureSelector({
 
                 {/* Secondary controls on their own line to avoid crowding the row */}
                 {hasBottomRow && (
-                  <div className={`mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 ${imageUrl ? "pl-[92px]" : ""}`}>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                     {deploymentControl}
                     {perChannelControl}
                   </div>
                 )}
+                </div>
               </div>
             );
           })}
