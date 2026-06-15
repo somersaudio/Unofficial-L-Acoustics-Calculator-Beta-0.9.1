@@ -1,0 +1,3246 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Verified rigging data per enclosure (codes, categories, weights, working-load limits) from official L-Acoustics rigging manuals/datasheets. Facts only.",
+  "enclosures": {
+    "Syva Low Syva": {
+      "weight_kg": 50,
+      "recommended_rigging": "SYVA BASE",
+      "rigging_parts": [
+        {
+          "code": "SYVA BASE",
+          "name": "Syva Base",
+          "category": "bracket_yoke",
+          "function": "ground-stack baseplate; secured to the bottom of Syva Low under the Syva-on-Syva-Low stack (mandatory for ground-stacking)",
+          "weight_kg": null,
+          "wll": "Ground-stacked: max / safe limit = 1 (one Syva-on-Syva-Low stack per Syva Base)",
+          "verified": true
+        },
+        {
+          "code": "SYVALF COV",
+          "name": "SyvaLF Cov",
+          "category": "accessory",
+          "function": "protective transport cover for the Syva Low (or Syva Sub) enclosure; also used to store Syva Base plates and unused screws",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "5XT": {
+      "weight_kg": 3.5,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "ETR5",
+          "name": "Adjustable U-bracket for 5XT",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling mount with site-angle (tilt) adjustment; also protects rear connectors in storage",
+          "weight_kg": 0.7,
+          "wll": "1 enclosure max/safe (1 x 5XT per ETR5); secured with two M10 / ø10 mm screws; safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "5XT-SEALPLATE",
+          "name": "Connector sealing plate for 5XT",
+          "category": "accessory",
+          "function": "weatherproofing cover for rear connector cup (two cable glands, IN + LINK); raises rating to IP54 at >=20 degrees down-tilt; not load-bearing",
+          "weight_kg": 0.3,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "A10 Wide/Focus": {
+      "weight_kg": 20,
+      "recommended_rigging": "A10-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A10-BUMP",
+          "name": "A10-BUMP flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary frame for flying vertical arrays of A10 Wide/Focus",
+          "weight_kg": 7.3,
+          "wll": "2 x O12 mm shackles WLL 1 t (two provided); safe/max 8 A10 per vertical array; compatible with CLAMP250",
+          "verified": true
+        },
+        {
+          "code": "A10-RIGBAR",
+          "name": "A10-RIGBAR rigging bar and pullback",
+          "category": "rigging_bar",
+          "function": "box-to-truss (lightweight main lift for up to 4) and bottom-of-array pullback",
+          "weight_kg": 3.5,
+          "wll": "2 x O12 mm shackles WLL 1 t (two provided); main-lift max 4 A10; pullback with A10-BUMP gives A10 Wide 4 / A10 Focus 8 (Wide/Focus mixed 8); compatible with CLAMP250; requires secondary safety when used as main lift",
+          "verified": true
+        },
+        {
+          "code": "A10-LIFT",
+          "name": "A10-LIFT rigging element",
+          "category": "flying_frame",
+          "function": "box-to-truss; flies horizontal/radial arrays (studs engage front+rear lodgings)",
+          "weight_kg": 2,
+          "wll": "1 x O12 mm shackle WLL 1 t (provided); 1 A10-LIFT per up to 3 enclosures; radial array up to 9 with 3x A10-LIFT; compatible with CLAMP250; add DIN580 eye bolt per enclosure for secondary safety",
+          "verified": true
+        },
+        {
+          "code": "A-TILT",
+          "name": "A-TILT site-angle stacking element",
+          "category": "bracket_yoke",
+          "function": "box-to-box; interfaces A10 (or A15) stacked onto KS21 with adjustable site angle",
+          "weight_kg": 8.7,
+          "wll": "Opening angle 12.5 deg-25 deg; ground-stack only (do not use in a flown array); subwoofer knob compatible with KS21 only; max 4 A10 stacked on KS21 (used with KS21-OUTRIG); mandatory KS21-OUTRIG underneath",
+          "verified": true
+        },
+        {
+          "code": "KS21-OUTRIG",
+          "name": "KS21-OUTRIG stability bars",
+          "category": "accessory",
+          "function": "ground-stack stability; set of two bars secured under a KS21 array (mandatory when A10 is stacked on KS21)",
+          "weight_kg": 3.5,
+          "wll": "Always used in pairs; weight 3.5 kg is per single bar; allows up to 4 A10 stacked on KS21 / 4 KS21 stacked; not a load-rated suspension element",
+          "verified": true
+        },
+        {
+          "code": "A-MOUNT",
+          "name": "A-MOUNT pole mount",
+          "category": "pole_mount",
+          "function": "box-to-pole; 35 mm (1-3/8 in) pole-mount adapter for a single A10 (also A15)",
+          "weight_kg": 1.1,
+          "wll": "1 enclosure max; site angle 0 deg / -5 deg / -15 deg; secured to enclosure with threaded knob and wedge clamp on pole",
+          "verified": true
+        },
+        {
+          "code": "X-BAR",
+          "name": "X-BAR rigging bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies a single A10 enclosure (front or rear extension position)",
+          "weight_kg": 1.1,
+          "wll": "1 x O12 mm shackle WLL 1 t (provided); 1 enclosure max (flown); compatible with CLAMP250",
+          "verified": true
+        }
+      ]
+    },
+    "A10i Wide/Focus": {
+      "weight_kg": 19,
+      "recommended_rigging": "A10i-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A10i-BUMP",
+          "name": "A10i flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary frame for flown vertical A10i arrays",
+          "weight_kg": 6.5,
+          "wll": "Pickup points accept Ø12 mm shackles WLL 1 t (2 provided) and CLAMP250; safe 8 / max 12 (with pullback) enclosures",
+          "verified": true
+        },
+        {
+          "code": "A10i-RIGBAR",
+          "name": "A10i rigging bar / pullback",
+          "category": "rigging_bar",
+          "function": "adds pullback (downtilt control) to a flown A10i array; can also act as main lifting accessory",
+          "weight_kg": 4.9,
+          "wll": "Compatible with Ø12 mm shackles WLL 1 t; raises array limit to 12 (Focus or mixed); RIGBAR x2 = 12. Secondary safety required when used as main lift",
+          "verified": true
+        },
+        {
+          "code": "A10i-LIFT",
+          "name": "A10i horizontal/radial deployment element",
+          "category": "accessory",
+          "function": "box-to-truss; rigging element for radial/horizontal (radial array) deployment of A10i",
+          "weight_kg": 2,
+          "wll": "Same pickup point per LIFT for arrays up to 6 enclosures; 1 LIFT=1 or 3, 2 LIFT=2/4/5/6, 3 LIFT=7/8/9; 7+ follow separate procedure",
+          "verified": true
+        },
+        {
+          "code": "A10-Ui",
+          "name": "A10i U-bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/structure; U-bracket for single A10i (or 2 with A10i-ULINK II); replaces discontinued A-U10i",
+          "weight_kg": 6.7,
+          "wll": "1 enclosure alone; 2 enclosures with A10i-ULINK II",
+          "verified": true
+        },
+        {
+          "code": "A10i-ULINK II",
+          "name": "A10i U-link rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; rigging plates for flying two A10i with A10-Ui",
+          "weight_kg": null,
+          "wll": "Enables 2 A10i on A10-Ui",
+          "verified": true
+        },
+        {
+          "code": "Ai-FIXBRACKET",
+          "name": "Ai fastening bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure; fastening bracket for A15i, A10i and KS21i (fixed angle)",
+          "weight_kg": 0.45,
+          "wll": "Ceiling-mounted max 2; stacked vertical array max 4",
+          "verified": true
+        },
+        {
+          "code": "A10i-FIXBRACKET",
+          "name": "A10i fastening bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure; fixed-angle fastening bracket for A10i (per current spec list; OM uses Ai-FIXBRACKET as the A-family fastening bracket)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": false
+        },
+        {
+          "code": "A10i-TILTBRACKET",
+          "name": "A10i tilt fastening bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure; fastening bracket with angle adjustment for A10i",
+          "weight_kg": 0.68,
+          "wll": "Stacked vertical array with angle adjustment max 4",
+          "verified": true
+        },
+        {
+          "code": "A10i-TILT",
+          "name": "A10i tilt rigging element",
+          "category": "link_plate",
+          "function": "box-to-box; angled rigging elements for A10i onto or under KS21i",
+          "weight_kg": null,
+          "wll": "Max 4 A10i Wide/Focus under A10i-TILT (under KS21i pullback config)",
+          "verified": true
+        },
+        {
+          "code": "A10iWIDE-LINK",
+          "name": "A10i Wide rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; inter-element link plates for A10i Wide (0° to -25° splay in 2.5° steps)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "A10iFOCUS-LINK",
+          "name": "A10i Focus rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; inter-element link plates for A10i Focus (adds 5° splay between two Focus boxes)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "A10iWIDE-ENDLINK",
+          "name": "A10i Wide end rigging plates",
+          "category": "link_plate",
+          "function": "box-to-frame; end (bottom/closing) rigging plates for A10i Wide",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "A10iFOCUS-ENDLINK",
+          "name": "A10i Focus end rigging plates",
+          "category": "link_plate",
+          "function": "box-to-frame; end (bottom/closing) rigging plates for A10i Focus",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "A10iKS21i-ULINK II",
+          "name": "A10i/KS21i U-link rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; rigging plates for flying A10i under KS21i with A15KS-Ui",
+          "weight_kg": null,
+          "wll": "1 KS21i + 2 A10i Wide/Focus (wall/ceiling-mounted)",
+          "verified": true
+        },
+        {
+          "code": "KS21i-SLINK",
+          "name": "KS21i rear rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; rear rigging plates for A15i and A10i onto or under KS21i",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KS21i-ENDSLINK",
+          "name": "KS21i end rear rigging plates",
+          "category": "link_plate",
+          "function": "box-to-frame; end rear rigging plates for A15i and A10i onto or under KS21i",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "A15i-BUMP",
+          "name": "A15i flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flying frame used to fly A10i combined under KS21i (and for KS21i vertical arrays)",
+          "weight_kg": 16,
+          "wll": "Pickup points accept Ø12 mm shackles WLL 1 t (2 provided) and CLAMP250; KS21i array safe 8 / max 16; A10i-under-KS21i vertical pullback max 6",
+          "verified": true
+        },
+        {
+          "code": "A15KS-Ui",
+          "name": "A15i/KS21i U-bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure; U-bracket for A15i and KS21i, used for wall/ceiling-mount of A10i under KS21i",
+          "weight_kg": 10,
+          "wll": "1 KS21i + 2 A10i Wide/Focus with A10iKS21i-ULINK II",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Rigging clamp (250 kg)",
+          "category": "truss_clamp",
+          "function": "frame-to-truss; clamp to attach A10i-BUMP / A15i-BUMP pickup points to truss",
+          "weight_kg": 1.8,
+          "wll": "Certified for 250 kg",
+          "verified": true
+        }
+      ]
+    },
+    "A15 Wide/Focus": {
+      "weight_kg": 33,
+      "recommended_rigging": "A15-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A15-BUMP",
+          "name": "A15-BUMP flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary reversible flying frame for vertical arrays of A15 Wide/Focus and KS21; also used at array bottom for pullback (rear pickup R)",
+          "weight_kg": 19,
+          "wll": "supplied with 2 x O12 mm shackles WLL 1 t each; array safe/max 8 A15 (with optional M-BAR); KS21 array safe 8 / max 16",
+          "verified": true
+        },
+        {
+          "code": "M-BAR",
+          "name": "M-BAR extension bar",
+          "category": "rigging_bar",
+          "function": "frame-extension; secured on A15-BUMP to extend the site-angle capability of the array; 17 pickup points",
+          "weight_kg": 5,
+          "wll": "supplied with 2 x O19 mm shackles WLL 3.25 t each",
+          "verified": true
+        },
+        {
+          "code": "A15-RIGBAR",
+          "name": "A15-RIGBAR rigging bar / pullback",
+          "category": "rigging_bar",
+          "function": "box-to-truss (lightweight main lifting accessory for up to 4 A15) and box-to-box pullback (with A15-BUMP or a 2nd A15-RIGBAR)",
+          "weight_kg": 4.6,
+          "wll": "supplied with 2 x O12 mm shackles WLL 1 t each; max 4 A15 when used as main lift; CLAMP250 compatible; requires secondary safety when used as main lift",
+          "verified": true
+        },
+        {
+          "code": "A15-LIFT",
+          "name": "A15-LIFT radial rigging element",
+          "category": "rigging_bar",
+          "function": "box-to-truss for flown radial (horizontal) arrays of A15 Wide/Focus; studs match front/rear enclosure lodgings",
+          "weight_kg": 2.3,
+          "wll": "supplied with 2 x O12 mm shackles WLL 1 t each; 1 lift per up to 3 enclosures; radial array up to 9 A15 with 3 x A15-LIFT; CLAMP250 compatible",
+          "verified": true
+        },
+        {
+          "code": "X-BAR",
+          "name": "X-BAR single-enclosure rigging bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies a single A15 enclosure as a point source",
+          "weight_kg": 1.1,
+          "wll": "supplied with 1 x O12 mm shackle WLL 1 t; max 1 enclosure",
+          "verified": true
+        },
+        {
+          "code": "A-TILT",
+          "name": "A-TILT stacking site-angle element",
+          "category": "bracket_yoke",
+          "function": "ground-stack interface between KS21 and A15/A10 with site-angle adjustment (12.5deg-25deg); must be used with 2 x KS21-OUTRIG (or KS21-CHARIOT + K2-JACK) for stability; NOT for flown arrays",
+          "weight_kg": 8.7,
+          "wll": "stacked-on-KS21 (A-TILT + KS21-OUTRIG): safe/max 4 including KS21 (4 A15 / 4 KS21)",
+          "verified": true
+        },
+        {
+          "code": "KS21-OUTRIG",
+          "name": "KS21-OUTRIG stability bars",
+          "category": "accessory",
+          "function": "ground-stack stability bars secured at bottom of a KS21 array; mandatory when stacking A15 on KS21 (use in pairs)",
+          "weight_kg": 3.5,
+          "wll": "spec is per single bar (3.5 kg); always use in pairs; stacked A15 limit with KS21-OUTRIG: 4 (A15 stacked vertical array), or 3 A15 Focus / 2 A15 Wide on subwoofer",
+          "verified": true
+        },
+        {
+          "code": "A-MOUNT",
+          "name": "A-MOUNT pole mount",
+          "category": "pole_mount",
+          "function": "pole-mount a single A15/A10 enclosure (35 mm / 1-3/8 in pole)",
+          "weight_kg": 1.1,
+          "wll": "max 1 enclosure; pole bore O36 mm",
+          "verified": true
+        },
+        {
+          "code": "KS21-CHARIOT",
+          "name": "KS21-CHARIOT chariot",
+          "category": "accessory",
+          "function": "ground transport/stack chariot for up to 3 KS21; alternative KS21 base under stacked A15 (with K2-JACK)",
+          "weight_kg": 23.6,
+          "wll": "up to 3 KS21; with K2-JACK stabilizers up to 4 KS21",
+          "verified": true
+        },
+        {
+          "code": "K2-JACK",
+          "name": "K2-JACK stabilizers",
+          "category": "accessory",
+          "function": "ground-stack stabilizer (4 tilt-adjustment screw jacks + 2 bars) attached to KS21-CHARIOT to stabilize a stacked A15-on-KS21 array",
+          "weight_kg": 10.1,
+          "wll": "weight is for one stabilizer; KS21-CHARIOT + K2-JACK supports up to 4 KS21 / 4 A15 stacked",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "box/bar-to-truss; clamp certified for 250 kg, compatible with A15-BUMP, A15-RIGBAR and A15-LIFT pickup points",
+          "weight_kg": 1.8,
+          "wll": "certified 250 kg",
+          "verified": true
+        }
+      ]
+    },
+    "A15i Wide/Focus": {
+      "weight_kg": 32,
+      "recommended_rigging": "A15i-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A15i-BUMP",
+          "name": "A15i-BUMP flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary reversible flying frame for vertical arrays of A15i Wide/Focus or KS21i",
+          "weight_kg": 16,
+          "wll": "Pickup points compatible with Ø12 mm shackles WLL 1 t (two provided) and CLAMP250; secured to array with 4x M6x18 screws. Vertical array safe/max 8 A15i Wide/Focus (16 KS21i max). 16 pickup points/side + front (F) + rear (R).",
+          "verified": true
+        },
+        {
+          "code": "M-BARi",
+          "name": "M-BARi extension bar (installation version)",
+          "category": "rigging_bar",
+          "function": "front/rear extension on A15i-BUMP to extend site-angle capability",
+          "weight_kg": 5,
+          "wll": "17 pickup points; compatible with Ø19 mm shackles WLL 3.25 t (two provided). Secured to frame with two rigging axes, nuts, safety pins.",
+          "verified": true
+        },
+        {
+          "code": "A15i-RIGBAR",
+          "name": "A15i-RIGBAR rigging bar / pullback",
+          "category": "rigging_bar",
+          "function": "pullback at bottom of array, or main lifting accessory at top; for A15i and KS21i",
+          "weight_kg": 5.6,
+          "wll": "Pickup points compatible with Ø12 mm shackles WLL 1 t (two provided) and CLAMP250; secured with 2x M6x40 screws. Pullback config max 12 A15i Wide/Focus (Wide-only safe 6); 2x A15i-RIGBAR safe 8. Not to be used as main lifting accessory for KS21i/A15i hybrid arrays.",
+          "verified": true
+        },
+        {
+          "code": "A15i-LIFT",
+          "name": "A15i-LIFT horizontal/radial rigging element",
+          "category": "rigging_bar",
+          "function": "fly a radial array of up to three A15i Wide/Focus; two studs match enclosure front/rear lodgings",
+          "weight_kg": 2.4,
+          "wll": "17 holes; compatible with Ø12 mm shackles WLL 1 t (two provided) and CLAMP250. One A15i-LIFT per up to 3 enclosures; radial array max 9 with 3x LIFT. Requires DIN580 eye-bolt secondary safety per enclosure.",
+          "verified": true
+        },
+        {
+          "code": "A15KS-Ui",
+          "name": "A15KS-Ui U-bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling/truss U-bracket for A15i and KS21i; flies/mounts up to two enclosures with ULINK II plates",
+          "weight_kg": 10,
+          "wll": "Secured to enclosure by 2x M8 screws/side (central + angulation); angle -30 to +30 deg in 5/10 deg steps. To fixture: 4x M10 corner screws OR truss clamp via 3 central holes. Single-box mounts =1; with A15i-ULINK II =2 enclosures.",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "clamps A15i-BUMP / A15i-RIGBAR / A15i-LIFT pickup points to truss",
+          "weight_kg": 1.8,
+          "wll": "Clamp certified for 250 kg",
+          "verified": true
+        },
+        {
+          "code": "Ai-FIXBRACKET",
+          "name": "Ai-FIXBRACKET fastening bracket (set of 4)",
+          "category": "bracket_yoke",
+          "function": "box-to-fixture/ground-stack fastening bracket for A15i, A10i and KS21i (enclosure secured via slotted hole)",
+          "weight_kg": 0.45,
+          "wll": "Set of four brackets; secured to fixture with 4x M10 screws. Stacked/ceiling config up to 4 A15i Wide/Focus (4 KS21i). Weight is per single bracket as listed.",
+          "verified": true
+        },
+        {
+          "code": "A15i-TILTBRACKET",
+          "name": "A15i-TILTBRACKET fastening bracket with angles (set of 4)",
+          "category": "bracket_yoke",
+          "function": "box-to-fixture/ground-stack bracket with site-angle adjustment for A15i (enclosure secured via round hole)",
+          "weight_kg": 0.85,
+          "wll": "Set of four brackets; angle 0 to -25 deg in 2.5 deg steps; secured to fixture with 4x M10 screws. Stacked vertical array up to 4 A15i Wide/Focus; angle adjust at bottom of up to 2. Weight is per single bracket as listed.",
+          "verified": true
+        },
+        {
+          "code": "A15i-TILT",
+          "name": "A15i-TILT site-angle rigging element",
+          "category": "downfill",
+          "function": "box-to-box inter-element angle between KS21i and A15i Wide/Focus in stacked or flown arrays",
+          "weight_kg": null,
+          "wll": "Inter-element angle 0 to -25 deg in 2.5 deg steps. Used in A15i-BUMP + A15i-TILT + rigging plates + A15i-RIGBAR pullback (max 4 KS21i + 4 A15i). No separate weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15iWIDE-LINK",
+          "name": "A15iWIDE-LINK rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box inter-element rigging plates for A15i Wide",
+          "weight_kg": null,
+          "wll": "Inter-element angle plates for A15i Wide. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15iFOCUS-LINK",
+          "name": "A15iFOCUS-LINK rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box inter-element rigging plates for A15i Focus (adds 5 deg inter-element angle between two A15i Focus)",
+          "weight_kg": null,
+          "wll": "Inter-element angle plates for A15i Focus (5 deg between two Focus boxes). No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15iWIDE-ENDLINK",
+          "name": "A15iWIDE-ENDLINK end rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box end (bottom-of-array) rigging plates for A15i Wide",
+          "weight_kg": null,
+          "wll": "End rigging plates for A15i Wide. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15iFOCUS-ENDLINK",
+          "name": "A15iFOCUS-ENDLINK end rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box end (bottom-of-array) rigging plates for A15i Focus",
+          "weight_kg": null,
+          "wll": "End rigging plates for A15i Focus. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15i-ULINK II",
+          "name": "A15i-ULINK II rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box plates for flying/mounting two A15i with A15KS-Ui",
+          "weight_kg": null,
+          "wll": "Used between two A15i mounted on A15KS-Ui (max 2 enclosures). Only ULINK II plates allowed between two A15KS-Ui-mounted enclosures. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "A15iKS21i-ULINK II",
+          "name": "A15iKS21i-ULINK II rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box plates for flying/mounting A15i under KS21i with A15KS-Ui",
+          "weight_kg": null,
+          "wll": "Links 1 A15i under 1 KS21i on A15KS-Ui. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "KS21i-SLINK",
+          "name": "KS21i-SLINK rear rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box rear rigging plates for mounting A15i (and A10i) onto or under KS21i",
+          "weight_kg": null,
+          "wll": "Rear rigging plates for A15i/A10i onto or under KS21i. No weight published in OM.",
+          "verified": true
+        },
+        {
+          "code": "KS21i-ENDSLINK",
+          "name": "KS21i-ENDSLINK end rear rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box end rear rigging plates for mounting A15i (and A10i) onto or under KS21i",
+          "weight_kg": null,
+          "wll": "End rear rigging plates for A15i/A10i onto or under KS21i. No weight published in OM.",
+          "verified": true
+        }
+      ]
+    },
+    "K1": {
+      "weight_kg": 106,
+      "recommended_rigging": "K1-BUMP",
+      "rigging_parts": [
+        {
+          "code": "K1-BUMP",
+          "name": "K1-BUMP",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary frame for flying and ground-stacking K1/K1-SB arrays",
+          "weight_kg": 98,
+          "wll": "4 x Ø22 mm shackles rated WLL 3.25 t each; array safe limit 16 K1 / max 24 K1 (or 14 K1 + 3 LA-RAK II AVB safe / 23 K1 + 4 LA-RAK II AVB max)",
+          "verified": true
+        },
+        {
+          "code": "K1-DELTA",
+          "name": "K1-DELTA",
+          "category": "accessory",
+          "function": "azimuth-angle tuning; rear dual-motor attachment to K1-BUMP rigging bar (adjusts azimuth -10 deg to +10 deg)",
+          "weight_kg": 9.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-BPCHAIN",
+          "name": "K1-BPCHAIN",
+          "category": "downfill",
+          "function": "box-to-motor; adjustable extension chain compatible with K1-BUMP or K2-BUMP, required for climbing-hoist setup",
+          "weight_kg": null,
+          "wll": "WLL 3.15 t",
+          "verified": true
+        },
+        {
+          "code": "K1-LASERMOUNT",
+          "name": "K1-LASERMOUNT",
+          "category": "pole_mount",
+          "function": "laser inclinometer support plate mounted to the rear right side of a K1 or K1-SB enclosure (compatible TEQSAS / SSE Prosight / Align Array / KSG)",
+          "weight_kg": 0.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARA-DOWNK1",
+          "name": "KARA-DOWNK1",
+          "category": "downfill",
+          "function": "box-to-box; flying bumper interface to rig a Kara II downfill array under K1/K1-SB (max 6 Kara II)",
+          "weight_kg": 21,
+          "wll": "maximum 6 Kara II downfill",
+          "verified": true
+        },
+        {
+          "code": "K2-LINK",
+          "name": "K2-LINK",
+          "category": "link_plate",
+          "function": "box-to-box; rigging interface for rear attachment of K2 under K1, K1-SB, or K1-BUMP (angle settings 0.25 / 2.5 / 5 deg)",
+          "weight_kg": 1.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-CHARIOT",
+          "name": "K1-CHARIOT",
+          "category": "accessory",
+          "function": "ground-stack/transport; chariot for 4 x K1 or 4 x K1-SB (stacked max 4 enclosures)",
+          "weight_kg": 47,
+          "wll": "max 4 enclosures stacked on chariot",
+          "verified": true
+        },
+        {
+          "code": "K1-CHARIOT2",
+          "name": "K1-CHARIOT2",
+          "category": "accessory",
+          "function": "transport; chariot for 4 K1 or 4 K1-SB (current CKL variant of K1-CHARIOT)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-PLA",
+          "name": "K1-PLA",
+          "category": "accessory",
+          "function": "transport; removable front dolly for K1 or K1-SB enclosure",
+          "weight_kg": 7.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K-BUMPFLIGHT",
+          "name": "K-BUMPFLIGHT",
+          "category": "accessory",
+          "function": "transport; modular flight case for 2 K1-BUMP or 2 K2-BUMP",
+          "weight_kg": 105,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "K1-SB": {
+      "weight_kg": 83,
+      "recommended_rigging": "K1-BUMP",
+      "rigging_parts": [
+        {
+          "code": "K1-BUMP",
+          "name": "K1/K1-SB flying and stacking frame",
+          "category": "flying_frame",
+          "function": "primary frame to fly K1 and K1-SB arrays from truss/motors (box-to-truss); central rigging bar with four Ø22 mm shackles",
+          "weight_kg": 98,
+          "wll": "K1-SB flown: safe 20 / max 24 enclosures per bump (config-dependent; verify in Soundvision)",
+          "verified": true
+        },
+        {
+          "code": "K1-DELTA",
+          "name": "K1-BUMP azimuth/motor accessory",
+          "category": "rigging_bar",
+          "function": "rear attachment of 2 motors to K1-BUMP; sets azimuth angle -10deg to +10deg with ~1 m between pickup points",
+          "weight_kg": 9.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-BPCHAIN",
+          "name": "Adjustable extension sling for K1-BUMP / K2-BUMP",
+          "category": "downfill",
+          "function": "adjustable extension chain/sling for climbing-hoist setup on K1-BUMP or K2-BUMP",
+          "weight_kg": 6.3,
+          "wll": "WLL 3.15 t",
+          "verified": true
+        },
+        {
+          "code": "KARA-DOWNK1",
+          "name": "KARA (II) downfill flying bumper",
+          "category": "downfill",
+          "function": "rigging interface to fly KARA (II) downfill under a K1 or K1-SB array (box-to-box); safe limit 6 Kara II",
+          "weight_kg": 21,
+          "wll": "safe 6 Kara II downfill under K1 array",
+          "verified": true
+        },
+        {
+          "code": "K2-LINK",
+          "name": "K1-to-K2 rigging interface",
+          "category": "link_plate",
+          "function": "interface to hang K2 below K1, K1-SB, or K1-BUMP (box-to-box); three top holes give three angle settings",
+          "weight_kg": 1.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-LASERMOUNT",
+          "name": "K1 laser inclinometer support plate",
+          "category": "accessory",
+          "function": "side-mount support plate (rear right) for a laser inclinometer on a K1 or K1-SB enclosure; compatible TEQSAS / SSE Prosight / Align Array / KSG",
+          "weight_kg": 0.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-CHARIOT",
+          "name": "Transport chariot for 4x K1/K1-SB",
+          "category": "accessory",
+          "function": "ground-stack/transport chariot holding a block of up to four K1 or K1-SB (stacked limit 4)",
+          "weight_kg": 47,
+          "wll": "max 4 K1 or K1-SB (stacked)",
+          "verified": true
+        },
+        {
+          "code": "K1-PLA",
+          "name": "Removable front dolly board",
+          "category": "accessory",
+          "function": "removable front dolly secured to a K1 or K1-SB with two ball-locking pins for ground handling",
+          "weight_kg": 7.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K-BUMPFLIGHT",
+          "name": "Modular flight case for 2x K1-BUMP / K2-BUMP",
+          "category": "accessory",
+          "function": "modular flight case to transport and directly hook/lift up to two K1-BUMP (or K2-BUMP) plus accessories without manual handling",
+          "weight_kg": 105,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-SBCOV",
+          "name": "K1-SB protective cover",
+          "category": "accessory",
+          "function": "protective cover for a single K1-SB enclosure",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K1-CHARIOTCOV",
+          "name": "Cover for 4x K1/K1-SB on K1-CHARIOT",
+          "category": "accessory",
+          "function": "protective cover for a stack of four K1 or K1-SB enclosures on a K1-CHARIOT",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "K2": {
+      "weight_kg": 56,
+      "recommended_rigging": "K2-BUMP",
+      "rigging_parts": [
+        {
+          "code": "K2-BUMP",
+          "name": "K2 flying frame (bumper)",
+          "category": "flying_frame",
+          "function": "Primary structure for flying K2/K1/K1-SB line arrays from motor(s); box-to-truss/motor. Incl. 1 extension sling + 1 laser adapter, 2 x Ø19 mm shackles.",
+          "weight_kg": 42.3,
+          "wll": "2 x Ø19 mm shackles WLL 3.25 t each; array limit: 16 safe / 24 max K2 flown (ground-stacked 4 safe / 6 max)",
+          "verified": true
+        },
+        {
+          "code": "K2-BAR",
+          "name": "Extension bar for K2-BUMP",
+          "category": "rigging_bar",
+          "function": "Extension bar attached to K2-BUMP (front or rear, position A/B) to increase site-angle range and to mount LA-RAK with K2-RAKMOUNT.",
+          "weight_kg": 17,
+          "wll": "2 x Ø19 mm shackles WLL 3.25 t each; K2-BUMP + K2-BAR: 14 K2 + 2 LA-RAK safe / 24 K2 + 2 LA-RAK max",
+          "verified": true
+        },
+        {
+          "code": "K2-RIGBAR",
+          "name": "K2 rigging bar and pullback",
+          "category": "rigging_bar",
+          "function": "Implements a pullback (with K2-BUMP/K2-BAR or another K2-RIGBAR) or acts as the main lifting point for a lighter K2 flown solution. Includes LA-SLING2T.",
+          "weight_kg": 15.5,
+          "wll": "As main lift: 12 K2; pullback config: 12 safe / 16 max; must be used with LA-SLING2T",
+          "verified": true
+        },
+        {
+          "code": "K2-LINK",
+          "name": "K2 rear attachment link (K2 below K1)",
+          "category": "link_plate",
+          "function": "Rigging interface for rear attachment of K2 enclosures under K1, K1-SB, or K1-BUMP; box-to-box (K2 under K1).",
+          "weight_kg": 1.8,
+          "wll": "K2-LINK under K1-BUMP: 16 safe / 24 max K2",
+          "verified": true
+        },
+        {
+          "code": "K1-DELTA",
+          "name": "Azimuth angle tuning accessory",
+          "category": "bracket_yoke",
+          "function": "Azimuth (horizontal pan) angle tuning accessory for the flown array; shared K-series rigging accessory.",
+          "weight_kg": 9.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARADOWNK2",
+          "name": "Kara-under-K2 downfill flying bumper",
+          "category": "downfill",
+          "function": "Flying bumper / rigging interface for adding a Kara II downfill block beneath a K2 array; box-to-box (Kara II under K2).",
+          "weight_kg": 17,
+          "wll": "up to 6 Kara II downfill; cannot be combined with a pullback",
+          "verified": true
+        },
+        {
+          "code": "K2-RAKMOUNT",
+          "name": "LA-RAK mounting cradle (4-rack) with stabilizer",
+          "category": "accessory",
+          "function": "Cradle/rails to stack one or two LA-RAK II AVB / LA-RAK III on top of a flown K2-BUMP array; must be used with one or two K2-BAR.",
+          "weight_kg": 3.3,
+          "wll": "3.3 kg cradle + 2.2 kg stabilizer; 1 rack = 2 rails + 2 K2-BAR, 2 racks = 4 rails + 1 K2-BAR",
+          "verified": true
+        },
+        {
+          "code": "K1-BPCHAIN",
+          "name": "Adjustable sling for K1-BUMP / K2-BUMP",
+          "category": "downfill",
+          "function": "Adjustable lifting sling/chain used with K1-BUMP or K2-BUMP; shared K1/K2 bump accessory.",
+          "weight_kg": 6.3,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "LA-SLING2T",
+          "name": "2-leg lifting chain (DIN EN 818-4, 8 mm, grade 8)",
+          "category": "coupling_bar",
+          "function": "2-leg lifting chain used as the motor-to-bump connection on K2-RIGBAR and for bridle suspension of single LA-RAK on K2-BUMP.",
+          "weight_kg": 3.7,
+          "wll": "Load rating 2.8 t (beta 0-45 deg) / 2 t (beta 46-60 deg); nominal length 1000 mm; beta_max 60 deg",
+          "verified": true
+        },
+        {
+          "code": "K2-LASERMOUNT",
+          "name": "K2 laser support plate",
+          "category": "accessory",
+          "function": "Laser support plate mounted on K2 for array aiming lasers (compatible TEQSAS / SSE Prosight / Align Array / KSG).",
+          "weight_kg": 0.74,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K2-JACK",
+          "name": "Tilt adjustment screw jacks / stabilizers for chariots",
+          "category": "accessory",
+          "function": "4 tilt-adjustment screw jacks + 2 bars; used with K2-CHARIOT to turn it into a ground-stacking platform for K2.",
+          "weight_kg": 10.1,
+          "wll": "10.1 kg per stabilizer; K2-CHARIOT + K2-JACK ground-stack: 4 safe / 6 max K2",
+          "verified": true
+        },
+        {
+          "code": "K2-CHARIOT",
+          "name": "Transport chariot for 4 K2",
+          "category": "accessory",
+          "function": "Transport/storage chariot for a block of four K2; can serve as a ground-stack platform when fitted with K2-JACK.",
+          "weight_kg": 50,
+          "wll": "holds 4 K2; with K2-JACK ground-stack 4 safe / 6 max",
+          "verified": true
+        },
+        {
+          "code": "K2-CHARIOTCOV",
+          "name": "Protective cover for 4 K2 on chariot",
+          "category": "accessory",
+          "function": "Protective cover for a block of four K2 stored on K2-CHARIOT (transport accessory, non-load-bearing).",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "K-BUMPFLIGHT",
+          "name": "Modular flight case for 2 K1-BUMP or 2 K2-BUMP",
+          "category": "accessory",
+          "function": "Modular flight case for transporting two K1-BUMP or two K2-BUMP (transport accessory). Incl. 12 pieces adhesive foam.",
+          "weight_kg": 105,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "K3": {
+      "weight_kg": 43,
+      "recommended_rigging": "K3-BUMP",
+      "rigging_parts": [
+        {
+          "code": "K3-BUMP",
+          "name": "Flying frame for K3",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor (primary flying frame for K3 arrays)",
+          "weight_kg": 35,
+          "wll": "flown: safe 16 / max 24 K3; uses 2x Ø19 mm shackles WLL 3.25 t; safety factor 4 per 2006/42/EC. Stacked: safe 4 / max 6",
+          "verified": true
+        },
+        {
+          "code": "K3-BAR",
+          "name": "Extension bar for K3-BUMP",
+          "category": "rigging_bar",
+          "function": "box-to-frame; extends K3-BUMP for greater site-angle range (rear/front, position A/B, 68 pickup positions)",
+          "weight_kg": 16,
+          "wll": "config-dependent; K3-BUMP + K3-BAR keeps safe 16 / max 24 K3",
+          "verified": true
+        },
+        {
+          "code": "K3-RIGBAR",
+          "name": "Rigging bar and pullback for K3 (includes LA-SLING2T)",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor as lightweight main lifting accessory, or pullback at bottom of array; must be used with LA-SLING2T",
+          "weight_kg": 18,
+          "wll": "flown/pullback: safe 16 / max 16 K3; secured with 2x Ø19 mm shackles WLL 3.25 t (provided)",
+          "verified": true
+        },
+        {
+          "code": "KARA-DOWNK3",
+          "name": "Interface for flying Kara / Kara II below K3",
+          "category": "downfill",
+          "function": "box-to-box; rigging interface to hang a Kara / Kara II downfill array under a K3 array",
+          "weight_kg": 13,
+          "wll": "flown with downfill: safe 12 K3 + 6 Kara II / max 18 K3 + 6 Kara II",
+          "verified": true
+        },
+        {
+          "code": "DELTA 1.5T",
+          "name": "Azimuth angle tuning accessory 1.5T",
+          "category": "accessory",
+          "function": "azimuth-angle control; combined with K3-BUMP + K3-BAR (azimuth -10 deg to +10 deg, ~1 m between lifting points)",
+          "weight_kg": 8,
+          "wll": "1.5 t",
+          "verified": true
+        },
+        {
+          "code": "LA-SLING2T",
+          "name": "Lifting chain (DIN EN 818-4), 2-leg, 8 mm",
+          "category": "coupling_bar",
+          "function": "sling/coupling; links K3-RIGBAR (and pullback) to the motor hook; included with K3-RIGBAR",
+          "weight_kg": 3.7,
+          "wll": "2.8 t for sling angle 0-45 deg; 2 t for 46-60 deg (max sling angle 60 deg); steel grade 8, 1000 mm incl. hooks",
+          "verified": true
+        },
+        {
+          "code": "BPCHAIN 1.5T",
+          "name": "Extension sling 1.5 tons (included in K3-BUMP)",
+          "category": "coupling_bar",
+          "function": "extension sling between motor hook and K3-BUMP; supplied with K3-BUMP",
+          "weight_kg": 4,
+          "wll": "1.5 t",
+          "verified": true
+        },
+        {
+          "code": "K3-TILT",
+          "name": "Rigging element for stacking K3 on KS28",
+          "category": "bracket_yoke",
+          "function": "box-to-sub (ground-stack); site-angle interface between KS28 and K3 (0 to -20 deg); used with 2x KS28-OUTRIG; not for flown arrays",
+          "weight_kg": 14,
+          "wll": "stacked K3-TILT + KS28-OUTRIG: safe 5 enclosures / max 4 K3 + 4 KS28; features two shackles for additional safety",
+          "verified": true
+        },
+        {
+          "code": "K2-JACK",
+          "name": "Screw-jack stabilizer set (2 bars + 4 feet with screw jacks and hand wheels) for chariots",
+          "category": "accessory",
+          "function": "ground-stack stabilizer; fits onto K3-CHARIOT to improve stability / correct floor (site angle -23 deg to +13 deg)",
+          "weight_kg": 10.1,
+          "wll": "stacked K3-CHARIOT + K2-JACK: safe 4 / max 6 K3; weight is 10.1 kg per stabilizer (2 per set)",
+          "verified": true
+        },
+        {
+          "code": "LA-RAKMOUNT",
+          "name": "Mounting cradles for racks (1x LA-RAK II AVB)",
+          "category": "bracket_yoke",
+          "function": "mounts one LA-RAK II AVB on top of a flown K3 array; two cradles screwed to K3-BUMP, used with two K3-BAR",
+          "weight_kg": 7,
+          "wll": "config K3-BUMP + 2 K3-BAR + 2 LA-SLING2T + LA-RAKMOUNT: max 18 K3 + 1 LA-RAK II AVB",
+          "verified": true
+        },
+        {
+          "code": "KS28-OUTRIG",
+          "name": "Stability bars for KS28 (set of two)",
+          "category": "accessory",
+          "function": "ground-stack stabilizer for KS28 base under a K3-on-KS28 stack; used with K3-TILT",
+          "weight_kg": 9.4,
+          "wll": "ground-stacked KS28: max 4 or 5; used with K3-TILT for K3-on-KS28 (safe 5 / max 4 K3 + 4 KS28)",
+          "verified": true
+        },
+        {
+          "code": "K3-CHARIOT",
+          "name": "Chariot for up to 4 K3",
+          "category": "accessory",
+          "function": "transport/storage chariot for blocks of up to 4 K3; also a ground-stack platform (up to 6 K3 with K2-JACK)",
+          "weight_kg": 47,
+          "wll": "transport/store 4 K3; as stacking platform up to 6 K3 with K2-JACK (rear rigging arm at -15 deg)",
+          "verified": true
+        }
+      ]
+    },
+    "K3i": {
+      "weight_kg": 36,
+      "recommended_rigging": "K3i-BUMP",
+      "rigging_parts": [
+        {
+          "code": "K3i-BUMP",
+          "name": "Flying frame for K3i",
+          "category": "flying_frame",
+          "function": "Primary flying frame / main lifting accessory; box-to-truss/motor (top of flown array)",
+          "weight_kg": 21,
+          "wll": "Equipped with 2 x Ø19 mm shackles WLL 3.25 t each; flown array safe limit 12 / max 24 enclosures (K3i-BUMP + K3i-BAR + rigging plates)",
+          "verified": true
+        },
+        {
+          "code": "K3i-BAR",
+          "name": "Extension bar for K3i-BUMP",
+          "category": "rigging_bar",
+          "function": "Front/rear extension on K3i-BUMP to increase site angle and add pick-up points; box-to-frame",
+          "weight_kg": 17,
+          "wll": "Equipped with 2 x Ø19 mm shackles WLL 3.25 t each; attaches to K3i-BUMP via 2 x Ø25 mm axes, M12 nuts, safety pins; 17 holes / 68 discrete pick-up positions",
+          "verified": true
+        },
+        {
+          "code": "K3i-RIGBAR",
+          "name": "Rigging bar and pullback for K3i",
+          "category": "rigging_bar",
+          "function": "Pullback at bottom of array, or main lifting accessory (K3i-RIGBAR x2) for lightweight flown arrays up to 16 K3i; box-to-truss/motor",
+          "weight_kg": 9.3,
+          "wll": "Equipped with 2 x Ø12 mm shackles WLL 1 t each; flown+pullback safe limit 12 / max 16 enclosures",
+          "verified": true
+        },
+        {
+          "code": "K3i-LINK",
+          "name": "Standard rigging plate for K3i",
+          "category": "link_plate",
+          "function": "Box-to-box linking plate; sets inter-element angle 0.25/1/2/3/4/5/7.5/10 deg (left & right plates differ)",
+          "weight_kg": null,
+          "wll": "Not stated (WLL governed by Soundvision mechanical model; rigging system safety factor >= 4 per 2006/42/EC)",
+          "verified": true
+        },
+        {
+          "code": "K3i-ENDLINK",
+          "name": "End rigging plate for K3i",
+          "category": "link_plate",
+          "function": "End/top rigging plate; required on the top enclosure when K3i-RIGBAR is the main lifting accessory and for stacked/bracket arrays",
+          "weight_kg": null,
+          "wll": "Not stated (governed by Soundvision mechanical model)",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-DOWNK3i",
+          "name": "Interface for flying Kara IIi below K3i",
+          "category": "downfill",
+          "function": "Downfill interface; rigs a Kara IIi array beneath a K3i array (box-to-box, assembled with 6x M6x19; secured with 4x M8x35 to K3i and 4x M6x19 to Kara IIi)",
+          "weight_kg": 10,
+          "wll": "Not separately rated; combined flown-with-downfill max limit 12 K3i + 6 Kara IIi (or 10 K3i + 6 Kara IIi with pullback)",
+          "verified": true
+        },
+        {
+          "code": "K3i-TILTBRACKET",
+          "name": "Fastening bracket with angles for K3i",
+          "category": "bracket_yoke",
+          "function": "Set of 4 fastening brackets for ground-stacked arrays; rear site angle 5 to -15 deg / front 5 to 25 deg in 2.5 deg steps",
+          "weight_kg": 1.3,
+          "wll": "Not stated; stacked array safe limit 4 K3i / max 6 K3i (with rigging plates); K3i-ENDLINK required on top enclosure",
+          "verified": true
+        },
+        {
+          "code": "K3i-CEILINGBRACKET",
+          "name": "Ceiling fastening bracket with angles for K3i",
+          "category": "bracket_yoke",
+          "function": "Set of 4 fastening brackets to mount a K3i array under the ceiling; rear site angle -5 to 15 deg / front -5 to -25 deg in 2.5 deg steps",
+          "weight_kg": 1,
+          "wll": "Not stated; ceiling-mounted max limit 3 K3i (with rigging plates); K3i-ENDLINK required on top enclosure; not allowed for ground stacks",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Truss clamp (certified for 250 kg)",
+          "category": "truss_clamp",
+          "function": "Box-to-truss; hangs a K3i-RIGBAR-led array from a truss (cannot be used on the bottom K3i-RIGBAR if a pullback is implemented)",
+          "weight_kg": 1.8,
+          "wll": "WLL 250 kg / 550 lb; supports an array of up to 6 K3i; always add a secondary safety",
+          "verified": true
+        }
+      ]
+    },
+    "KS21": {
+      "weight_kg": 49,
+      "recommended_rigging": "A15-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A15-BUMP",
+          "name": "Flying frame for vertical deployment of A15 and KS21",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary lifting frame for flown vertical KS21 arrays (1 or 2 lifting points)",
+          "weight_kg": null,
+          "wll": "safe 8 / max 16 enclosures per array; pickup points take Ø12 mm shackles WLL 1 t (two provided) and CLAMP250",
+          "verified": true
+        },
+        {
+          "code": "A15-RIGBAR",
+          "name": "Rigging bar and pullback for A15 and KS21",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor or pullback; lightweight main lifting accessory to fly up to 4 KS21",
+          "weight_kg": 4.6,
+          "wll": "max 4 enclosures; pickup points take Ø12 mm shackles WLL 1 t (two provided) and CLAMP250; secondary safety required when used as main lifting accessory",
+          "verified": true
+        },
+        {
+          "code": "KS21-OUTRIG",
+          "name": "Stability bars for KS21",
+          "category": "accessory",
+          "function": "ground-stack stabilizer; pair of stability bars at the bottom of a stacked array (mandatory when A15/A10 Wide/Focus stacked on KS21)",
+          "weight_kg": 3.5,
+          "wll": "raises stacked-vertical-array limit to 4 enclosures (vs 3 with no accessory); 4x Ø6.5 mm floor-fixing holes per bar; weight is per single bar",
+          "verified": true
+        },
+        {
+          "code": "K2-JACK",
+          "name": "Tilt adjustment screw jacks + bars for chariots",
+          "category": "accessory",
+          "function": "chariot stabilizer; 4 screw-jack feet + 2 bars fitted to KS21-CHARIOT to improve stability / correct floor discrepancies",
+          "weight_kg": 10.1,
+          "wll": "raises KS21-CHARIOT stacked limit to 4 enclosures (vs 3); weight is for one stabilizer",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Clamp certified for 250 kg",
+          "category": "truss_clamp",
+          "function": "box-to-truss; clamp used at A15-BUMP / A15-RIGBAR pickup points to attach array to truss",
+          "weight_kg": 1.8,
+          "wll": "250 kg",
+          "verified": true
+        },
+        {
+          "code": "KS21-CHARIOT",
+          "name": "Chariot for up to 3 KS21",
+          "category": "accessory",
+          "function": "ground-stack/transport; rolling chariot carrying a stack of KS21, with two rigging arms securing the lower box and two brakes",
+          "weight_kg": 23.6,
+          "wll": "max 3 enclosures (4 with K2-JACK stabilizers); for use with L-Acoustics KS21 only",
+          "verified": true
+        },
+        {
+          "code": "KS21-PLA",
+          "name": "Removable front dolly for 1 KS21",
+          "category": "accessory",
+          "function": "transport dolly board secured to the front of a single KS21 via two spring-loaded pins",
+          "weight_kg": 9.5,
+          "wll": "1 KS21; for use with L-Acoustics KS21 only",
+          "verified": true
+        },
+        {
+          "code": "KS21-COV",
+          "name": "Protective cover for 1 KS21",
+          "category": "accessory",
+          "function": "transport cover; individual protective cover for one KS21 on KS21-PLA (non-load-bearing)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KS21-CHARIOTCOV",
+          "name": "Protective cover for 2 or 3 KS21 on KS21-CHARIOT",
+          "category": "accessory",
+          "function": "transport cover; protective cover for a stack of 2-3 KS21 on KS21-CHARIOT (folds inward + velcro for 2) (non-load-bearing)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "KS21i": {
+      "weight_kg": 46,
+      "recommended_rigging": "A15i-BUMP",
+      "rigging_parts": [
+        {
+          "code": "A15i-BUMP",
+          "name": "Flying frame for vertical deployment of A15i and KS21i",
+          "category": "flying_frame",
+          "function": "box-to-truss / motor (primary flying frame for flown vertical KS21i or A15i arrays)",
+          "weight_kg": 16,
+          "wll": "safe 8 / max 16 KS21i enclosures (vertical flown array, A15i-BUMP + rigging plates); uses 2x O12 mm shackle WLL 1 t",
+          "verified": true
+        },
+        {
+          "code": "A15KS-Ui",
+          "name": "U-bracket for A15i and KS21i",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling and box-to-box (wall/ceiling mount or fly 1-2 KS21i; uses M8 inserts)",
+          "weight_kg": 10,
+          "wll": "max 1 KS21i alone; max 2 KS21i with KS21i-ULINK II. Anchoring resistance (2 enclosures, horizontal): tensile 375 daN, shear 75 daN",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Clamp certified for 250 kg",
+          "category": "truss_clamp",
+          "function": "box/frame-to-truss (couples A15i-BUMP pickup points to truss)",
+          "weight_kg": 1.8,
+          "wll": "certified 250 kg",
+          "verified": true
+        },
+        {
+          "code": "Ai-FIXBRACKET",
+          "name": "Fastening bracket for A15i, A10i and KS21i",
+          "category": "bracket_yoke",
+          "function": "ground-stack / ceiling stability bracket (secures stacked arrays; ceiling-mounted with rigging plates)",
+          "weight_kg": 0.45,
+          "wll": "enables stacked vertical array of up to 4 KS21i (Ai-FIXBRACKET + rigging plates) vs 3 with plates alone; ceiling-mount anchoring resistance 150 daN tensile",
+          "verified": true
+        },
+        {
+          "code": "KS21i-LINK",
+          "name": "Standard rigging plates for KS21i",
+          "category": "rigging_bar",
+          "function": "box-to-box / box-to-frame (standard linking plates between KS21i enclosures and to A15i-BUMP)",
+          "weight_kg": null,
+          "wll": "config-dependent; WLL alone not sufficient to size an array - model in Soundvision. M6 insert UTS 1160 N / ultimate shear 5370 N",
+          "verified": true
+        },
+        {
+          "code": "KS21i-SLINK",
+          "name": "S-shaped standard rigging plates for KS21i",
+          "category": "rigging_bar",
+          "function": "box-to-box (S-shaped standard linking plates for KS21i arrays)",
+          "weight_kg": null,
+          "wll": "config-dependent; verify in Soundvision",
+          "verified": true
+        },
+        {
+          "code": "KS21i-ENDLINK",
+          "name": "End rigging plates for KS21i",
+          "category": "rigging_bar",
+          "function": "box-to-frame (end/closing linking plates at top or bottom of a KS21i array)",
+          "weight_kg": null,
+          "wll": "config-dependent; verify in Soundvision",
+          "verified": true
+        },
+        {
+          "code": "KS21i-ENDSLINK",
+          "name": "S-shaped end rigging plates for KS21i",
+          "category": "rigging_bar",
+          "function": "box-to-frame (S-shaped end/closing linking plates for KS21i arrays)",
+          "weight_kg": null,
+          "wll": "config-dependent; verify in Soundvision",
+          "verified": true
+        },
+        {
+          "code": "KS21i-ULINK II",
+          "name": "Rigging plates for flying two KS21i with A15KS-Ui",
+          "category": "link_plate",
+          "function": "box-to-box (links two KS21i mounted on / flown from A15KS-Ui)",
+          "weight_kg": null,
+          "wll": "enables 2 KS21i on A15KS-Ui; only ULINK II may be used between two KS21i on A15KS-Ui",
+          "verified": true
+        },
+        {
+          "code": "KS21i-SCREEN",
+          "name": "Acoustically transparent front screen for KS21i",
+          "category": "accessory",
+          "function": "front screen (mounts to 4 M6 screen inserts; not a load-bearing rigging part)",
+          "weight_kg": 3.1,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "KS28": {
+      "weight_kg": 79,
+      "recommended_rigging": "KS28-BUMP",
+      "rigging_parts": [
+        {
+          "code": "KS28-BUMP",
+          "name": "KS28-BUMP lifting beam",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary flying beam, KS28 rigging arms pin to the bump's two ball-lock pins",
+          "weight_kg": 15.5,
+          "wll": "flies up to 16 x KS28; pick-up via 2 x O19 mm shackles WLL 3.25 t each (user-supplied)",
+          "verified": true
+        },
+        {
+          "code": "LA-SLING2T",
+          "name": "LA-SLING2T lifting chain (2-leg, 8 mm, DIN EN 818-4)",
+          "category": "downfill",
+          "function": "motor-to-bump; 2-leg lifting chain for single-motor pickup of the KS28-BUMP (optional; bridle alternative)",
+          "weight_kg": 3.7,
+          "wll": "2.8 t for sling angle b 0-45 deg; 2 t for b 46-60 deg (max sling angle bmax 60 deg); steel grade 8, nominal length 1000 mm",
+          "verified": true
+        },
+        {
+          "code": "KS28-CHARIOT",
+          "name": "KS28-CHARIOT transport chariot",
+          "category": "accessory",
+          "function": "ground transport/stacking of up to 4 x KS28; two rigging arms with spring-loaded pins secure the lower enclosure (transport accessory, not a flying frame)",
+          "weight_kg": 53.5,
+          "wll": "up to 4 x KS28 (stacked on chariot, max limit 4)",
+          "verified": true
+        },
+        {
+          "code": "KS28-PLA",
+          "name": "KS28-PLA front dolly",
+          "category": "accessory",
+          "function": "removable front dolly on wheels for 1 x KS28, fitted with two spring-loaded pins (transport accessory)",
+          "weight_kg": 14,
+          "wll": "1 x KS28",
+          "verified": true
+        }
+      ]
+    },
+    "Kara II": {
+      "weight_kg": 26,
+      "recommended_rigging": "M-BUMP",
+      "rigging_parts": [
+        {
+          "code": "M-BUMP",
+          "name": "Bumper for flying or stacking KARA/SB18",
+          "category": "flying_frame",
+          "function": "Primary bumper: flies or ground-stacks Kara II (and SB18) arrays from truss/motor; box-to-truss and array top frame",
+          "weight_kg": 25,
+          "wll": "2 x O19 mm shackles WLL 3.25 t; flies up to 24 Kara II (safe 16 / max 24 with optional M-BAR); array count decreases with curvature",
+          "verified": true
+        },
+        {
+          "code": "M-BAR",
+          "name": "Extension bar for rigging frame",
+          "category": "rigging_bar",
+          "function": "Optional extension bar for M-BUMP; mounts 1 or 2 per frame to extend rigging points and forms part of the M-JACK stacking platform",
+          "weight_kg": 5,
+          "wll": "2 x O19 mm shackles WLL 3.25 t",
+          "verified": true
+        },
+        {
+          "code": "M-JACK",
+          "name": "4 tilt adjustment screw jacks with 2 angle bar extensions for stacked M-BUMP",
+          "category": "accessory",
+          "function": "Ground-stack platform feet: four tilt-adjustment screw jacks used with one M-BUMP and two M-BAR to form a stacking platform (max 9 Kara II stacked)",
+          "weight_kg": 1.3,
+          "wll": "4 axis with safety pin; not a load-rated lifting element (ground-stack tilt jacks)",
+          "verified": true
+        },
+        {
+          "code": "KARA-ANGARMEX",
+          "name": "2 angle bar extension for KARA bumper",
+          "category": "accessory",
+          "function": "Two angle arm extensions adding extra 10 degrees downward site angle for the bottom Kara II; attaches to M-BUMP or KARA-MINIBU",
+          "weight_kg": 0.6,
+          "wll": "2 x O4.8 x 18 mm rivets + 2 M4 x 12 mm Allen bolts; with 5/16\" BLP (no separate WLL stated)",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBU",
+          "name": "Mini bumper for flying 6 KARA",
+          "category": "flying_frame",
+          "function": "Smaller flying/stacking bumper for arrays up to 6 Kara II (or attached to SB18 array); box-to-truss",
+          "weight_kg": 7.6,
+          "wll": "2 x O12 mm shackles WLL 1 t; flies up to 6 Kara II",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBUEX",
+          "name": "Extension bars for flying/stacking SB18/KARA",
+          "category": "rigging_bar",
+          "function": "Set of two complementary rigging plates for KARA-MINIBU to adapt to SB18 or pullback configs; box-to-box (KARA-MINIBU + KARA-MINIBUEX flies 6 Kara II or up to 4 SB18)",
+          "weight_kg": 2.2,
+          "wll": "6 M8x25 screws + 6 M8 lock nuts; 4 x 5/16\" T-BLP to attach SB18 (no separate WLL; relies on KARA-MINIBU shackles WLL 1 t)",
+          "verified": true
+        },
+        {
+          "code": "KARA-PULLBACK",
+          "name": "Pullback plate for Kara",
+          "category": "accessory",
+          "function": "Pullback plate connecting to the bottom of a Kara II array to set a pullback (negative site angle) configuration",
+          "weight_kg": 6,
+          "wll": "1 x O19 mm shackle WLL 3.25 t; pullback angle must not exceed 90 degrees negative site angle",
+          "verified": true
+        }
+      ]
+    },
+    "Kara IIi": {
+      "weight_kg": 21,
+      "recommended_rigging": "KARAIIi-BUMP",
+      "rigging_parts": [
+        {
+          "code": "KARAIIi-BUMP",
+          "name": "KARAIIi-BUMP flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; primary flying frame for vertical Kara IIi (and SB18 IIi) arrays; nine central-bar pickup points for site-angle adjustment; secured to top enclosure with four M6x18 screws",
+          "weight_kg": 21,
+          "wll": "2 x Ø19 mm shackles WLL 3.25 t (two provided); array safe/max 12/24 Kara IIi (flown)",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-RIGBAR",
+          "name": "KARAIIi-RIGBAR rigging bar / pullback",
+          "category": "rigging_bar",
+          "function": "box-to-truss/box-to-box; rigging bar for pullback configurations, secured at bottom of array; can also act as main lifting accessory (requires KARAIIi-ENDLINK on top enclosure); secured with two M6x40 screws",
+          "weight_kg": 4.8,
+          "wll": "2 x Ø12 mm shackles WLL 1 t (two provided); pickup points also compatible with CLAMP250",
+          "verified": true
+        },
+        {
+          "code": "M-BARi",
+          "name": "M-BARi extension bar",
+          "category": "coupling_bar",
+          "function": "box-to-frame; extension bar secured on KARAIIi-BUMP (front or rear, positions A/B) to extend site-angle capability; secured with two M8 bolts, nuts and safety pins; 17 pickup points",
+          "weight_kg": null,
+          "wll": "2 x Ø19 mm shackles WLL 3.25 t (two provided)",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-LINK",
+          "name": "KARAIIi-LINK rigging plates",
+          "category": "link_plate",
+          "function": "box-to-box; standard rigging plates linking two Kara IIi; set inter-element angle 0,1,2,3,4,5,7.5,10 deg (supplied x2 per kit)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-ENDLINK",
+          "name": "KARAIIi-ENDLINK end rigging plates",
+          "category": "link_plate",
+          "function": "box-to-frame; end rigging plates for top/bottom enclosure of a Kara IIi array; required on top enclosure when KARAIIi-RIGBAR is the main lifting accessory (supplied x2 per kit)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-TILT",
+          "name": "KARAIIi-TILT angled rigging element",
+          "category": "link_plate",
+          "function": "box-to-box; site-angle adjustment element linking SB18 IIi and Kara IIi in stacked or flown arrays (standard or reversed orientation; +5 to -15 deg in 2.5 deg steps)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-FIXBRACKET",
+          "name": "KARAIIi-FIXBRACKET fastening brackets",
+          "category": "bracket_yoke",
+          "function": "ground-stack/ceiling/wall; set of four fixed fastening brackets to anchor base of array or ceiling-mount up to 3 Kara IIi (2 SB18 IIi); secured to fixture with four M10 screws",
+          "weight_kg": 0.5,
+          "wll": "set of 4 brackets; ground-stack/ceiling up to 3 Kara IIi (safety per Soundvision)",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-TILTBRACKET",
+          "name": "KARAIIi-TILTBRACKET angled fastening brackets",
+          "category": "bracket_yoke",
+          "function": "ground-stack/ceiling; set of four fastening brackets with site-angle adjustment for a stack of up to 3 Kara IIi (+5 to -15 deg rear bracket, +5 to +25 deg front bracket); four M10 screws to fixture",
+          "weight_kg": 0.6,
+          "wll": "set of 4 brackets; stack up to 3 Kara IIi (safe/max 6/9 stacked with angle adjustment)",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "box-to-truss; certified clamp used on KARAIIi-RIGBAR pickup points to attach array to truss",
+          "weight_kg": 1.8,
+          "wll": "WLL 250 kg / 550 lb; supports up to 11 Kara IIi or 5 SB18 IIi",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-SCREEN",
+          "name": "KARAIIi-SCREEN front screen",
+          "category": "accessory",
+          "function": "acoustically transparent front screen for Kara IIi; secured on rigging plates with four M6x35 Torx screws (replaces grill screws) - cosmetic/protective, not a load-bearing rigging element",
+          "weight_kg": 2.4,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "Kiva II": {
+      "weight_kg": 14,
+      "recommended_rigging": "KIBU II",
+      "rigging_parts": [
+        {
+          "code": "KIBU II",
+          "name": "KIBU II flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss; primary flying frame for a standalone flown Kiva II line array (13 pickup points)",
+          "weight_kg": 3.8,
+          "wll": "Flown: safe 12 / max 20 Kiva II enclosures; rigs to truss via 2 x Ø12 mm shackles WLL 1 t (provided)",
+          "verified": true
+        },
+        {
+          "code": "KIBU-SB",
+          "name": "KIBU-SB rigging frame",
+          "category": "flying_frame",
+          "function": "box-to-truss and box-to-box; rigging interface to fly or stack Kiva II together with SB15m subwoofers (13 pickup points for SB15m, 14 for Kiva II)",
+          "weight_kg": 10.7,
+          "wll": "Flown Kiva II: safe 12 / max 20; flown SB15m: 8; stacked Kiva II: safe 4 / max 9; rigs to truss via 2 x Ø12 mm shackles WLL 1 t (provided)",
+          "verified": true
+        },
+        {
+          "code": "KIET II",
+          "name": "KIET II ceiling/pole-mount plate",
+          "category": "bracket_yoke",
+          "function": "fixed-install mount; ceiling/balcony suspension or pole-mount of Kiva II (delivered with removable 35 mm pole socket)",
+          "weight_kg": 3.2,
+          "wll": "Ceiling-mounted: max 3 Kiva II; pole-mounted on 35 mm pole: max 3 (max 2 when pole-mounted on SB15m)",
+          "verified": true
+        },
+        {
+          "code": "KIVA-PULLBACK",
+          "name": "KIVA-PULLBACK pull-back accessory",
+          "category": "accessory",
+          "function": "pull-back/downfill geometry; secures the bottom of a flown array (used with KIBU II or KIBU-SB)",
+          "weight_kg": 2.6,
+          "wll": "Pullback: up to 9 Kiva II (with KIBU-SB + SB15m: 9 Kiva II + 3 SB15m); 1 x Ø12 mm shackle WLL 1 t; pull-back angle must not exceed 90 deg negative site angle",
+          "verified": true
+        }
+      ]
+    },
+    "L2 / L2D": {
+      "weight_kg": 158,
+      "recommended_rigging": "L2-BUMP",
+      "rigging_parts": [
+        {
+          "code": "L2-BUMP",
+          "name": "L2-BUMP flying frame",
+          "category": "flying_frame",
+          "function": "primary box-to-truss/motor flying frame for L2 and L2D arrays (and single L2D)",
+          "weight_kg": 25,
+          "wll": "2 x O19 mm shackles WLL 3.25 t each; safe/max 4 L2 or 3 L2 + 1 L2D per flown array (config-dependent, model in Soundvision)",
+          "verified": true
+        },
+        {
+          "code": "L2-BAR",
+          "name": "L2-BAR extension bar",
+          "category": "rigging_bar",
+          "function": "extension bar combined with L2-BUMP (via 2 ball-locking pins) to extend pickup point",
+          "weight_kg": 16,
+          "wll": "2 x O19 mm shackles WLL 3.25 t",
+          "verified": true
+        },
+        {
+          "code": "L2-RIGBAR",
+          "name": "L2-RIGBAR rigging bar / pullback",
+          "category": "rigging_bar",
+          "function": "rigging bar and pullback for L2 and L2D (pullback angle must not exceed 90 deg negative site angle)",
+          "weight_kg": 8,
+          "wll": "2 x O19 mm shackles WLL 3.25 t; flown+pullback safe 2 L2 / max 4 L2 with L2-BUMP+L2-BAR, or 2x L2-RIGBAR safe 2 L2 / max 1 L2 + 1 L2D",
+          "verified": true
+        },
+        {
+          "code": "LA-RAKMOUNT",
+          "name": "LA-RAKMOUNT rack mounting cradles",
+          "category": "bracket_yoke",
+          "function": "secures one LA-RAK III rack stacked on top of a flown array via L2-BUMP (incl. screws)",
+          "weight_kg": 7,
+          "wll": "rates 1 LA-RAK III flown atop array; requires L2-BUMP + 2x L2-BAR + 2x LA-SLING2T (config: 4 L2 + 1 rack or 3 L2 + 1 L2D + 1 rack)",
+          "verified": true
+        },
+        {
+          "code": "LA-SLING2T",
+          "name": "LA-SLING2T 2-leg lifting chain",
+          "category": "downfill",
+          "function": "2-leg 8 mm lifting chain (DIN EN 818-4, grade 8) used in the flown-rack rigging configuration",
+          "weight_kg": 3.7,
+          "wll": "load rating 2.8 t for sling angle 0-45 deg, 2 t for 46-60 deg; max sling angle 60 deg; nominal length 1000 mm",
+          "verified": true
+        },
+        {
+          "code": "BPCHAIN 1.5T",
+          "name": "BPCHAIN 1.5T extension sling",
+          "category": "downfill",
+          "function": "1.5 t extension sling (generic L Series; listed as included in K3-BUMP; L2-BUMP ships with an extension sling)",
+          "weight_kg": 4,
+          "wll": "1.5 tons",
+          "verified": true
+        },
+        {
+          "code": "K2-JACK",
+          "name": "K2-JACK tilt screw jacks",
+          "category": "accessory",
+          "function": "set of 4 tilt-adjustment screw jacks + 2 bars to set ground-stack site angle on L2-CHARIOT / L2D-CHARIOT",
+          "weight_kg": 10.1,
+          "wll": "10.1 kg per stabilizer; supports 1 L2 (on L2-CHARIOT) or 1 L2D (on L2D-CHARIOT) ground-stacked",
+          "verified": true
+        },
+        {
+          "code": "L2-LASERMOUNT",
+          "name": "L2-LASERMOUNT laser inclinometer mount",
+          "category": "accessory",
+          "function": "secures a laser inclinometer to the inserts of L2 or L2D for site-angle alignment (non-load-bearing)",
+          "weight_kg": 1,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "DELTA 1.5T",
+          "name": "DELTA 1.5T azimuth angle tuning accessory",
+          "category": "accessory",
+          "function": "azimuth (rotation) angle tuning accessory for the flown array",
+          "weight_kg": 8,
+          "wll": "3 x O19 mm shackles WLL 3.25 t; rated 1.5 t",
+          "verified": true
+        },
+        {
+          "code": "L2-ROLL",
+          "name": "L2-ROLL lift-and-roll accessory",
+          "category": "accessory",
+          "function": "temporary handling tool to lift/reverse an upside-down L2 or L2D (used with L2-RIGBAR); NOT for rigging/flying",
+          "weight_kg": null,
+          "wll": "1 L2 or 1 L2D (handling only); explicitly not a long-term rigging accessory",
+          "verified": true
+        },
+        {
+          "code": "L2-CHARIOT",
+          "name": "L2-CHARIOT transport cart",
+          "category": "accessory",
+          "function": "single-L2 transport chariot (4 ball-locking pins); ground-stack base when fitted with K2-JACK",
+          "weight_kg": 32,
+          "wll": "holds 1 L2",
+          "verified": true
+        },
+        {
+          "code": "L2D-CHARIOT",
+          "name": "L2D-CHARIOT transport cart",
+          "category": "accessory",
+          "function": "single-L2D transport chariot (6 ball-locking pins, red labels); ground-stack base when fitted with K2-JACK",
+          "weight_kg": 33,
+          "wll": "holds 1 L2D",
+          "verified": true
+        },
+        {
+          "code": "L2-CHARIOTLID",
+          "name": "L2-CHARIOTLID protective lid",
+          "category": "accessory",
+          "function": "protective lid secured on top of L2 for transport / equipment storage",
+          "weight_kg": 15,
+          "wll": "load capacity up to 400 kg / 881.8 lb",
+          "verified": true
+        },
+        {
+          "code": "L2D-CHARIOTLID",
+          "name": "L2D-CHARIOTLID protective lid",
+          "category": "accessory",
+          "function": "protective lid secured on top of L2D for transport / equipment storage (red labels)",
+          "weight_kg": 14,
+          "wll": "load capacity up to 400 kg / 881.8 lb",
+          "verified": true
+        }
+      ]
+    },
+    "SB10i": {
+      "weight_kg": 14,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "SB10i-onCW",
+          "name": "SB10i on-wall / on-ceiling mounting accessory",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling surface mount (one SB10i)",
+          "weight_kg": 1,
+          "wll": "1 SB10i per SB10i-onCW (wall- or ceiling-mounted; safe = max = 1; safety factor 5)",
+          "verified": true
+        },
+        {
+          "code": "ground-stack runners (x4, provided)",
+          "name": "Removable ground-stack runners",
+          "category": "accessory",
+          "function": "ground-stack feet; hand-tightened into bottom M6 inserts after removing placeholder screws",
+          "weight_kg": null,
+          "wll": "ground-stacked: safe/max 2 enclosures; stacked upright: max 1 (no rigging accessory required)",
+          "verified": true
+        }
+      ]
+    },
+    "SB15m": {
+      "weight_kg": 36,
+      "recommended_rigging": "KIBU-SB",
+      "rigging_parts": [
+        {
+          "code": "SB15MRIG",
+          "name": "SB15m coupling bars (with LOCKTAB locking tab)",
+          "category": "coupling_bar",
+          "function": "box-to-box: couples adjacent SB15m enclosures, and couples the top SB15m to the KIBU-SB frame, via the rigging rails (PROCEDURE A)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "LOCKTAB",
+          "name": "Locking tab (integral to SB15MRIG coupling bars)",
+          "category": "accessory",
+          "function": "secures the SB15MRIG coupling bar in the rigging rails; yellow label must be fully covered to confirm full engagement",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KIBU-SB",
+          "name": "Flying frame for KIVA and SB15m",
+          "category": "flying_frame",
+          "function": "box-to-truss / box-to-motor: primary flying frame to suspend SB15m (and KIVA) arrays; one side dedicated to KIVA, the other to SB15m; provided with two bow shackles WLL 1 t",
+          "weight_kg": null,
+          "wll": "Supplied with two bow shackles rated WLL 1 t each; max flown 8 SB15m with KIBU-SB + WLL 1 t shackle, or 6 SB15m with KIBU-SB + CLAMP250 (truss). Use hole 6 for 0 deg site angle.",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Truss clamp",
+          "category": "truss_clamp",
+          "function": "frame-to-truss: installed on the KIBU-SB in place of the bow shackle to attach a flown array to a truss; requires safety slings between KIBU-SB and truss",
+          "weight_kg": null,
+          "wll": "Max 6 SB15m flown when using KIBU-SB + CLAMP250",
+          "verified": true
+        }
+      ]
+    },
+    "SB18 / SB18 IIi": {
+      "weight_kg": 52,
+      "recommended_rigging": "M-BUMP",
+      "rigging_parts": [
+        {
+          "code": "M-BUMP",
+          "name": "M-BUMP flying/stacking frame",
+          "category": "flying_frame",
+          "function": "Flies or ground-stacks a vertical SB18 and/or KARA array (box-to-truss/motor)",
+          "weight_kg": null,
+          "wll": "Provided with 2x Ø19mm bow shackles (WLL 3250 kg each, 6:1 SF) and BLP set; array size validated in SOUNDVISION",
+          "verified": true
+        },
+        {
+          "code": "M-BAR",
+          "name": "M-BAR extension bar for M-BUMP",
+          "category": "rigging_bar",
+          "function": "Extension bar for the M-BUMP frame to extend site-angle range (frame-to-frame)",
+          "weight_kg": null,
+          "wll": "Provided with 2x Ø19mm bow shackles (WLL 3250 kg each) and 2x T-shaped ball-locking pins (3/8\")",
+          "verified": true
+        },
+        {
+          "code": "M-JACK",
+          "name": "M-JACK platform feet (set of 4) for M-BUMP",
+          "category": "downfill",
+          "function": "Set of 4 adjustable platform feet for ground-stacking the M-BUMP stacking platform",
+          "weight_kg": null,
+          "wll": "Not stated (leveling feet); supplied in a package with KARA-ANGARMEX",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBU",
+          "name": "KARA-MINIBU compact flying/stacking frame",
+          "category": "flying_frame",
+          "function": "Flies or stacks a small vertical SB18 and/or KARA array (box-to-truss/motor)",
+          "weight_kg": null,
+          "wll": "Provided with 2x Ø12mm bow shackles (WLL 1000 kg each, 6:1 SF) and 4 round-shaped ball-locking pins (5/16\")",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBUEX",
+          "name": "KARA-MINIBUEX extension arms (2) for KARA-MINIBU",
+          "category": "rigging_bar",
+          "function": "2 extension arms for the KARA-MINIBU frame (frame-to-frame), required to fly SB18 with KARA-MINIBU",
+          "weight_kg": null,
+          "wll": "Provided with 4x T-shaped ball-locking pins (5/16\"), 6 screws (M8x25mm) and 6 self-locking nuts",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "Attaches an array to a truss in place of a shackle (box/frame-to-truss)",
+          "weight_kg": null,
+          "wll": "WLL 250 kg / 550 lb; certified clamp. For SB18 IIi on KARAIIi-RIGBAR supports an array of up to 5 SB18 IIi",
+          "verified": true
+        },
+        {
+          "code": "SB18PLA",
+          "name": "SB18PLA front dolly board",
+          "category": "accessory",
+          "function": "Removable front dolly board for moving the SB18 and protecting the front grill in transport/storage (not load-bearing rigging)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "SB18COV",
+          "name": "SB18COV protective cover",
+          "category": "accessory",
+          "function": "Protective transport/storage cover (not load-bearing rigging)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-BUMP",
+          "name": "KARAIIi-BUMP flying frame (installation)",
+          "category": "flying_frame",
+          "function": "Primary flying frame for vertical SB18 IIi (and Kara IIi) arrays (box-to-motor); secured with 4x M6x18 screws + M6 nuts",
+          "weight_kg": null,
+          "wll": "Compatible with Ø19mm shackles WLL 3.25 t (two provided). Safe limit 12 / max 16 SB18 IIi (KARAIIi-BUMP + rigging plates)",
+          "verified": true
+        },
+        {
+          "code": "M-BARi",
+          "name": "M-BARi extension bar for rigging frame (installation)",
+          "category": "rigging_bar",
+          "function": "Extension bar secured on KARAIIi-BUMP to extend SB18 IIi site-angle capability (front/rear, position A or B); 2x M8 bolts/nuts/safety pins",
+          "weight_kg": null,
+          "wll": "17 pickup points compatible with Ø19mm shackles WLL 3.25 t (two provided). With M-BARi: safe limit 8 / max 16",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-RIGBAR",
+          "name": "KARAIIi-RIGBAR rigging bar / pullback (installation)",
+          "category": "rigging_bar",
+          "function": "Rigging bar and pullback for SB18 IIi (and Kara IIi) arrays; main lift or pullback; 2x M6x40 screws",
+          "weight_kg": null,
+          "wll": "Pickup points compatible with Ø12mm shackles WLL 1 t (two provided) and CLAMP250. KARAIIi-RIGBAR x2: safe limit 4 / max 6",
+          "verified": true
+        },
+        {
+          "code": "KARAIIi-FIXBRACKET",
+          "name": "KARAIIi-FIXBRACKET fastening brackets (set of 4, installation)",
+          "category": "bracket_yoke",
+          "function": "Set of 4 fastening brackets to ground-anchor/stabilize, ceiling-mount (up to 2 SB18 IIi), or stack SB18 IIi; 4x M10 screws to fixture",
+          "weight_kg": null,
+          "wll": "Ceiling-mounted: max 2 SB18 IIi. Stacked (optional): max 4 SB18 IIi",
+          "verified": true
+        },
+        {
+          "code": "SB18IIi-LINK",
+          "name": "SB18IIi-LINK rigging plates (installation)",
+          "category": "link_plate",
+          "function": "Standard rigging plates that interface the SB18 IIi to the KARAIIi rigging system (box-to-box / box-to-frame)",
+          "weight_kg": null,
+          "wll": "Required interface for all SB18 IIi flown/stacked configs (see max-config table)",
+          "verified": true
+        },
+        {
+          "code": "SB18IIi-ENDLINK",
+          "name": "SB18IIi-ENDLINK end rigging plates (installation)",
+          "category": "link_plate",
+          "function": "End rigging plates for SB18 IIi; required on the top enclosure when KARAIIi-RIGBAR is the main lifting accessory",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "SB6i": {
+      "weight_kg": 8.6,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "SB6i-onCW",
+          "name": "On-wall / on-ceiling mounting accessory with silent blocks for SB6i",
+          "category": "bracket_yoke",
+          "function": "box-to-surface (wall/ceiling) mounting interface for one SB6i",
+          "weight_kg": null,
+          "wll": "safe/maximum 1 enclosure per mount (safety factor 5; complies with EN 62368-1)",
+          "verified": true
+        }
+      ]
+    },
+    "Soka": {
+      "weight_kg": 9.4,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "Soka-onW",
+          "name": "Soka-onW on-wall mounting accessory",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; surface mount one Soka in separated configuration with vibration-isolating silent blocks",
+          "weight_kg": 0.36,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "WALLx2",
+          "name": "WALLx2 wall-mounting kit",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; mount one Soka vertically flush on a wall",
+          "weight_kg": 0.4,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "PANx2",
+          "name": "PANx2 adjustable pan accessory kit +/-45 degrees",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; vertical wall mount with adjustable azimuth +/-45 degrees (two PAN units, no TILT/horizontal fasteners)",
+          "weight_kg": 0.8,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT5",
+          "name": "TILT5 fixed tilt accessory 5 degrees",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; adds fixed 5-degree (negative) site angle; must combine with TILT-SUPPORT or VBAR, optionally PAN",
+          "weight_kg": 0.3,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "PAN",
+          "name": "PAN adjustable pan accessory +/-45 degrees",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; adjustable azimuth +/-45 degrees; must combine with TILT-SUPPORT, optionally with TILT5 for site+azimuth",
+          "weight_kg": 0.4,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT-SUPPORT",
+          "name": "TILT-SUPPORT support plate",
+          "category": "bracket_yoke",
+          "function": "wall interface/support plate required to safely mount PAN or TILT5; three 6.4 mm slotted holes for vertical/horizontal adjustment",
+          "weight_kg": 0.5,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "VBAR",
+          "name": "VBAR vertical rigging bracket",
+          "category": "flying_frame",
+          "function": "box-to-ceiling / box-to-truss; ceiling-mount or fly one vertical Soka from truss or threaded rod; seven pickup points (site angle 11 to -4 degrees), 9 mm cable pass-through; ceiling use must use holes 1 and 7",
+          "weight_kg": 0.5,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        },
+        {
+          "code": "POLE",
+          "name": "POLE pole-mount adapter",
+          "category": "pole_mount",
+          "function": "box-to-pole; mount one Soka on a 35 mm (1-3/8 in) pole",
+          "weight_kg": 0.5,
+          "wll": "safe/max 1 Soka (safety factor 5); no rated WLL published",
+          "verified": true
+        }
+      ]
+    },
+    "Syva": {
+      "weight_kg": 21,
+      "recommended_rigging": "Syva Bar",
+      "rigging_parts": [
+        {
+          "code": "Syva Bar",
+          "name": "Syva Bar (lifting/rigging bar for Syva)",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor: flies a single Syva; 7 pickup points giving site angle -10 deg to +5 deg",
+          "weight_kg": null,
+          "wll": "Flown with provided Ø12 mm shackle WLL 1 t; max/safe limit = 1 Syva flown",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 (truss clamp certified for 250 kg)",
+          "category": "truss_clamp",
+          "function": "box/bar-to-truss or structure: secures Syva Bar (flown) or Syva Wall to a structure/truss",
+          "weight_kg": null,
+          "wll": "Certified for 250 kg",
+          "verified": true
+        },
+        {
+          "code": "Syva Wall",
+          "name": "Syva Wall (wall-mount for Syva)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/wedge: two-part base + bracket, azimuth up to 90 deg in 15 deg steps via toothed wheel, safety pin",
+          "weight_kg": null,
+          "wll": "Applies a load of 350 N on the anchoring points; max/safe limit = 1 Syva",
+          "verified": true
+        },
+        {
+          "code": "Syva Base",
+          "name": "Syva Base (base plate for Syva / Syva Low / Syva Sub)",
+          "category": "bracket_yoke",
+          "function": "ground-stack: required base plate secured to enclosure bottom; 4 removable runners, floor-fixable; also used to stack Syva on Syva Low/Sub",
+          "weight_kg": null,
+          "wll": "Ground-stacked max/safe limit = 1; do not ground-stack Syva without Syva Base",
+          "verified": true
+        },
+        {
+          "code": "Syva Pole",
+          "name": "Syva Pole (35 mm / 1-3/8\" pole-mount adapter for Syva)",
+          "category": "pole_mount",
+          "function": "box-to-pole: 35 mm pole-mount adapter with locking knob and Ø M10 locking nut",
+          "weight_kg": null,
+          "wll": "Pole-mounted max/safe limit = 1",
+          "verified": true
+        }
+      ]
+    },
+    "Syva Low": {
+      "weight_kg": 29,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "SYVA BASE",
+          "name": "Syva Base",
+          "category": "bracket_yoke",
+          "function": "ground-stack baseplate; secures to bottom of Syva Low (or Syva/Syva Sub) for ground-stacking and is the base under a Syva head stacked on Syva Low",
+          "weight_kg": null,
+          "wll": "safe/max limit 1 enclosure (ground-stacked, per OM mechanical-safety table)",
+          "verified": true
+        },
+        {
+          "code": "SYVALF COV",
+          "name": "SyvaLF Cov",
+          "category": "accessory",
+          "function": "protective transport cover for Syva Low or Syva Sub (grill protection, rear connector flap, x3 handles, x4 runners)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "Syva Sub": {
+      "weight_kg": 27,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "Syva Base",
+          "name": "Syva Base baseplate",
+          "category": "bracket_yoke",
+          "function": "ground-stack baseplate; secured to the bottom of the enclosure for ground-stacking Syva / Syva Low / Syva Sub (four removable runners; can be floor-fixed)",
+          "weight_kg": null,
+          "wll": "safe/max 1 enclosure ground-stacked (per OM 'Other configurations' table for Syva Low / Syva Sub)",
+          "verified": true
+        },
+        {
+          "code": "Anti-vibration mats (x2)",
+          "name": "Anti-vibration mats (supplied)",
+          "category": "accessory",
+          "function": "ground-stacking - two anti-vibration mats provided to ground-stack the subwoofers (Syva Low / Syva Sub)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "SyvaLF Cov",
+          "name": "SyvaLF Cov protective cover",
+          "category": "accessory",
+          "function": "transport/storage - reference protective cover for Syva Low or Syva Sub (reinforced front, rear flap over connector, 3 handles, 4 runners)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "X12": {
+      "weight_kg": 20,
+      "recommended_rigging": "X-BAR",
+      "rigging_parts": [
+        {
+          "code": "X-BAR",
+          "name": "Rigging bar for 1 enclosure",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; primary flying accessory, drives into cabinet insert and suspends one X12 via shackle or CLAMP250",
+          "weight_kg": 1.1,
+          "wll": "supplied with 1 x Ø12 mm shackle WLL 1 t; max/safe 1 enclosure flown",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Clamp certified for 250 kg",
+          "category": "truss_clamp",
+          "function": "box-to-truss; clamps X-BAR (or assembly) to truss for flying; also sets site angle on X-BAR",
+          "weight_kg": null,
+          "wll": "250 kg (clamp certified)",
+          "verified": true
+        },
+        {
+          "code": "X-UL12",
+          "name": "Long U-bracket for X12",
+          "category": "bracket_yoke",
+          "function": "box-to-surface; wall/ceiling mount and can be used for flying; pairs with X-UTILT for tilt (not for use with EMBi)",
+          "weight_kg": 2.7,
+          "wll": "max/safe 1 enclosure",
+          "verified": true
+        },
+        {
+          "code": "X-US1215",
+          "name": "Short U-bracket for X12 and X15 HiQ",
+          "category": "bracket_yoke",
+          "function": "box-to-surface; wall/ceiling mount, flying, and pole-mount (with EMBi); shared with X15 HiQ",
+          "weight_kg": 3,
+          "wll": "max/safe 1 enclosure",
+          "verified": true
+        },
+        {
+          "code": "X-UTILT",
+          "name": "U-bracket wall-mount for X series with tilt adjustment",
+          "category": "bracket_yoke",
+          "function": "box-to-wall; tilt-adjustment accessory for negative site angles, used with X-US1215 or X-UL12; vertical use only",
+          "weight_kg": 1.5,
+          "wll": "max/safe 1 enclosure (wall-mounted with U-bracket)",
+          "verified": true
+        },
+        {
+          "code": "EMBi",
+          "name": "Pole mount socket (8XTi/12XTi and X series)",
+          "category": "pole_mount",
+          "function": "pole-mount adapter for X-US1215 (35 mm pole) allowing site-angle adjustment; do NOT use with X-UL12",
+          "weight_kg": 0.5,
+          "wll": "max/safe 1 enclosure (pole-mounted)",
+          "verified": true
+        }
+      ]
+    },
+    "X15 HiQ": {
+      "weight_kg": 21,
+      "recommended_rigging": "X-BAR",
+      "rigging_parts": [
+        {
+          "code": "X-BAR",
+          "name": "Rigging bar for 1 enclosure",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor flying (single-enclosure rigging bar; mounts to cabinet inserts in front or rear extension position)",
+          "weight_kg": 1.1,
+          "wll": "Provided with 1x Ø12 mm shackle WLL 1 t; five angulation holes; compatible with CLAMP250",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Clamp certified for 250 kg",
+          "category": "truss_clamp",
+          "function": "box-to-truss (attaches X-BAR to truss tube for flying); also used to set flown site angle",
+          "weight_kg": null,
+          "wll": "certified 250 kg",
+          "verified": true
+        },
+        {
+          "code": "X-UL15",
+          "name": "Long U-bracket for X15 HiQ",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling mount; can also be used for flying; combinable with X-UTILT for tilt",
+          "weight_kg": 2.9,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X-US1215",
+          "name": "Short U-bracket for X12 and X15 HiQ",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling mount (shared with X12); used with EMBi for pole-mount; can be used for flying; combinable with X-UTILT for tilt",
+          "weight_kg": 3,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X-UTILT",
+          "name": "U-bracket wall mount with tilt adjustment (X series)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall tilt-adjust accessory; works with X-US1215 or X-UL15; vertical use only, negative site angles (0 to -45 deg)",
+          "weight_kg": 1.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "EMBi",
+          "name": "Pole mount socket (8XTi/12XTi and X series, 35 mm)",
+          "category": "pole_mount",
+          "function": "box-to-pole adapter; used together with X-US1215 only (do NOT use with X-UL15); site angle adjustable via U-bracket",
+          "weight_kg": 0.5,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "X4i": {
+      "weight_kg": 1,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "X-U4i",
+          "name": "Adjustable U-bracket for X4i",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling/pole mount with tilt adjustment; fixes to the 2 M5 side inserts; secured to surface with two M6 screws; Ø11 mm hole for pole/mic-stand (Ø10 mm European threaded axis; US via 3/8\"-16 to 5/8\"-27 adapter)",
+          "weight_kg": 0.3,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X-B4i",
+          "name": "Base plate and bracket for X4i",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling/pole mount with tilt, or base for surface/shelf placement with site-angle adjustment; fixes to the 2 M5 side inserts; secured with two M6 screws; Ø11 mm pole-mount hole",
+          "weight_kg": 0.4,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-onCW",
+          "name": "On-wall / on-ceiling mounting accessory with silent blocks for X4i",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling interface with vibration-isolating silent blocks; mounts to the 2 M6 rear rigging inserts; secured to surface with three M6 round/pan-head screws; includes safety screw",
+          "weight_kg": 0.3,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-WALL",
+          "name": "On-wall / on-ceiling mounting accessory without silent blocks (compatible small loudspeakers)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling interface (no silent blocks); surface-mounting plate + main part with X4i adaptor plate; mounts via 2x M6x20 Torx; includes safety screw",
+          "weight_kg": 0.28,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-PAN",
+          "name": "Small Pan accessory for installation",
+          "category": "accessory",
+          "function": "pan/horizontal-aiming interface added between X4i and wall/ceiling mount (can combine with X4i-TILT accessories)",
+          "weight_kg": 0.39,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-TILT5",
+          "name": "Small fixed tilt accessory 5 degrees for installation",
+          "category": "accessory",
+          "function": "adds a fixed 5-degree tilt between X4i and its wall/ceiling mount",
+          "weight_kg": 0.33,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-TILT15",
+          "name": "Small fixed tilt accessory 15 degrees for installation",
+          "category": "accessory",
+          "function": "adds a fixed 15-degree tilt between X4i and its wall/ceiling mount",
+          "weight_kg": 0.34,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X4i-TILT40",
+          "name": "Small fixed tilt accessory 40 degrees for installation",
+          "category": "accessory",
+          "function": "adds a fixed 40-degree tilt between X4i and its wall/ceiling mount",
+          "weight_kg": 0.35,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "X6i": {
+      "weight_kg": 6.3,
+      "recommended_rigging": "VBAR",
+      "rigging_parts": [
+        {
+          "code": "VBAR",
+          "name": "VBAR",
+          "category": "rigging_bar",
+          "function": "box-to-truss / box-to-ceiling (vertical) - flies or mounts a vertically-oriented X6i",
+          "weight_kg": 0.6,
+          "wll": "no numeric WLL published; single box on max Ø10 mm truss clamp or threaded rod; ceiling-mount screw ultimate tensile load 9 daN/screw x2 (holes 1 and 7)",
+          "verified": true
+        },
+        {
+          "code": "X6i-HBAR",
+          "name": "X6i-HBAR",
+          "category": "rigging_bar",
+          "function": "box-to-truss / box-to-ceiling (horizontal) - flies or mounts a horizontally-oriented X6i",
+          "weight_kg": 0.4,
+          "wll": "no numeric WLL published; single box on max Ø10 mm truss clamp or threaded rod; 6 pickup points (Ø10.3 mm)",
+          "verified": true
+        },
+        {
+          "code": "CEILING-PENDANT",
+          "name": "CEILING-PENDANT",
+          "category": "rigging_bar",
+          "function": "box-to-truss / threaded rod - flies X6i downward-facing as a pendant",
+          "weight_kg": 0.1,
+          "wll": "no numeric WLL published; single box; top slotted hole Ø12 mm",
+          "verified": true
+        },
+        {
+          "code": "X6i-onCW",
+          "name": "X6i-onCW",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling - on-wall or on-ceiling mount with vibration-isolating silent blocks",
+          "weight_kg": 0.7,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "WALL",
+          "name": "WALL",
+          "category": "bracket_yoke",
+          "function": "box-to-wall - mounts one X6i horizontally on a wall (used with TILT-SUPPORT)",
+          "weight_kg": 0.2,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "WALLx2",
+          "name": "WALLx2",
+          "category": "bracket_yoke",
+          "function": "box-to-wall - mounts one X6i vertically on a wall (kit of two WALL)",
+          "weight_kg": 0.4,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "PAN",
+          "name": "PAN",
+          "category": "bracket_yoke",
+          "function": "wall/mount pan adjustment +/-45 deg",
+          "weight_kg": 0.4,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "PANx2",
+          "name": "PANx2",
+          "category": "bracket_yoke",
+          "function": "wall/mount pan adjustment kit +/-45 deg (kit of two PAN)",
+          "weight_kg": 0.8,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT",
+          "name": "TILT",
+          "category": "bracket_yoke",
+          "function": "adjustable tilt accessory 0-40 deg for wall/ceiling mounting",
+          "weight_kg": 0.6,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT5",
+          "name": "TILT5",
+          "category": "bracket_yoke",
+          "function": "fixed 5 deg tilt accessory",
+          "weight_kg": 0.3,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT15",
+          "name": "TILT15",
+          "category": "bracket_yoke",
+          "function": "fixed 15 deg tilt accessory",
+          "weight_kg": 0.4,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT40",
+          "name": "TILT40",
+          "category": "bracket_yoke",
+          "function": "fixed 40 deg tilt accessory",
+          "weight_kg": 0.5,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "TILT-SUPPORT",
+          "name": "TILT-SUPPORT",
+          "category": "bracket_yoke",
+          "function": "support plate required for WALL/PAN/TILT/TILT5/TILT15/TILT40 wall-mounting assemblies",
+          "weight_kg": 0.5,
+          "wll": "no numeric WLL published",
+          "verified": true
+        },
+        {
+          "code": "GROUND",
+          "name": "GROUND",
+          "category": "accessory",
+          "function": "ground-stack stabilizer (0 deg)",
+          "weight_kg": 0.2,
+          "wll": "no numeric WLL published; ground-stack stability only",
+          "verified": true
+        },
+        {
+          "code": "GROUND35",
+          "name": "GROUND35",
+          "category": "accessory",
+          "function": "ground-stack accessory for 35 deg site angle",
+          "weight_kg": 0.2,
+          "wll": "no numeric WLL published; ground-stack stability only",
+          "verified": true
+        },
+        {
+          "code": "GROUND55",
+          "name": "GROUND55",
+          "category": "accessory",
+          "function": "ground-stack accessory for 55 deg site angle",
+          "weight_kg": 0.1,
+          "wll": "no numeric WLL published; ground-stack stability only",
+          "verified": true
+        },
+        {
+          "code": "POLE",
+          "name": "POLE",
+          "category": "pole_mount",
+          "function": "pole-mount adapter (Ø36 mm, M10)",
+          "weight_kg": 0.5,
+          "wll": "no numeric WLL published",
+          "verified": true
+        }
+      ]
+    },
+    "X8": {
+      "weight_kg": 12,
+      "recommended_rigging": "X-BAR",
+      "rigging_parts": [
+        {
+          "code": "X-BAR",
+          "name": "Rigging bar for X8 (1 enclosure)",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor (flying single X8); threaded axis with cam lever, front or rear extension, ~10 vertical/horizontal angulations",
+          "weight_kg": 1.1,
+          "wll": "Supplied with 1 x Ø12 mm shackle WLL 1 t; single enclosure only; deployment safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "X-US8",
+          "name": "Short U-bracket for X8",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / ceiling / truss (flying via M10 truss clamp) and pole-mount base (with EMBi); secured with 3x M10 screws",
+          "weight_kg": 2.3,
+          "wll": "1 enclosure (max/safe limit); safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "X-UL8",
+          "name": "Long U-bracket for X8",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / ceiling / truss (flying via M10 truss clamp); secured with 3x M10 screws",
+          "weight_kg": 2.3,
+          "wll": "1 enclosure (max/safe limit); safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "X-UL8i",
+          "name": "Long U-bracket for X8 (installation version)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / ceiling / truss for fixed installs; secured to X8 with 2x M10 screws; not compatible with X-UTILT or EMBi",
+          "weight_kg": 2,
+          "wll": "1 enclosure (max/safe limit); safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "X-UTILT",
+          "name": "U-bracket wall-mount for X series with tilt adjustment",
+          "category": "bracket_yoke",
+          "function": "wall-mount tilt-adjust accessory (negative site angles) used together with X-US8 or X-UL8; vertical use only",
+          "weight_kg": 1.5,
+          "wll": "1 enclosure (max/safe limit); safety factor 5",
+          "verified": true
+        },
+        {
+          "code": "EMBi",
+          "name": "Pole-mount socket (8XTi/12XTi and X series)",
+          "category": "pole_mount",
+          "function": "35 mm pole-mount adapter used with X-US8 to pole-mount X8; not for use with X-UL8 or X-UL8i",
+          "weight_kg": 0.5,
+          "wll": "1 enclosure; pole-mount only",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "Truss clamp certified for 250 kg",
+          "category": "truss_clamp",
+          "function": "box-to-truss; optional clamp used with X-BAR (in place of the shackle) to fly/select site angle",
+          "weight_kg": null,
+          "wll": "Certified for 250 kg",
+          "verified": true
+        }
+      ]
+    },
+    "X8i": {
+      "weight_kg": 11,
+      "recommended_rigging": "VBAR",
+      "rigging_parts": [
+        {
+          "code": "VBAR",
+          "name": "VBAR",
+          "category": "flying_frame",
+          "function": "box-to-truss / box-to-ceiling: vertical flying or truss-mount bracket; 7 pickup points for site angles +9 deg to -17 deg",
+          "weight_kg": 0.6,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X8i-HBAR",
+          "name": "X8i-HBAR",
+          "category": "flying_frame",
+          "function": "box-to-truss / box-to-ceiling: horizontal flying or truss-mount bracket; 6 pickup points for site angle",
+          "weight_kg": 0.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "CEILING-PENDANT",
+          "name": "CEILING-PENDANT",
+          "category": "flying_frame",
+          "function": "box-to-ceiling: ceiling-hung pendant flying bracket",
+          "weight_kg": 0.1,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "X8i-onCW",
+          "name": "X8i-onCW",
+          "category": "bracket_yoke",
+          "function": "box-to-wall / box-to-ceiling: on-wall or on-ceiling mounting interface with silent blocks",
+          "weight_kg": 0.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "WALL",
+          "name": "WALL",
+          "category": "bracket_yoke",
+          "function": "box-to-wall: single wall-mounting accessory (used with TILT-SUPPORT)",
+          "weight_kg": 0.2,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "WALLx2",
+          "name": "WALLx2",
+          "category": "bracket_yoke",
+          "function": "box-to-wall: wall-mounting kit",
+          "weight_kg": 0.4,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "PAN",
+          "name": "PAN",
+          "category": "bracket_yoke",
+          "function": "box-to-wall: adjustable pan accessory +/-45 deg (used with TILT-SUPPORT)",
+          "weight_kg": 0.4,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "PANx2",
+          "name": "PANx2",
+          "category": "bracket_yoke",
+          "function": "box-to-wall: adjustable pan accessory kit +/-45 deg",
+          "weight_kg": 0.8,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "TILT",
+          "name": "TILT",
+          "category": "bracket_yoke",
+          "function": "tilt adjustment for wall/ceiling mounts: adjustable 0 deg to 40 deg (used with TILT-SUPPORT or VBAR/X8i-HBAR)",
+          "weight_kg": 0.6,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "TILT5",
+          "name": "TILT5",
+          "category": "bracket_yoke",
+          "function": "tilt adjustment: fixed 5 deg",
+          "weight_kg": 0.3,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "TILT15",
+          "name": "TILT15",
+          "category": "bracket_yoke",
+          "function": "tilt adjustment: fixed 15 deg",
+          "weight_kg": 0.4,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "TILT40",
+          "name": "TILT40",
+          "category": "bracket_yoke",
+          "function": "tilt adjustment: fixed 40 deg",
+          "weight_kg": 0.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "TILT-SUPPORT",
+          "name": "TILT-SUPPORT",
+          "category": "bracket_yoke",
+          "function": "mandatory support plate securing TILT/PAN/WALL wall-mount assemblies",
+          "weight_kg": 0.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "GROUND",
+          "name": "GROUND",
+          "category": "accessory",
+          "function": "ground-stack: ground-mounting accessory (0 deg)",
+          "weight_kg": 0.2,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "GROUND55",
+          "name": "GROUND55",
+          "category": "accessory",
+          "function": "ground-stack: ground-mounting accessory for 55 deg site angle",
+          "weight_kg": 0.1,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "GROUND35",
+          "name": "GROUND35",
+          "category": "accessory",
+          "function": "ground-stack: ground-mounting accessory for 35 deg site angle",
+          "weight_kg": 0.2,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "POLE",
+          "name": "POLE",
+          "category": "pole_mount",
+          "function": "pole-mount adapter (M10 / 36 mm pole socket)",
+          "weight_kg": 0.5,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "8XT": {
+      "weight_kg": 11,
+      "recommended_rigging": "ETR8-2",
+      "rigging_parts": []
+    },
+    "12XT (Active)": {
+      "weight_kg": 29,
+      "recommended_rigging": "XTLIFTBAR",
+      "rigging_parts": [
+        {
+          "code": "XTLIFTBAR",
+          "name": "XTLIFTBAR flying bar",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor flying of 12XT (shared with 115XT HiQ)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "ETR12-2",
+          "name": "ETR12-2 mounting U-bracket",
+          "category": "bracket_yoke",
+          "function": "wall/ceiling mount of one 12XT",
+          "weight_kg": 5.3,
+          "wll": "Maximum of one 12XT or 112P enclosure per ETR12-2; adjustable 0-360 deg in 10 deg steps",
+          "verified": true
+        },
+        {
+          "code": "CA ETRPIN",
+          "name": "Ball locking pin (ETR12-2 spare)",
+          "category": "accessory",
+          "function": "securing pin for the ETR12-2 U-bracket",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "OMNIMOUNT 120.0 SERIES",
+          "name": "OMNIMOUNT 120.0 Series fixture",
+          "category": "bracket_yoke",
+          "function": "third-party wall/ceiling mount via four rear M8 inserts (T40 screws)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "12XT (Passive)": {
+      "weight_kg": 29,
+      "recommended_rigging": "XTLIFTBAR",
+      "rigging_parts": [
+        {
+          "code": "XTLIFTBAR",
+          "name": "XTLIFTBAR rigging accessory (flying bar)",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor (flying the 12XT, and 115XT HiQ)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "ETR12-2",
+          "name": "ETR12-2 mounting accessory (U-bracket)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling fixed mount; can also be suspended from a structure (under-balcony)",
+          "weight_kg": 5.3,
+          "wll": "Setup safety limit: maximum of one 12XT (or 112P) enclosure per ETR12-2; secure with three 10 mm screws + anchors rated >=5x enclosure/bracket assembly weight",
+          "verified": true
+        },
+        {
+          "code": "OMNIMOUNT 120.0 SERIES",
+          "name": "OMNIMOUNT 120.0 SERIES mounting accessory (3rd-party)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling mount via four rear M8 inserts (T40 Torx); 3rd-party Omnimount fixture",
+          "weight_kg": null,
+          "wll": "Per Omnimount 120.0 series rating (not specified by L-Acoustics)",
+          "verified": true
+        },
+        {
+          "code": "CA ETRPIN",
+          "name": "Ball locking pin (ETR12-2 spare part)",
+          "category": "accessory",
+          "function": "securing pin for the ETR12-2 U-bracket; listed customer spare part",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "115XT HiQ": {
+      "weight_kg": 28.5,
+      "recommended_rigging": "XTLIFTBAR",
+      "rigging_parts": [
+        {
+          "code": "XTLIFTBAR",
+          "name": "XTLIFTBAR fly bar",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor (fly bar to fly a 115XT HiQ from a structure)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "ETR15",
+          "name": "ETR15 mounting accessory (U-bracket)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/ceiling (dedicated U-bracket for wall/ceiling mounting one 115XT HiQ, 0-360 deg in 10 deg steps)",
+          "weight_kg": 5.5,
+          "wll": "Maximum of one 115XT HiQ enclosure per ETR15 (setup safety limit); fix to concrete with three 10 mm screws + expansion anchors each rated >= 5x the enclosure/bracket assembly weight",
+          "verified": true
+        },
+        {
+          "code": "CA ETRPIN",
+          "name": "Ball locking pin (ETR15 spare part)",
+          "category": "accessory",
+          "function": "box-to-bracket (ball locking pin securing 115XT HiQ to the ETR15 U-bracket)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "M8 safety eyebolt insert",
+          "name": "M8 safety eyebolt insert (rear face)",
+          "category": "accessory",
+          "function": "safety attachment point (M8 insert on rear face for a safety eye-bolt when flown)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "35 mm pole socket",
+          "name": "Integrated 35 mm / 1.4 in pole socket",
+          "category": "pole_mount",
+          "function": "box-to-pole (integrated 35 mm socket for pole-stand mounting)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "112XT": {
+      "weight_kg": 27,
+      "recommended_rigging": "XTLIFTBAR",
+      "rigging_parts": [
+        {
+          "code": "ETR112XT",
+          "name": "ETR112XT Adjustable U-Bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure: ceiling/wall/scaffold mount of one 112XT in horizontal or vertical orientation; mates with the pole-mount sockets, 3 center mount holes, 10-degree angular resolution",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "CPL112XT",
+          "name": "CPL112XT Coupling Adapter Bars",
+          "category": "coupling_bar",
+          "function": "box-to-box: used with the ETR112XT U-bracket to vertically array two 112XT enclosures with independent tilt adjustment for each box",
+          "weight_kg": null,
+          "wll": "max 2 x 112XT per ETR112XT/CPL112XT vertical array (per manual)",
+          "verified": true
+        },
+        {
+          "code": "XTLIFTBAR",
+          "name": "XTLIFTBAR Single-Point Fly Bar",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor: single-point rigging of one 112XT (also 115XT / 115XT HiQ) from a hoist; mounts to a pole-mount socket (top or bottom); shackle relocation gives 5 tilt positions",
+          "weight_kg": null,
+          "wll": "tilt +14 / +7 / 0 / -7 / -14 degrees (5 pick points); numeric WLL not published in manual",
+          "verified": true
+        },
+        {
+          "code": "PION2",
+          "name": "PION 2 Double-Stud Aeroquip Flytrack Fitting-to-Ring",
+          "category": "rigging_bar",
+          "function": "safety/permanent-install attachment: double-stud flytrack fitting to ring, engages the side-recessed flytrack sections for a safety steel, or works with ETR112XT/ETR115XT as a safety attachment",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "115XT": {
+      "weight_kg": 29.5,
+      "recommended_rigging": "ETR115XT",
+      "rigging_parts": [
+        {
+          "code": "ETR115XT",
+          "name": "Adjustable U-bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure (ceiling/wall/scaffold) suspension; flies one 115XT (or 115XT HiQ) horizontally or vertically with 10 deg tilt resolution; also the base for arraying two boxes with CPL115XT",
+          "weight_kg": 5.5,
+          "wll": "WLL 61.5 daN (138 lbf); ultimate safety factor >12. Attaches to support via 1, 2 or all 3 of the 11 mm holes on the main bracket",
+          "verified": true
+        },
+        {
+          "code": "CPL115XT",
+          "name": "Coupling adapter bars (set of 2)",
+          "category": "coupling_bar",
+          "function": "box-to-box; used with ETR115XT to array two 115XT (or 115XT HiQ) vertically with independent tilt per enclosure",
+          "weight_kg": 1.75,
+          "wll": "WLL 14.5 daN (33 lbf); ultimate safety factor >12. Supplied as 2 pieces. Max 2 enclosures flown vertically per ETR115XT + CPL115XT",
+          "verified": true
+        },
+        {
+          "code": "XTLIFTBAR",
+          "name": "Single-point liftbar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor single-point rigging; mates with a pole-mount socket and provides 5 pick points for tilt adjustment",
+          "weight_kg": 0.55,
+          "wll": "WLL 30 daN (67.5 lbf); ultimate safety factor >12. Max 1 enclosure (one 112XT or 115XT) per liftbar",
+          "verified": true
+        },
+        {
+          "code": "PION2",
+          "name": "Double-stud Aeroquip flytrack fitting-to-ring",
+          "category": "accessory",
+          "function": "secondary safety attachment only (to the recessed side-mounted flytrack sections); also used for permanent installation. Not to be used as the main rigging point",
+          "weight_kg": null,
+          "wll": "Ultimate safety factor >12; one PION2 can withstand the weight of one 115XT. Secondary safety only - must NOT be the main rigging point",
+          "verified": true
+        }
+      ]
+    },
+    "MTD108a": {
+      "weight_kg": 10.5,
+      "recommended_rigging": "ETR8",
+      "rigging_parts": []
+    },
+    "MTD112b": {
+      "weight_kg": 27.5,
+      "recommended_rigging": "ETR1",
+      "rigging_parts": []
+    },
+    "MTD115b (Active)": {
+      "weight_kg": 31.5,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "ETR2",
+          "name": "ETR2 Adjustable U-Bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-structure: ceiling/wall/scaffold mount of MTD115b (and SB115), horizontal orientation only",
+          "weight_kg": 4,
+          "wll": "WLL 31.5 daN / 71 lbf; ultimate safety factor >12 (per CE Declaration of Conformity DCE-MTD115b). Attaches to support via 1, 2 or all 3 of the 11 mm holes on the main bracket. Horizontal orientation only.",
+          "verified": true
+        },
+        {
+          "code": "PION1",
+          "name": "PION1 Single-Stud Aeroquip Flytrack Fitting-to-Ring",
+          "category": "accessory",
+          "function": "secondary safety attachment only (safety steel anchor); not to be used as a main rigging point",
+          "weight_kg": null,
+          "wll": "One PION1 withstands the weight of one MTD115b with ultimate safety factor 12. Secondary rigging point only; mates to the integrated side-mounted recessed fly-track / single-stud anchor plate.",
+          "verified": true
+        },
+        {
+          "code": "OMNIMOUNT",
+          "name": "Omnimount bracket (optional, third-party Omnimount-ready interface)",
+          "category": "bracket_yoke",
+          "function": "box-to-wall/structure via four rear threaded inserts (Omnimount-ready)",
+          "weight_kg": null,
+          "wll": "Not stated in L-Acoustics docs (Omnimount is a third-party mount sized to enclosure weight; MTD115b = 31.5 kg).",
+          "verified": true
+        },
+        {
+          "code": "POLE-SOCKET-36MM",
+          "name": "Integrated 36 mm (1.42 in) pole-mount socket",
+          "category": "pole_mount",
+          "function": "ground-stack/tripod: bottom-side pole-mount socket included as standard",
+          "weight_kg": null,
+          "wll": "Not stated (standard built-in tripod/pole socket).",
+          "verified": true
+        }
+      ]
+    },
+    "MTD115b (Passive)": {
+      "weight_kg": 31.5,
+      "recommended_rigging": "ETR2",
+      "rigging_parts": [
+        {
+          "code": "ETR2",
+          "name": "ETR2 Adjustable U-Bracket",
+          "category": "bracket_yoke",
+          "function": "box-to-truss / box-to-support: primary overhead suspension (horizontal orientation) and ceiling/wall/scaffold U-bracket mount for MTD115b (also used with SB115)",
+          "weight_kg": 4,
+          "wll": "WLL 31.5 daN / 71 lbf; ultimate safety factor >12 (per MTD115b CE Declaration). Attaches to support via 1, 2 or all 3 of the 11 mm dia. holes on the main bracket; horizontal orientation only.",
+          "verified": true
+        },
+        {
+          "code": "PION1",
+          "name": "PION1 Single-Stud Aeroquip Flytrack Fitting-to-Ring",
+          "category": "accessory",
+          "function": "safety attachment only (safety steel anchor) into the recessed side fly-track / single-stud anchor plate; NOT a primary rigging point",
+          "weight_kg": null,
+          "wll": "Secondary/safety point only - shall not be used as the main rigging point; one PION1 withstands the weight of one MTD115b at ultimate safety factor 12",
+          "verified": true
+        },
+        {
+          "code": "INTEGRATED",
+          "name": "Integrated rigging hardware (threaded rigging inserts / single-stud anchor plate, 36 mm pole-mount socket, handles, Omnimount-ready inserts)",
+          "category": "accessory",
+          "function": "built-in mounting provisions: 4 recessed threaded inserts for the ETR2 (two each top/bottom), rear single-stud anchor plate for PION1 safety, 36 mm (1.42 in) bottom pole-mount socket for tripod, and 4 inserts for an optional Omnimount bracket (horizontal or vertical)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    },
+    "ARCS Wide/Focus": {
+      "weight_kg": 38,
+      "recommended_rigging": "WIFOBUMP",
+      "rigging_parts": [
+        {
+          "code": "WIFORIG",
+          "name": "WIFORIG coupling bars (with LOCKTAB locking tab)",
+          "category": "coupling_bar",
+          "function": "box-to-box; constant-curvature inter-element coupling of ARCS Wide/Focus enclosures. 2 supplied with each enclosure.",
+          "weight_kg": null,
+          "wll": "Config-dependent; safety factor 4 per 2006/42/EC verified in Soundvision (no standalone WLL stated for the bar)",
+          "verified": true
+        },
+        {
+          "code": "WIFOBUMP",
+          "name": "WIFOBUMP flying frame / bumper",
+          "category": "flying_frame",
+          "function": "box-to-truss / box-to-motor; flies ARCS Wide/Focus or SB18m as a vertical array. Integrated laser-support plate for inclinometer.",
+          "weight_kg": 10.5,
+          "wll": "Provided with two bow shackles WLL 1 t each. Max 8 ARCS Wide/Focus (or 4 SB18m); 6 ARCS Wide/Focus (or 3 SB18m) when used with CLAMP250. Safety factor 4, confirm in Soundvision.",
+          "verified": true
+        },
+        {
+          "code": "WIFOLIFT",
+          "name": "WIFOLIFT horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies 2, 4, 6 or 8 ARCS Wide/Focus as a horizontal array (max 4 per single WIFOLIFT). Provided with one bow shackle WLL 1 t and one connecting rod.",
+          "weight_kg": 2,
+          "wll": "Max 4 ARCS Wide/Focus per WIFOLIFT. Supplied bow shackle WLL 1 t. Safety factor 4, confirm in Soundvision.",
+          "verified": true
+        },
+        {
+          "code": "WIFOLIFTBAR",
+          "name": "WIFOLIFTBAR horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies 3, 5 or 6 ARCS Wide/Focus as a horizontal array (used together with WIFOLIFTs for larger horizontal arrays). Provided with one bow shackle WLL 1 t and 2 swivel shackles.",
+          "weight_kg": 1.6,
+          "wll": "Safe limit 5 ARCS Wide/Focus; max 6 ARCS Wide or 5 ARCS Focus (6 ARCS Wide only via holes 2-6, Wide only). Supplied bow shackle WLL 1 t.",
+          "verified": true
+        },
+        {
+          "code": "WIFOTILT",
+          "name": "WIFOTILT stacking / tilt accessory",
+          "category": "bracket_yoke",
+          "function": "ground-stack; stacks and sets the site angle of up to 4 ARCS Wide/Focus on top of an SB18m subwoofer.",
+          "weight_kg": 2.1,
+          "wll": "Max 4 ARCS Wide/Focus stacked on SB18m. Safety factor / stability confirmed in Soundvision.",
+          "verified": true
+        },
+        {
+          "code": "WIFOSOCK",
+          "name": "WIFOSOCK pole-mount socket",
+          "category": "pole_mount",
+          "function": "pole-mount; adapts a single ARCS Wide/Focus enclosure to a speaker pole.",
+          "weight_kg": 0.8,
+          "wll": "1 ARCS Wide/Focus (pole-mounted, single enclosure only)",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "box-to-truss; attaches a WIFOBUMP / WIFOLIFT / WIFOLIFTBAR directly to a truss in place of a shackle.",
+          "weight_kg": 1.8,
+          "wll": "Used in place of a 1 t bow shackle; reduces array limits (e.g. WIFOBUMP+CLAMP250 max 6 ARCS Wide/Focus). Capacity config-dependent per Soundvision.",
+          "verified": true
+        }
+      ]
+    },
+    "ARCS": {
+      "weight_kg": 38,
+      "recommended_rigging": "WIFOBUMP",
+      "rigging_parts": [
+        {
+          "code": "WIFOBUMP",
+          "name": "WIFOBUMP vertical flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flies a vertical ARCS WIDE/FOCUS (or SB18m) array",
+          "weight_kg": 11.5,
+          "wll": "Supplied with 2 bow shackles WLL 1 t each; config limit safe/max 8 ARCS WIDE/FOCUS (6 with CLAMP250) or 4 SB18m (3 with CLAMP250)",
+          "verified": true
+        },
+        {
+          "code": "WIFORIG",
+          "name": "WIFORIG coupling bars (with LOCKTAB)",
+          "category": "coupling_bar",
+          "function": "box-to-box; couples adjacent ARCS WIDE/FOCUS enclosures; 2 supplied per enclosure",
+          "weight_kg": null,
+          "wll": "not stated (config-dependent, model in SOUNDVISION)",
+          "verified": true
+        },
+        {
+          "code": "WIFOLIFT",
+          "name": "WIFOLIFT horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies 2/4/6/8 ARCS WIDE/FOCUS as a horizontal array",
+          "weight_kg": 2,
+          "wll": "Supplied with 1 bow shackle WLL 1 t + 1 connecting rod; config limit 4 ARCS WIDE/FOCUS per WIFOLIFT",
+          "verified": true
+        },
+        {
+          "code": "WIFOLIFTBAR",
+          "name": "WIFOLIFTBAR horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies 3/5/6 ARCS WIDE/FOCUS as a horizontal array; spreader between two WIFOLIFT",
+          "weight_kg": 1.6,
+          "wll": "Supplied with 1 bow shackle WLL 1 t (+ 2 swivel shackles); config limit safe 5 ARCS WIDE/FOCUS, max 6 WIDE or 5 FOCUS",
+          "verified": true
+        },
+        {
+          "code": "WIFOTILT",
+          "name": "WIFOTILT stack-and-tilt accessory",
+          "category": "downfill",
+          "function": "ground-stack/box-to-sub; stacks and sets site angle of up to 4 ARCS WIDE/FOCUS on SB18m",
+          "weight_kg": 2.1,
+          "wll": "max 4 ARCS WIDE/FOCUS stacked on SB18m",
+          "verified": true
+        },
+        {
+          "code": "WIFOSOCK",
+          "name": "WIFOSOCK pole-mount socket",
+          "category": "pole_mount",
+          "function": "pole-mount; mounts 1 ARCS WIDE/FOCUS on a pole with adjustable site angle",
+          "weight_kg": 0.8,
+          "wll": "1 ARCS WIDE/FOCUS max",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "box-to-truss; clamps a WIFOBUMP/WIFOLIFT/WIFOLIFTBAR array to a truss tube in place of a shackle",
+          "weight_kg": 1.8,
+          "wll": "Clamp certified for 250 kg",
+          "verified": true
+        },
+        {
+          "code": "SB18MRIG",
+          "name": "SB18MRIG coupling bars (with LOCKTAB)",
+          "category": "coupling_bar",
+          "function": "box-to-box; couples SB18m subwoofers in the shared WIFO rigging system; 2 supplied per SB18m (not an ARCS-enclosure part)",
+          "weight_kg": null,
+          "wll": "not stated",
+          "verified": true
+        }
+      ]
+    },
+    "Kiva": {
+      "weight_kg": 13,
+      "recommended_rigging": "KIBU",
+      "rigging_parts": [
+        {
+          "code": "KIBU",
+          "name": "KIBU rigging structure / bumper",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; dedicated flying & ground-stacking bumper for an original-Kiva line-source array",
+          "weight_kg": 4,
+          "wll": "WLL/CMU 266 kg (586 lb) per BGV-C1; supplied with 2 shackles each rated 630 kg (1388 lb), 5:1 ultimate strength factor; safe 8 / max 20 Kiva flown",
+          "verified": true
+        },
+        {
+          "code": "KIBU II",
+          "name": "KIBU II rigging frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; current-generation flying & stacking frame for Kiva / Kiva II (successor to KIBU)",
+          "weight_kg": 3.8,
+          "wll": "Supplied with 2 x Ø12 mm shackles WLL 1 t; safe 12 / max 20 Kiva(II) flown",
+          "verified": true
+        },
+        {
+          "code": "KIBU-SB",
+          "name": "KIBU-SB rigging frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/box-to-box; frame for flying or stacking Kiva / Kiva II with the SB15m subwoofer (mixed or independent arrays)",
+          "weight_kg": 10.7,
+          "wll": "Supplied with 2 x Ø12 mm bow shackles WLL 1 t (+ 2 coupling bars w/ locking tabs); flown safe 8/12 - max 20 Kiva; stacked safe 4 / max 9 Kiva; max 8 SB15m",
+          "verified": true
+        },
+        {
+          "code": "KIET",
+          "name": "KIET mounting accessory",
+          "category": "pole_mount",
+          "function": "box-to-structure; ceiling/under-balcony bracket or 35 mm pole-mount plate for distributed Kiva",
+          "weight_kg": 3,
+          "wll": "Rated for max 2 KIVA (or 1 KILO) enclosures",
+          "verified": true
+        },
+        {
+          "code": "KIET II",
+          "name": "KIET II rigging plate",
+          "category": "pole_mount",
+          "function": "box-to-structure; current-generation ceiling or 35 mm pole-mount plate for distributed Kiva / Kiva II (successor to KIET)",
+          "weight_kg": 3.2,
+          "wll": "Rated for max 3 Kiva / Kiva II enclosures",
+          "verified": true
+        },
+        {
+          "code": "KIVA-PULLBACK",
+          "name": "KIVA-PULLBACK pullback accessory",
+          "category": "accessory",
+          "function": "box-to-box; pullback accessory to set array site angle / secure permanent installs (used with KIBU II / KIBU-SB)",
+          "weight_kg": 2.6,
+          "wll": "Supplied with 1 x Ø12 mm shackle WLL 1 t; pullback max 9 Kiva(II) (9 Kiva II + 3 SB15m with KIBU-SB)",
+          "verified": true
+        },
+        {
+          "code": "CLAMP250",
+          "name": "CLAMP250 truss clamp",
+          "category": "truss_clamp",
+          "function": "frame-to-truss; truss clamp used in place of a shackle to attach KIBU-SB directly to truss (with safety slings)",
+          "weight_kg": null,
+          "wll": "Clamp certified for 250 kg; with KIBU-SB+CLAMP250 flown safe 12 / max 18 Kiva, max 6 SB15m",
+          "verified": true
+        }
+      ]
+    },
+    "Kilo": {
+      "weight_kg": 19,
+      "recommended_rigging": "KIBU",
+      "rigging_parts": [
+        {
+          "code": "Captive 3-point rigging system",
+          "name": "Integrated captive 3-point rigging system",
+          "category": "flying_frame",
+          "function": "Integrated box-to-box and box-to-bumper rigging built into the KILO cabinet; sets inter-element splay angles within a KIVA line source",
+          "weight_kg": null,
+          "wll": "Inter-enclosure angles 0,1,2,3,4,5,7.5,10,12.5,15 deg; high-strength steel with anti-corrosion coating",
+          "verified": true
+        },
+        {
+          "code": "KIBU",
+          "name": "KIBU rigging structure (bumper)",
+          "category": "flying_frame",
+          "function": "box-to-truss / box-to-motor; primary bumper to fly a KIVA/KILO line source array from 1 or 2 rigging points",
+          "weight_kg": 4,
+          "wll": "max 20 KIVA OR 14 KILO flown per bumper; supplied with 2 bow shackles, each rated 630 kg (1388 lb) with 5:1 ultimate-strength safety factor; WLL config-dependent",
+          "verified": false
+        },
+        {
+          "code": "KIET",
+          "name": "KIET mounting accessory",
+          "category": "bracket_yoke",
+          "function": "box-to-structure / box-to-ceiling-or-pole; mounting accessory for KIVA or KILO in distributed/install configurations (suspend or fix with three 10 mm screws)",
+          "weight_kg": 3,
+          "wll": "max 2 KIVA OR 1 KILO per KIET",
+          "verified": false
+        }
+      ]
+    },
+    "SB118": {
+      "weight_kg": 61,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "Stacking runners + runner guides",
+          "name": "Integrated stacking runners and runner guides",
+          "category": "accessory",
+          "function": "box-to-box ground-stack interlock for vertical arrays (built into cabinet, not a separate purchasable part)",
+          "weight_kg": null,
+          "wll": "Certified for vertical stacking of up to 8 SB118 enclosures",
+          "verified": true
+        },
+        {
+          "code": "35 mm pole-mount socket",
+          "name": "Built-in 35 mm / 1.4 in pole-mount socket",
+          "category": "pole_mount",
+          "function": "accepts a single XT-range enclosure (8XT/12XT/115XT HiQ) pole-mounted on top (built into cabinet)",
+          "weight_kg": null,
+          "wll": "Single XT enclosure only",
+          "verified": true
+        },
+        {
+          "code": "SB118PLA",
+          "name": "Removable front dolly board for one SB118",
+          "category": "accessory",
+          "function": "transport dolly; attaches via two captive pins into the front locator studs (optional)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "SB118COV",
+          "name": "Protective cover for one SB118",
+          "category": "accessory",
+          "function": "protective transport cover, recommended with SB118PLA (optional)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ]
+    }
+  }
+}
