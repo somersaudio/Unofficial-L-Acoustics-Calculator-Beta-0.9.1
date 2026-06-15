@@ -177,7 +177,8 @@ export interface EnclosureRequest {
   quantity: number;
   perOutput?: number; // ×N per channel in LA-RAK spread mode (default: 1)
   locked?: boolean; // Row pinned "as is" — its controls are frozen; still solved normally
-  deploymentMode?: string; // Per-row deployment selection (drives this array's rigging/weight)
+  deploymentMode?: string; // Per-row deployment selection (drives this array's default rigging/weight)
+  riggingCode?: string; // Per-row rigging-part override (defaults to the deployment's default rigging)
 }
 
 /** Allocation of enclosures to a single amplifier output */
@@ -422,7 +423,7 @@ export interface AmpInstanceSerialized {
 export interface ZoneSerialized {
   id: string;
   name: string;
-  requests: Array<{ id?: string; enclosureName: string; quantity: number; perOutput?: number; locked?: boolean; deploymentMode?: string }>;
+  requests: Array<{ id?: string; enclosureName: string; quantity: number; perOutput?: number; locked?: boolean; deploymentMode?: string; riggingCode?: string }>;
   disabledAmps: string[];
   lockedAmpInstances?: AmpInstanceSerialized[];
 }

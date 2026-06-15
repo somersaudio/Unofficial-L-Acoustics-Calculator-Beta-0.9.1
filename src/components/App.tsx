@@ -328,13 +328,8 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Custom rack names, keyed by rackGroupId (locked) or "unlocked-{idx}" (unlocked)
   const [rackNameMap, setRackNameMap] = useState<Record<string, string>>({});
-  // Selected rigging piece per enclosure name, shown on the amp line (right panel).
-  // The left-panel stack weight is driven separately by each row's own deployment.
-  const [riggingSelections, setRiggingSelections] = useState<Record<string, string>>({});
-  const handleRiggingChange = (enclosureName: string, code: string) =>
-    setRiggingSelections((prev) => ({ ...prev, [enclosureName]: code }));
-  // Deployment is now stored per-row on each EnclosureRequest (see EnclosureSelector),
-  // so two arrays of the same enclosure type can use different deployments.
+  // Deployment and rigging are stored per-row on each EnclosureRequest (see EnclosureSelector),
+  // so two arrays of the same enclosure type can use different deployments/rigging.
   const handleShowRigging = (url: string) => { void window.electronAPI.openExternal?.(url); };
 
   // Restore zones from localStorage once data is loaded
@@ -722,21 +717,6 @@ export default function App() {
     return map;
   }, [activeZone.requests]);
 
-  // Per-enclosure default rigging derived from each array's deployment (e.g. ground-stack
-  // → KIBU-SB), so the amp-line rigging dropdown reflects the chosen deployment.
-  const riggingDefaults = useMemo(() => {
-    const map: Record<string, string> = {};
-    const encs = state.status === "ready" ? state.data.riggingParts?.enclosures : undefined;
-    if (!encs) return map;
-    for (const req of activeZone.requests) {
-      const deps = encs[req.enclosure.enclosure]?.deployments;
-      if (!deps || deps.length === 0) continue;
-      const mode = req.deploymentMode && deps.some((d) => d.mode === req.deploymentMode) ? req.deploymentMode : deps[0].mode;
-      const dep = deps.find((d) => d.mode === mode);
-      if (dep?.default_rigging) map[req.enclosure.enclosure] = dep.default_rigging;
-    }
-    return map;
-  }, [activeZone.requests, state]);
 
   // Clear pending-unlock rack name when speaker configuration changes
   const requestsKey = useMemo(() =>
@@ -946,10 +926,6 @@ export default function App() {
             onRackNameChange={(rackKey, name) => setRackNameMap(prev => ({ ...prev, [rackKey]: name }))}
             perOutputMap={perOutputMap}
             hintsEnabled={hintsEnabled}
-            riggingParts={data.riggingParts}
-            riggingSelections={riggingSelections}
-            onRiggingChange={handleRiggingChange}
-            riggingDefaults={riggingDefaults}
             onMoveEnclosure={(move: EnclosureMoveResult) => {
               // Find the active zone's current solution to get amp instances
               const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);

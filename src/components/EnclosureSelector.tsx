@@ -287,12 +287,19 @@ export default function EnclosureSelector({
 
   const handleDeploymentChange = (index: number, mode: string) => {
     const newReqs = [...requests];
-    const next = { ...newReqs[index], deploymentMode: mode };
+    // Clear any rigging override so the new deployment's default rigging applies.
+    const next = { ...newReqs[index], deploymentMode: mode, riggingCode: undefined };
     // Re-clamp the array down to the new deployment's max (e.g. flown 20 → stacked 9),
     // but never below this row's amp-locked share (those enclosures physically exist).
     const { max } = limitsFor(next.enclosure.enclosure, mode);
     if (max != null) next.quantity = Math.max(Math.min(next.quantity, max), rowLockedShares(requests)[index]);
     newReqs[index] = next;
+    onRequestsChange(newReqs);
+  };
+
+  const handleRiggingCodeChange = (index: number, code: string) => {
+    const newReqs = [...requests];
+    newReqs[index] = { ...newReqs[index], riggingCode: code };
     onRequestsChange(newReqs);
   };
 
@@ -534,6 +541,15 @@ export default function EnclosureSelector({
                 : encRigRow?.deployments?.[0]?.mode;
             const rowDeploy = encRigRow?.deployments?.find((d) => d.mode === rowDeployMode);
             const rowRiggingCode = rowDeploy?.default_rigging ?? encRigRow?.recommended_rigging;
+            // The rigging piece actually used: a per-row override, else the deployment default,
+            // validated against the parts list so the <select> value always matches an option.
+            const riggingPartsList = encRigRow?.rigging_parts ?? [];
+            const riggingCodeExists = (c?: string) => !!c && riggingPartsList.some((p) => p.code === c);
+            const selectedRiggingCode = riggingCodeExists(request.riggingCode)
+              ? request.riggingCode
+              : riggingCodeExists(rowRiggingCode)
+                ? rowRiggingCode
+                : riggingPartsList[0]?.code;
 
             // Per-array limits for the current deployment (hard cap at max; amber warning past safe)
             const rowMax = rowDeploy?.max ?? null;
@@ -579,12 +595,16 @@ export default function EnclosureSelector({
               );
             })();
 
-            // Deployment (rigging) dropdown + Show-rigging link — per row
+            // Deployment + rigging dropdowns + Show-rigging link — per row.
+            // The rigging select renders whenever rigging parts exist, even with no deployments.
             const deploymentControl = (() => {
-              const deps = encRigRow?.deployments;
-              if (!deps || deps.length === 0) return null;
+              const deps = encRigRow?.deployments ?? [];
+              const hasDeps = deps.length > 0;
+              const hasParts = riggingPartsList.length > 0;
+              if (!hasDeps && !hasParts && !encRigRow?.rigging_pdf) return null;
               return (
                 <div className="flex items-center gap-1.5 text-[10px]">
+                  {hasDeps && (
                   <select
                     value={rowDeployMode}
                     onChange={(e) => handleDeploymentChange(index, e.target.value)}
@@ -596,6 +616,22 @@ export default function EnclosureSelector({
                       <option key={d.mode} value={d.mode}>{d.label}</option>
                     ))}
                   </select>
+                  )}
+                  {hasParts && (
+                    <select
+                      value={selectedRiggingCode ?? ""}
+                      onChange={(e) => handleRiggingCodeChange(index, e.target.value)}
+                      disabled={request.locked}
+                      title="Rigging hardware for this array"
+                      className="max-w-[12rem] rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                    >
+                      {riggingPartsList.map((p) => (
+                        <option key={p.code} value={p.code}>
+                          {p.code}{p.weight_kg != null ? ` (${p.weight_kg} kg)` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   {encRigRow?.rigging_pdf && (
                     <button
                       type="button"
@@ -614,7 +650,7 @@ export default function EnclosureSelector({
             const weightControl = (() => {
               const encW = encRigRow?.weight_kg;
               if (typeof encW !== "number") return null;
-              const selPart = rowRiggingCode ? encRigRow?.rigging_parts.find((p) => p.code === rowRiggingCode) : undefined;
+              const selPart = selectedRiggingCode ? encRigRow?.rigging_parts.find((p) => p.code === selectedRiggingCode) : undefined;
               const rigKg = selPart?.weight_kg ?? 0;
               const stackKg = encW * request.quantity + rigKg;
               const stackValue = weightInLbs ? Math.round(stackKg * 2.20462) : Math.round(stackKg);

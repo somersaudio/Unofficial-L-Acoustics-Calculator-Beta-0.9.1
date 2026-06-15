@@ -28,6 +28,7 @@ export function serializeZones(zones: Zone[]): ZoneSerialized[] {
       perOutput: r.perOutput,
       locked: r.locked,
       deploymentMode: r.deploymentMode,
+      riggingCode: r.riggingCode,
     })),
     disabledAmps: Array.from(zone.disabledAmps),
     lockedAmpInstances: zone.lockedAmpInstances.map(serializeAmpInstance),
@@ -102,7 +103,7 @@ export function deserializeZones(
       .map((r) => {
         const enclosure = enclosureMap.get(r.enclosureName);
         if (!enclosure) return null;
-        return { id: r.id ?? crypto.randomUUID(), enclosure, quantity: r.quantity, perOutput: r.perOutput, locked: r.locked, deploymentMode: r.deploymentMode };
+        return { id: r.id ?? crypto.randomUUID(), enclosure, quantity: r.quantity, perOutput: r.perOutput, locked: r.locked, deploymentMode: r.deploymentMode, riggingCode: r.riggingCode };
       })
       .filter((r): r is NonNullable<typeof r> => r !== null),
     disabledAmps: new Set(sz.disabledAmps),

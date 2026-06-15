@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect, useRef, useContext } from "react"; // eslint-disable-line
-import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, Enclosure, RiggingPartsData } from "../types";
+import React, { useState, useMemo, useEffect, useRef } from "react"; // eslint-disable-line
+import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, Enclosure } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength, calculateCableLoss } from "../types";
 import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance, repackRackInstances, spreadRackInstances } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
@@ -15,13 +15,6 @@ import {
   type DropValidation,
 } from "./EnclosureDragDrop";
 
-/** Provides rigging data + per-enclosure selection to the deeply-nested AmpCard. */
-const RiggingContext = React.createContext<{
-  riggingParts?: RiggingPartsData;
-  selections: Record<string, string>;
-  defaults?: Record<string, string>;
-  onChange?: (enclosureName: string, code: string) => void;
-}>({ selections: {} });
 
 interface SolverResultsProps {
   zoneSolutions: ZoneWithSolution[];
@@ -40,11 +33,6 @@ interface SolverResultsProps {
   onRackNameChange?: (rackKey: string, name: string) => void;
   perOutputMap?: Record<string, number>;
   hintsEnabled?: boolean;
-  riggingParts?: RiggingPartsData;
-  riggingSelections?: Record<string, string>;
-  onRiggingChange?: (enclosureName: string, code: string) => void;
-  /** Per-enclosure default rigging derived from the left-panel deployment (e.g. ground-stack → KIBU-SB) */
-  riggingDefaults?: Record<string, string>;
 }
 
 /** Returns inline style for output label color that darkens as output index increases */
@@ -2458,14 +2446,6 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
     return rawInstance;
   }, [packed, spread, rawInstance, perOutputMap]);
 
-  // Rigging selector for this amp's primary (first loaded) enclosure
-  const rigging = useContext(RiggingContext);
-  const riggingPrimaryEnc = (() => {
-    for (const o of instance.outputs) for (const e of o.enclosures) if (e.count > 0) return e.enclosure.enclosure;
-    return null;
-  })();
-  const riggingEnc = riggingPrimaryEnc ? rigging.riggingParts?.enclosures?.[riggingPrimaryEnc] : undefined;
-
   // Stable key prefix for cable lengths — locked amps use ID, unlocked use positional index
   const cableKeyPrefix = isLocked ? instance.id : (ampIndex !== undefined ? String(ampIndex) : instance.id);
 
@@ -2656,22 +2636,6 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
               <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-neutral-700 dark:text-gray-300">
                 {instance.ampConfig.mode}
               </span>
-            )}
-            {riggingEnc && riggingEnc.rigging_parts.length > 0 && riggingPrimaryEnc && (
-              <select
-                value={rigging.selections[riggingPrimaryEnc] ?? rigging.defaults?.[riggingPrimaryEnc] ?? riggingEnc.recommended_rigging ?? ""}
-                onChange={(e) => rigging.onChange?.(riggingPrimaryEnc, e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                title="Rigging hardware for this enclosure type on this amp line"
-                className="ml-1 max-w-[12rem] rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 focus:outline-none"
-              >
-                <option value="">No rigging</option>
-                {riggingEnc.rigging_parts.map((p) => (
-                  <option key={p.code} value={p.code}>
-                    {p.code}{p.weight_kg != null ? ` (${p.weight_kg} kg)` : ""}
-                  </option>
-                ))}
-              </select>
             )}
             {showPackToggle && (
               <button
@@ -3802,7 +3766,7 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, riggingParts, riggingSelections, onRiggingChange, riggingDefaults }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
@@ -3834,7 +3798,6 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
   }
 
   return (
-    <RiggingContext.Provider value={{ riggingParts, selections: riggingSelections ?? {}, defaults: riggingDefaults, onChange: onRiggingChange }}>
     <EnclosureDragDropProvider
       onMoveEnclosure={handleMoveEnclosure}
       validateDrop={validateDrop}
@@ -3860,6 +3823,5 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
         />
       </div>
     </EnclosureDragDropProvider>
-    </RiggingContext.Provider>
   );
 }
