@@ -19,6 +19,7 @@ import {
 const RiggingContext = React.createContext<{
   riggingParts?: RiggingPartsData;
   selections: Record<string, string>;
+  defaults?: Record<string, string>;
   onChange?: (enclosureName: string, code: string) => void;
 }>({ selections: {} });
 
@@ -42,6 +43,8 @@ interface SolverResultsProps {
   riggingParts?: RiggingPartsData;
   riggingSelections?: Record<string, string>;
   onRiggingChange?: (enclosureName: string, code: string) => void;
+  /** Per-enclosure default rigging derived from the left-panel deployment (e.g. ground-stack → KIBU-SB) */
+  riggingDefaults?: Record<string, string>;
 }
 
 /** Returns inline style for output label color that darkens as output index increases */
@@ -2656,7 +2659,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
             )}
             {riggingEnc && riggingEnc.rigging_parts.length > 0 && riggingPrimaryEnc && (
               <select
-                value={rigging.selections[riggingPrimaryEnc] ?? riggingEnc.recommended_rigging ?? ""}
+                value={rigging.selections[riggingPrimaryEnc] ?? rigging.defaults?.[riggingPrimaryEnc] ?? riggingEnc.recommended_rigging ?? ""}
                 onChange={(e) => rigging.onChange?.(riggingPrimaryEnc, e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 title="Rigging hardware for this enclosure type on this amp line"
@@ -3799,7 +3802,7 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, riggingParts, riggingSelections, onRiggingChange }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, riggingParts, riggingSelections, onRiggingChange, riggingDefaults }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
@@ -3831,7 +3834,7 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
   }
 
   return (
-    <RiggingContext.Provider value={{ riggingParts, selections: riggingSelections ?? {}, onChange: onRiggingChange }}>
+    <RiggingContext.Provider value={{ riggingParts, selections: riggingSelections ?? {}, defaults: riggingDefaults, onChange: onRiggingChange }}>
     <EnclosureDragDropProvider
       onMoveEnclosure={handleMoveEnclosure}
       validateDrop={validateDrop}
