@@ -640,8 +640,8 @@ export default function EnclosureSelector({
                 {/* Secondary controls on their own line to avoid crowding the row */}
                 {hasBottomRow && (
                   <div className={`mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 ${imageUrl ? "pl-[92px]" : ""}`}>
-                    {perChannelControl}
                     {deploymentControl}
+                    {perChannelControl}
                   </div>
                 )}
               </div>
