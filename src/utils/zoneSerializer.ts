@@ -125,10 +125,20 @@ export function deserializeZones(
       amp.outputs.some((o) => o.enclosures.some((e) => e.sourceArrayId === undefined))
     );
     if (!needsBackfill) continue;
+    // Counts already attributed to an array (entries that DO have a stamp) — so the
+    // backfill only fills each array's REMAINING capacity and never over-attributes.
+    const alreadyStamped = new Map<string, number>();
+    for (const amp of zone.lockedAmpInstances) {
+      for (const output of amp.outputs) {
+        for (const e of output.enclosures) {
+          if (e.sourceArrayId) alreadyStamped.set(e.sourceArrayId, (alreadyStamped.get(e.sourceArrayId) ?? 0) + e.count);
+        }
+      }
+    }
     const slotsByName = new Map<string, Array<{ id: string; remaining: number }>>();
     for (const req of [...zone.requests].sort((a, b) => Number(Boolean(a.locked)) - Number(Boolean(b.locked)))) {
       const list = slotsByName.get(req.enclosure.enclosure) ?? [];
-      list.push({ id: req.id, remaining: req.quantity });
+      list.push({ id: req.id, remaining: Math.max(0, req.quantity - (alreadyStamped.get(req.id) ?? 0)) });
       slotsByName.set(req.enclosure.enclosure, list);
     }
     for (const amp of zone.lockedAmpInstances) {

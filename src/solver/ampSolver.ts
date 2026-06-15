@@ -2161,8 +2161,8 @@ export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Re
  */
 function collectEnclosuresFromInstances(
   instances: AmpInstance[]
-): Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number }> {
-  const collected: Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number }> = [];
+): Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number; sourceArrayId?: string }> {
+  const collected: Array<{ enclosure: Enclosure; totalCount: number; minImpedanceOverride?: number; sourceArrayId?: string }> = [];
   const seenMultiChannel = new Set<string>();
 
   for (let ampIdx = 0; ampIdx < instances.length; ampIdx++) {
@@ -2172,13 +2172,14 @@ function collectEnclosuresFromInstances(
     for (const output of instance.outputs) {
       for (const entry of output.enclosures) {
         const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfig.key);
-        // Use ampIdx prefix to avoid cross-amp collisions in group keys
-        const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure);
+        // Keep arrays distinct (name + sourceArrayId) so the redistribution preserves which
+        // array each enclosure belongs to — required for exact per-array locked counts.
+        const existing = collected.find(c => c.enclosure.enclosure === entry.enclosure.enclosure && c.sourceArrayId === entry.sourceArrayId);
 
         if (existing) {
           if (channelsPerUnit > 1) {
             const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
-            const groupKey = `amp${ampIdx}_${entry.enclosure.enclosure}_${groupIdx}`;
+            const groupKey = `amp${ampIdx}_${entry.enclosure.enclosure}_${entry.sourceArrayId ?? ""}_${groupIdx}`;
             if (!seenMultiChannel.has(groupKey)) {
               seenMultiChannel.add(groupKey);
               existing.totalCount += entry.count;
@@ -2189,12 +2190,13 @@ function collectEnclosuresFromInstances(
         } else {
           if (channelsPerUnit > 1) {
             const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
-            seenMultiChannel.add(`amp${ampIdx}_${entry.enclosure.enclosure}_${groupIdx}`);
+            seenMultiChannel.add(`amp${ampIdx}_${entry.enclosure.enclosure}_${entry.sourceArrayId ?? ""}_${groupIdx}`);
           }
           collected.push({
             enclosure: entry.enclosure,
             totalCount: entry.count,
             minImpedanceOverride: output.minImpedanceOverride,
+            sourceArrayId: entry.sourceArrayId,
           });
         }
       }
@@ -2317,7 +2319,7 @@ export function repackRackInstances(instances: AmpInstance[]): AmpInstance[] {
   });
 
   // Pack each enclosure type sequentially across all amps
-  for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
+  for (const { enclosure, totalCount, minImpedanceOverride, sourceArrayId } of collected) {
     let remaining = totalCount;
 
     // Try each amp in order
@@ -2341,7 +2343,7 @@ export function repackRackInstances(instances: AmpInstance[]): AmpInstance[] {
           for (let c = 0; c < channelsPerUnit; c++) {
             const oi = group[c];
             const sectionZ = getSectionImpedance(enclosure, c);
-            outputs[oi].enclosures.push({ enclosure, count: toStack });
+            outputs[oi].enclosures.push({ enclosure, count: toStack, sourceArrayId });
             outputs[oi].totalEnclosures = toStack;
             outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
             if (minImpedanceOverride !== undefined) {
@@ -2358,14 +2360,14 @@ export function repackRackInstances(instances: AmpInstance[]): AmpInstance[] {
 
           if (currentOnOutput === 0) {
             const toAdd = Math.min(remaining, maxForThisType);
-            outputs[oi].enclosures.push({ enclosure, count: toAdd });
+            outputs[oi].enclosures.push({ enclosure, count: toAdd, sourceArrayId });
             outputs[oi].totalEnclosures += toAdd;
             if (minImpedanceOverride !== undefined) {
               outputs[oi].minImpedanceOverride = minImpedanceOverride;
             }
             remaining -= toAdd;
           } else {
-            const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+            const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure && e.sourceArrayId === sourceArrayId);
             if (existingEntry) {
               const canAdd = Math.min(remaining, maxForThisType - existingEntry.count);
               if (canAdd > 0) {
@@ -2445,7 +2447,7 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
   }
 
   // Spread each enclosure type across all rack channels
-  for (const { enclosure, totalCount, minImpedanceOverride } of collected) {
+  for (const { enclosure, totalCount, minImpedanceOverride, sourceArrayId } of collected) {
     let remaining = totalCount;
 
     // Find a valid amp config for this enclosure (they should all be the same type in a rack)
@@ -2471,7 +2473,7 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
         for (let c = 0; c < channelsPerUnit; c++) {
           const oi = group[c];
           const sectionZ = getSectionImpedance(enclosure, c);
-          outputs[oi].enclosures.push({ enclosure, count: toStack });
+          outputs[oi].enclosures.push({ enclosure, count: toStack, sourceArrayId });
           outputs[oi].totalEnclosures = toStack;
           outputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
           if (minImpedanceOverride !== undefined) {
@@ -2510,11 +2512,11 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
         for (let c = 0; c < channelsPerUnit; c++) {
           const oi = group[c];
           const sectionZ = getSectionImpedance(enclosure, c);
-          const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+          const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure && e.sourceArrayId === sourceArrayId);
           if (existingEntry) {
             existingEntry.count += 1;
           } else {
-            outputs[oi].enclosures.push({ enclosure, count: 1 });
+            outputs[oi].enclosures.push({ enclosure, count: 1, sourceArrayId });
             if (minImpedanceOverride !== undefined) {
               outputs[oi].minImpedanceOverride = minImpedanceOverride;
             }
@@ -2535,7 +2537,7 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
         const outputs = allOutputs[ampIdx];
         if (outputs[oi].totalEnclosures === 0) {
           const toPlace = Math.min(remaining, perOut, limits.per_output);
-          outputs[oi].enclosures.push({ enclosure, count: toPlace });
+          outputs[oi].enclosures.push({ enclosure, count: toPlace, sourceArrayId });
           outputs[oi].totalEnclosures = toPlace;
           if (minImpedanceOverride !== undefined) {
             outputs[oi].minImpedanceOverride = minImpedanceOverride;
@@ -2570,11 +2572,11 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
 
         const { ampIdx, oi } = rackChannelOrder[bestIdx];
         const outputs = allOutputs[ampIdx];
-        const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure);
+        const existingEntry = outputs[oi].enclosures.find(e => e.enclosure.enclosure === enclosure.enclosure && e.sourceArrayId === sourceArrayId);
         if (existingEntry) {
           existingEntry.count += 1;
         } else {
-          outputs[oi].enclosures.push({ enclosure, count: 1 });
+          outputs[oi].enclosures.push({ enclosure, count: 1, sourceArrayId });
           if (minImpedanceOverride !== undefined) {
             outputs[oi].minImpedanceOverride = minImpedanceOverride;
           }
