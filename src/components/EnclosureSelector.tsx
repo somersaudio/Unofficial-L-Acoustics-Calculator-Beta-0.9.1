@@ -664,7 +664,7 @@ export default function EnclosureSelector({
               );
             })();
 
-            const hasBottomRow = Boolean(weightControl || perChannelControl || deploymentControl);
+            const hasBottomRow = Boolean(weightControl || deploymentControl);
 
             const isLocked = Boolean(request.locked);
             const lockGold = document.documentElement.classList.contains("dark") ? "#b59e5f" : "#7A6B3A";
@@ -717,7 +717,8 @@ export default function EnclosureSelector({
                   )}
                 </div>
 
-                {/* Quantity controls */}
+                {/* Quantity count, with the ×N per-channel control stacked beneath it */}
+                <div className="flex flex-col items-end gap-1.5">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() =>
@@ -749,6 +750,8 @@ export default function EnclosureSelector({
                   >
                     +
                   </button>
+                </div>
+                {perChannelControl}
                 </div>
 
                 {/* Lock this row "as is" — freezes its controls; still solved normally */}
@@ -800,7 +803,6 @@ export default function EnclosureSelector({
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                     {weightControl}
                     {deploymentControl}
-                    {perChannelControl}
                   </div>
                 )}
                 {overSafe && (
