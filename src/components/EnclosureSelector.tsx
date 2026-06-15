@@ -728,8 +728,8 @@ export default function EnclosureSelector({
                   )}
                 </div>
 
-                {/* Quantity count, with the ×N per-channel control stacked beneath it */}
-                <div className="flex flex-col items-end gap-1.5">
+                {/* Quantity count, with the ×N per-channel control to its right */}
+                <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() =>
