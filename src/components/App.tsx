@@ -309,6 +309,10 @@ export default function App() {
     const saved = localStorage.getItem("useFeet");
     return saved ? JSON.parse(saved) : true;
   });
+  const [weightInLbs, setWeightInLbs] = useState<boolean>(() => {
+    const saved = localStorage.getItem("weightInLbs");
+    return saved ? JSON.parse(saved) : true;
+  });
   const [matrixEnabled, setMatrixEnabled] = useState<boolean>(() => {
     const saved = localStorage.getItem("matrixEnabled");
     return saved ? JSON.parse(saved) : true;
@@ -361,6 +365,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("useFeet", JSON.stringify(useFeet));
   }, [useFeet]);
+
+  useEffect(() => {
+    localStorage.setItem("weightInLbs", JSON.stringify(weightInLbs));
+  }, [weightInLbs]);
 
   useEffect(() => {
     localStorage.setItem("matrixEnabled", JSON.stringify(matrixEnabled));
@@ -844,6 +852,7 @@ export default function App() {
               deploymentSelections={deploymentSelections}
               onDeploymentChange={handleDeploymentChange}
               onShowRigging={handleShowRigging}
+              weightInLbs={weightInLbs}
             />
           </div>
           {/* Recommended Configuration — stuck to bottom */}
@@ -1083,6 +1092,30 @@ export default function App() {
                 style={!useFeet ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
               >
                 m
+              </button>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setWeightInLbs(true)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                  weightInLbs
+                    ? "text-white hover:brightness-110"
+                    : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                }`}
+                style={weightInLbs ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
+              >
+                lb
+              </button>
+              <button
+                onClick={() => setWeightInLbs(false)}
+                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                  !weightInLbs
+                    ? "text-white hover:brightness-110"
+                    : "bg-gray-200 text-gray-600 hover:bg-gray-300 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                }`}
+                style={!weightInLbs ? { backgroundColor: darkMode ? '#b59e5f' : '#d4c48a', color: darkMode ? 'white' : '#5C4A1E', textShadow: darkMode ? '0 1px 3px rgba(0,0,0,0.5)' : '0 1px 2px rgba(92,74,30,0.3)' } : undefined}
+              >
+                kg
               </button>
             </div>
             <div className="flex items-center gap-2">

@@ -32,6 +32,8 @@ interface EnclosureSelectorProps {
   onDeploymentChange?: (enclosureName: string, mode: string) => void;
   /** Open the rigging manual PDF for the current rigging hardware */
   onShowRigging?: (url: string) => void;
+  /** Show stack weight in lb (true) or kg (false) */
+  weightInLbs?: boolean;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -84,6 +86,7 @@ export default function EnclosureSelector({
   deploymentSelections,
   onDeploymentChange,
   onShowRigging,
+  weightInLbs = true,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -475,13 +478,14 @@ export default function EnclosureSelector({
                   const selPart = selCode ? encRig?.rigging_parts.find((p) => p.code === selCode) : undefined;
                   const rigKg = selPart?.weight_kg ?? 0;
                   const stackKg = encW * request.quantity + rigKg;
-                  const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg`;
+                  const stackValue = weightInLbs ? Math.round(stackKg * 2.20462) : Math.round(stackKg);
+                  const unit = weightInLbs ? "lb" : "kg";
+                  const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg / ${Math.round(stackKg * 2.20462)} lb`;
                   return (
                     <div className="flex-shrink-0 text-right leading-tight" title={title}>
                       <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {Math.round(stackKg)}<span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> kg</span>
+                        {stackValue}<span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> {unit}</span>
                       </div>
-                      <div className="text-[10px] text-gray-400 dark:text-neutral-500">{Math.round(stackKg * 2.20462)} lb</div>
                     </div>
                   );
                 })()}
