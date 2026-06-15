@@ -647,8 +647,8 @@
       "enclosure": "Syva",
       "max_enclosures": {
         "LA12X": {
-          "per_output": 3,
-          "per_amplifier": 12
+          "per_output": 2,
+          "per_amplifier": 8
         },
         "LA7.16(i)": {
           "per_output": 1,
