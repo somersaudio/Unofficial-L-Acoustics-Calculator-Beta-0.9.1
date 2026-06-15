@@ -149,7 +149,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A10-BUMP"
+          "default_rigging": "A10-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "surface_mount",
@@ -342,12 +344,14 @@
           "label": "Flown (truss / motor)",
           "default_rigging": "A10i-BUMP",
           "safe": 8,
-          "max": 12
+          "max": 8
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A10i-BUMP"
+          "default_rigging": "A10i-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "surface_mount",
@@ -474,7 +478,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15-BUMP"
+          "default_rigging": "A15-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "surface_mount",
@@ -654,7 +660,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15i-BUMP"
+          "default_rigging": "A15i-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "surface_mount",
@@ -772,7 +780,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K1-BUMP"
+          "default_rigging": "K1-BUMP",
+          "safe": 4,
+          "max": 4
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1/EN/Owner's Manual/K1_OM_EN.pdf"
@@ -1274,7 +1284,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K3i-BUMP"
+          "default_rigging": "K3i-BUMP",
+          "safe": 4,
+          "max": 6
         },
         {
           "mode": "surface_mount",
@@ -1383,7 +1395,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15-BUMP"
+          "default_rigging": "A15-BUMP",
+          "safe": 3,
+          "max": 3
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21/EN/Owner's Manual/KS21_OM_EN.pdf"
@@ -1494,7 +1508,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15i-BUMP"
+          "default_rigging": "A15i-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "surface_mount",
@@ -1551,12 +1567,15 @@
           "mode": "flown",
           "label": "Flown (truss / motor)",
           "default_rigging": "KS28-BUMP",
-          "max": 16
+          "max": 16,
+          "safe": 16
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "KS28-BUMP"
+          "default_rigging": "KS28-BUMP",
+          "safe": 4,
+          "max": 4
         }
       ],
       "rigging_pdf": "https://www.babbel-haeger.de/fileadmin/babbel-haeger/downloads/KS28_RM_EN.pdf"
@@ -1640,7 +1659,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "M-BUMP"
+          "default_rigging": "M-BUMP",
+          "safe": 9,
+          "max": 9
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA II/EN/Owner's Manual/Kara_II_OM_EN.pdf"
@@ -1752,7 +1773,8 @@
           "mode": "ground_stack",
           "label": "Ground-stacked",
           "default_rigging": "KARAIIi-FIXBRACKET",
-          "max": 3
+          "max": 9,
+          "safe": 6
         },
         {
           "mode": "surface_mount",
@@ -1809,7 +1831,7 @@
           "mode": "flown",
           "label": "Flown (truss / motor)",
           "default_rigging": "KIBU II",
-          "safe": 12,
+          "safe": 8,
           "max": 20
         },
         {
@@ -1970,7 +1992,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "L2-BUMP"
+          "default_rigging": "L2-BUMP",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/L2/EN/Owner's Manual/L2_OM_EN.pdf"
@@ -2055,12 +2079,15 @@
           "mode": "flown",
           "label": "Flown (truss / motor)",
           "default_rigging": "KIBU-SB",
-          "max": 8
+          "max": 8,
+          "safe": 8
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "KIBU-SB"
+          "default_rigging": "KIBU-SB",
+          "safe": 8,
+          "max": 8
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB15m/EN/Owner's Manual/SB15m_UM_RM.zip"
