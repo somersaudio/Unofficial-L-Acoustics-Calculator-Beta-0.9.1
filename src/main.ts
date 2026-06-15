@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
 import started from "electron-squirrel-startup";
@@ -118,6 +118,13 @@ function setupIpcHandlers(): void {
       };
     }
     return appData;
+  });
+
+  // Open an external URL (e.g. a rigging manual PDF) in the user's default browser
+  ipcMain.handle("open-external", (_event, url: string) => {
+    if (typeof url === "string" && /^https:\/\//i.test(url)) {
+      shell.openExternal(url);
+    }
   });
 
   ipcMain.handle("save-project", async (_event, data: string): Promise<{ success: boolean; filePath?: string; error?: string }> => {

@@ -328,6 +328,15 @@ export default function App() {
   const [riggingSelections, setRiggingSelections] = useState<Record<string, string>>({});
   const handleRiggingChange = (enclosureName: string, code: string) =>
     setRiggingSelections((prev) => ({ ...prev, [enclosureName]: code }));
+  // Deployment selection per enclosure (left panel); changing it sets that mode's default rigging
+  const [deploymentSelections, setDeploymentSelections] = useState<Record<string, string>>({});
+  const handleDeploymentChange = (enclosureName: string, mode: string) => {
+    setDeploymentSelections((prev) => ({ ...prev, [enclosureName]: mode }));
+    if (state.status !== "ready") return;
+    const dep = state.data.riggingParts?.enclosures?.[enclosureName]?.deployments?.find((d) => d.mode === mode);
+    if (dep) setRiggingSelections((prev) => ({ ...prev, [enclosureName]: dep.default_rigging }));
+  };
+  const handleShowRigging = (url: string) => { void window.electronAPI.openExternal?.(url); };
 
   // Restore zones from localStorage once data is loaded
   const [zonesRestored, setZonesRestored] = useState(false);
@@ -832,6 +841,9 @@ export default function App() {
               rackMode={rackMode}
               riggingParts={data.riggingParts}
               riggingSelections={riggingSelections}
+              deploymentSelections={deploymentSelections}
+              onDeploymentChange={handleDeploymentChange}
+              onShowRigging={handleShowRigging}
             />
           </div>
           {/* Recommended Configuration — stuck to bottom */}

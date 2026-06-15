@@ -16,6 +16,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   loadProject: (): Promise<{ success: boolean; data?: string; error?: string }> =>
     ipcRenderer.invoke("load-project"),
 
+  // Open an external URL (e.g. a rigging manual PDF) in the default browser
+  openExternal: (url: string): Promise<void> =>
+    ipcRenderer.invoke("open-external", url),
+
   // Menu event listeners
   onMenuOpenProject: (callback: () => void) => {
     ipcRenderer.on("menu-open-project", callback);
@@ -34,6 +38,7 @@ declare global {
       getAppData: () => Promise<DataLoadResult>;
       saveProject: (data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
       loadProject: () => Promise<{ success: boolean; data?: string; error?: string }>;
+      openExternal: (url: string) => Promise<void>;
       onMenuOpenProject: (callback: () => void) => () => void;
       onMenuSaveProject: (callback: () => void) => () => void;
     };

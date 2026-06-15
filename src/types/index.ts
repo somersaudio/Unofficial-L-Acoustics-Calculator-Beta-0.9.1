@@ -132,10 +132,18 @@ export interface RiggingPart {
   verified: boolean;
 }
 
+export interface DeploymentOption {
+  mode: string; // flown | ground_stack | surface_mount
+  label: string; // human label, e.g. "Flown (truss / motor)"
+  default_rigging: string; // rigging part code used by default for this deployment
+}
+
 export interface EnclosureRigging {
   weight_kg: number | null; // net enclosure weight
   recommended_rigging: string; // code of the primary flying frame; "" if not flyable
   rigging_parts: RiggingPart[];
+  deployments?: DeploymentOption[]; // structured deployment options + default rigging per mode
+  rigging_pdf?: string; // URL to the rigging manual / OM PDF for "Show rigging"
 }
 
 export interface RiggingPartsData {

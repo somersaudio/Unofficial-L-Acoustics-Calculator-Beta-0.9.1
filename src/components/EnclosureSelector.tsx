@@ -27,6 +27,11 @@ interface EnclosureSelectorProps {
   riggingParts?: RiggingPartsData;
   /** Selected rigging piece per enclosure name (added to the stack weight) */
   riggingSelections?: Record<string, string>;
+  /** Selected deployment mode per enclosure name */
+  deploymentSelections?: Record<string, string>;
+  onDeploymentChange?: (enclosureName: string, mode: string) => void;
+  /** Open the rigging manual PDF for the current rigging hardware */
+  onShowRigging?: (url: string) => void;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -76,6 +81,9 @@ export default function EnclosureSelector({
   rackMode = false,
   riggingParts,
   riggingSelections,
+  deploymentSelections,
+  onDeploymentChange,
+  onShowRigging,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -497,6 +505,36 @@ export default function EnclosureSelector({
                       )}
                     </div>
                   )}
+                  {(() => {
+                    const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
+                    const deps = encRig?.deployments;
+                    if (!deps || deps.length === 0) return null;
+                    const selMode = deploymentSelections?.[request.enclosure.enclosure] ?? deps[0].mode;
+                    return (
+                      <div className="mt-0.5 flex items-center gap-1.5 text-[10px]">
+                        <select
+                          value={selMode}
+                          onChange={(e) => onDeploymentChange?.(request.enclosure.enclosure, e.target.value)}
+                          title="Deployment — changes the default rigging hardware"
+                          className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                        >
+                          {deps.map((d) => (
+                            <option key={d.mode} value={d.mode}>{d.label}</option>
+                          ))}
+                        </select>
+                        {encRig?.rigging_pdf && (
+                          <button
+                            type="button"
+                            onClick={() => onShowRigging?.(encRig.rigging_pdf!)}
+                            className="text-blue-600 hover:underline dark:text-blue-400"
+                            title="Open the rigging manual PDF for the current rigging hardware"
+                          >
+                            Show rigging
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Quantity controls */}
