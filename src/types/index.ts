@@ -136,6 +136,8 @@ export interface DeploymentOption {
   mode: string; // flown | ground_stack | surface_mount
   label: string; // human label, e.g. "Flown (truss / motor)"
   default_rigging: string; // rigging part code used by default for this deployment
+  safe?: number; // safe/recommended max enclosures in this array for this deployment
+  max?: number; // absolute max enclosures in this array for this deployment (hard cap)
 }
 
 export interface EnclosureRigging {

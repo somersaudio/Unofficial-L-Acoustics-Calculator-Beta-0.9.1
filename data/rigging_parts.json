@@ -29,7 +29,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "SYVA BASE"
+          "default_rigging": "SYVA BASE",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
@@ -61,7 +63,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "ETR5"
+          "default_rigging": "ETR5",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/5XT/EN/Owner's Manual/5XT_OM_EN.pdf"
@@ -138,7 +142,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A10-BUMP"
+          "default_rigging": "A10-BUMP",
+          "safe": 8,
+          "max": 8
         },
         {
           "mode": "ground_stack",
@@ -148,7 +154,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "A-MOUNT"
+          "default_rigging": "A-MOUNT",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10 Wide/EN/Owner's Manual/A10_OM_EN.pdf"
@@ -333,7 +340,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A10i-BUMP"
+          "default_rigging": "A10i-BUMP",
+          "safe": 8,
+          "max": 12
         },
         {
           "mode": "ground_stack",
@@ -343,7 +352,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "A10-Ui"
+          "default_rigging": "A10-Ui",
+          "safe": 1,
+          "max": 2
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A10i%20Wide/EN/Owner's%20Manual/A10i_OM_EN.pdf"
@@ -456,7 +467,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A15-BUMP"
+          "default_rigging": "A15-BUMP",
+          "safe": 8,
+          "max": 8
         },
         {
           "mode": "ground_stack",
@@ -466,7 +479,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "A-MOUNT"
+          "default_rigging": "A-MOUNT",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15 Wide/EN/Owner's Manual/A15_OM_EN.pdf"
@@ -633,7 +647,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A15i-BUMP"
+          "default_rigging": "A15i-BUMP",
+          "safe": 8,
+          "max": 8
         },
         {
           "mode": "ground_stack",
@@ -643,7 +659,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "A15KS-Ui"
+          "default_rigging": "A15KS-Ui",
+          "safe": 1,
+          "max": 2
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/A15i Wide/EN/Owner's Manual/A15i_OM_EN.pdf"
@@ -747,7 +765,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "K1-BUMP"
+          "default_rigging": "K1-BUMP",
+          "safe": 16,
+          "max": 24
         },
         {
           "mode": "ground_stack",
@@ -865,7 +885,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "K1-BUMP"
+          "default_rigging": "K1-BUMP",
+          "safe": 20,
+          "max": 24
         },
         {
           "mode": "ground_stack",
@@ -1010,12 +1032,16 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "K2-BUMP"
+          "default_rigging": "K2-BUMP",
+          "safe": 16,
+          "max": 24
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K2-BUMP"
+          "default_rigging": "K2-BUMP",
+          "safe": 4,
+          "max": 6
         }
       ],
       "rigging_pdf": "http://usedstage.ru/wp-content/uploads/2019/08/K2manual.pdf"
@@ -1137,12 +1163,16 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "K3-BUMP"
+          "default_rigging": "K3-BUMP",
+          "safe": 16,
+          "max": 24
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K3-BUMP"
+          "default_rigging": "K3-BUMP",
+          "safe": 4,
+          "max": 6
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3/EN/Owner%27s%20Manual/K3_OM_EN.pdf"
@@ -1237,7 +1267,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "K3i-BUMP"
+          "default_rigging": "K3i-BUMP",
+          "safe": 12,
+          "max": 24
         },
         {
           "mode": "ground_stack",
@@ -1247,7 +1279,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "K3i-TILTBRACKET"
+          "default_rigging": "K3i-TILTBRACKET",
+          "safe": 4,
+          "max": 6
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K3i/EN/Owner's%20Manual/K3i_OM_EN.pdf"
@@ -1342,7 +1376,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A15-BUMP"
+          "default_rigging": "A15-BUMP",
+          "safe": 8,
+          "max": 16
         },
         {
           "mode": "ground_stack",
@@ -1451,7 +1487,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "A15i-BUMP"
+          "default_rigging": "A15i-BUMP",
+          "safe": 8,
+          "max": 16
         },
         {
           "mode": "ground_stack",
@@ -1461,7 +1499,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "A15KS-Ui"
+          "default_rigging": "A15KS-Ui",
+          "max": 2
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KS21i/EN/Owner's Manual/KS21i_OM_EN.pdf"
@@ -1511,7 +1550,8 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KS28-BUMP"
+          "default_rigging": "KS28-BUMP",
+          "max": 16
         },
         {
           "mode": "ground_stack",
@@ -1593,7 +1633,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "M-BUMP"
+          "default_rigging": "M-BUMP",
+          "safe": 16,
+          "max": 24
         },
         {
           "mode": "ground_stack",
@@ -1702,17 +1744,21 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KARAIIi-BUMP"
+          "default_rigging": "KARAIIi-BUMP",
+          "safe": 12,
+          "max": 24
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "KARAIIi-FIXBRACKET"
+          "default_rigging": "KARAIIi-FIXBRACKET",
+          "max": 3
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "KARAIIi-FIXBRACKET"
+          "default_rigging": "KARAIIi-FIXBRACKET",
+          "max": 3
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KARA IIi/EN/Owner's Manual/Kara_IIi_OM_EN.pdf"
@@ -1762,17 +1808,22 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KIBU II"
+          "default_rigging": "KIBU II",
+          "safe": 12,
+          "max": 20
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "KIBU-SB"
+          "default_rigging": "KIBU-SB",
+          "safe": 4,
+          "max": 9
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "KIET II"
+          "default_rigging": "KIET II",
+          "max": 3
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/KIVA II/EN/Technical Bulletin/kiva_kiva_ii_securing_arrays_with_kiva-pullback_tb_en.pdf"
@@ -1912,7 +1963,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "L2-BUMP"
+          "default_rigging": "L2-BUMP",
+          "safe": 4,
+          "max": 4
         },
         {
           "mode": "ground_stack",
@@ -1949,7 +2002,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "SB10i-onCW"
+          "default_rigging": "SB10i-onCW",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB10i/EN/Owner's Manual/SB10i_OM_EN.pdf"
@@ -1999,7 +2054,8 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KIBU-SB"
+          "default_rigging": "KIBU-SB",
+          "max": 8
         },
         {
           "mode": "ground_stack",
@@ -2154,7 +2210,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "KARAIIi-FIXBRACKET"
+          "default_rigging": "KARAIIi-FIXBRACKET",
+          "max": 2
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB18/EN/Owner's Manual/SB18_UM_RM.zip"
@@ -2177,7 +2234,9 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "SB6i-onCW"
+          "default_rigging": "SB6i-onCW",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/SB6i/EN/Owner's%20Manual/SB6i_OM_EN.pdf"
@@ -2263,17 +2322,23 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "VBAR"
+          "default_rigging": "VBAR",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "VBAR"
+          "default_rigging": "VBAR",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "Soka-onW"
+          "default_rigging": "Soka-onW",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Soka/EN/Owner's Manual/Soka_OM_EN.pdf"
@@ -2332,17 +2397,23 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "Syva Bar"
+          "default_rigging": "Syva Bar",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "Syva Wall"
+          "default_rigging": "Syva Wall",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "Syva Wall"
+          "default_rigging": "Syva Wall",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://www.eventuryproductions.com/pdf/geluid/l_acoustics_syva_rigging_manual.pdf"
@@ -2374,7 +2445,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "SYVA BASE"
+          "default_rigging": "SYVA BASE",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/Syva Low/EN/Owner's Manual/Syva_OM_EN.pdf"
@@ -2415,7 +2488,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "Syva Base"
+          "default_rigging": "Syva Base",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://www.eventuryproductions.com/pdf/geluid/l_acoustics_syva_rigging_manual.pdf"
@@ -2483,12 +2558,16 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "X-BAR"
+          "default_rigging": "X-BAR",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "X-UL12"
+          "default_rigging": "X-UL12",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/X12/EN/Owner's Manual/X12_OM_EN.pdf"
@@ -2901,17 +2980,22 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "X-BAR"
+          "default_rigging": "X-BAR",
+          "max": 1
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "X-US8"
+          "default_rigging": "X-US8",
+          "safe": 1,
+          "max": 1
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "X-US8"
+          "default_rigging": "X-US8",
+          "safe": 1,
+          "max": 1
         }
       ],
       "rigging_pdf": "https://www.promusic.cz/sites/default/files/product/field_files/x8_rm_en_1.0.pdf"
@@ -3155,7 +3239,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "ETR12-2"
+          "default_rigging": "ETR12-2",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
@@ -3215,7 +3300,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "ETR12-2"
+          "default_rigging": "ETR12-2",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/12XT/documents.zip"
@@ -3284,7 +3370,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "ETR15"
+          "default_rigging": "ETR15",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XTHiQ/documents.zip"
@@ -3394,17 +3481,20 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "XTLIFTBAR"
+          "default_rigging": "XTLIFTBAR",
+          "max": 1
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "ETR115XT"
+          "default_rigging": "ETR115XT",
+          "max": 1
         },
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "ETR115XT"
+          "default_rigging": "ETR115XT",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/115XT/documents.zip"
@@ -3597,12 +3687,14 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "WIFOBUMP"
+          "default_rigging": "WIFOBUMP",
+          "max": 8
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "WIFOBUMP"
+          "default_rigging": "WIFOBUMP",
+          "max": 8
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCS%20WIFO/documents.zip#documents/ARCSWIFO_RM_EN.pdf"
@@ -3688,12 +3780,16 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "WIFOBUMP"
+          "default_rigging": "WIFOBUMP",
+          "safe": 8,
+          "max": 8
         },
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "WIFOBUMP"
+          "default_rigging": "WIFOBUMP",
+          "safe": 8,
+          "max": 8
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCS%20WIFO/documents.zip"
@@ -3770,7 +3866,9 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KIBU"
+          "default_rigging": "KIBU",
+          "safe": 8,
+          "max": 20
         },
         {
           "mode": "ground_stack",
@@ -3780,7 +3878,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "KIET"
+          "default_rigging": "KIET",
+          "max": 2
         }
       ],
       "rigging_pdf": "https://static.audiobizz.eu/files/toepassingen/LA05301_1023.pdf"
@@ -3821,7 +3920,8 @@
         {
           "mode": "flown",
           "label": "Flown (truss / motor)",
-          "default_rigging": "KIBU"
+          "default_rigging": "KIBU",
+          "max": 14
         },
         {
           "mode": "ground_stack",
@@ -3831,7 +3931,8 @@
         {
           "mode": "surface_mount",
           "label": "Wall / ceiling / pole",
-          "default_rigging": "KIET"
+          "default_rigging": "KIET",
+          "max": 1
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kilo/documents.zip"

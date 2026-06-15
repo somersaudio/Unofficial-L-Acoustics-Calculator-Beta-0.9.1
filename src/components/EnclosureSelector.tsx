@@ -173,6 +173,35 @@ export default function EnclosureSelector({
     return { hybrid, current, subwoofers, legacy };
   }, [enclosures]);
 
+  // Per-array deployment limits (safe/max enclosure count) for an enclosure type in a given mode.
+  // Falls back to the first deployment when no mode is set or the saved mode is unknown.
+  const limitsFor = (encName: string, mode?: string): { safe: number | null; max: number | null } => {
+    const deps = riggingParts?.enclosures?.[encName]?.deployments;
+    if (!deps || deps.length === 0) return { safe: null, max: null };
+    const m = mode && deps.some((d) => d.mode === mode) ? mode : deps[0].mode;
+    const dep = deps.find((d) => d.mode === m);
+    return { safe: dep?.safe ?? null, max: dep?.max ?? null };
+  };
+
+  // How many of each row's enclosures are already locked into amps (distributed across
+  // rows of the same type, unlocked rows first). A clamp must never drop a row below its
+  // share — those enclosures physically exist and are allocated to a locked amp.
+  const rowLockedShares = (reqs: EnclosureRequest[]): number[] => {
+    const remaining = new Map(lockedEnclosureCounts);
+    const shares = new Array<number>(reqs.length).fill(0);
+    const order = reqs
+      .map((_, i) => i)
+      .sort((a, b) => Number(Boolean(reqs[a].locked)) - Number(Boolean(reqs[b].locked)));
+    for (const i of order) {
+      const name = reqs[i].enclosure.enclosure;
+      const rem = remaining.get(name) ?? 0;
+      const sub = Math.min(rem, reqs[i].quantity);
+      if (rem) remaining.set(name, rem - sub);
+      shares[i] = sub;
+    }
+    return shares;
+  };
+
   const handleAddEnclosure = () => {
     if (!selectedEnclosure) return;
 
@@ -192,14 +221,17 @@ export default function EnclosureSelector({
     );
 
     if (existingIndex >= 0) {
+      const target = requests[existingIndex];
+      const { max } = limitsFor(target.enclosure.enclosure, target.deploymentMode);
+      let q = target.quantity + effectiveQuantity;
+      if (max != null) q = Math.min(q, max);
       const newRequests = [...requests];
-      newRequests[existingIndex] = {
-        ...newRequests[existingIndex],
-        quantity: newRequests[existingIndex].quantity + effectiveQuantity,
-      };
+      newRequests[existingIndex] = { ...target, quantity: q };
       onRequestsChange(newRequests);
     } else {
-      onRequestsChange([...requests, { id: crypto.randomUUID(), enclosure, quantity: effectiveQuantity }]);
+      const { max } = limitsFor(selectedEnclosure);
+      const q = max != null ? Math.min(effectiveQuantity, max) : effectiveQuantity;
+      onRequestsChange([...requests, { id: crypto.randomUUID(), enclosure, quantity: q }]);
       if (wasBumped) {
         // The new request will be at the end
         setBumpedIndices(new Set([requests.length]));
@@ -219,9 +251,14 @@ export default function EnclosureSelector({
   };
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
-    const encName = requests[index].enclosure.enclosure;
+    const req = requests[index];
+    const encName = req.enclosure.enclosure;
     const minCount = minCountMap.get(encName) ?? 1;
-    const effectiveQuantity = Math.max(newQuantity, minCount);
+    let effectiveQuantity = Math.max(newQuantity, minCount);
+    const { max } = limitsFor(encName, req.deploymentMode);
+    if (max != null) effectiveQuantity = Math.min(effectiveQuantity, max);
+    // Never clamp below this row's amp-locked share (those enclosures physically exist)
+    effectiveQuantity = Math.max(effectiveQuantity, rowLockedShares(requests)[index]);
     if (effectiveQuantity < 1) return;
 
     const wasBumped = newQuantity < minCount;
@@ -250,7 +287,12 @@ export default function EnclosureSelector({
 
   const handleDeploymentChange = (index: number, mode: string) => {
     const newReqs = [...requests];
-    newReqs[index] = { ...newReqs[index], deploymentMode: mode };
+    const next = { ...newReqs[index], deploymentMode: mode };
+    // Re-clamp the array down to the new deployment's max (e.g. flown 20 → stacked 9),
+    // but never below this row's amp-locked share (those enclosures physically exist).
+    const { max } = limitsFor(next.enclosure.enclosure, mode);
+    if (max != null) next.quantity = Math.max(Math.min(next.quantity, max), rowLockedShares(requests)[index]);
+    newReqs[index] = next;
     onRequestsChange(newReqs);
   };
 
@@ -453,18 +495,8 @@ export default function EnclosureSelector({
         // Distribute amp-locked counts across rows of the same enclosure type, draining
         // UNLOCKED rows first so a pinned (locked) row isn't hidden while an unlocked
         // row of the same type remains. Supports multiple arrays of one type.
-        const ampLockRemaining = new Map(lockedEnclosureCounts);
-        const rowUnlockedCounts = new Array<number>(requests.length).fill(0);
-        const order = requests
-          .map((_, i) => i)
-          .sort((a, b) => Number(Boolean(requests[a].locked)) - Number(Boolean(requests[b].locked)));
-        for (const i of order) {
-          const req = requests[i];
-          const rem = ampLockRemaining.get(req.enclosure.enclosure) ?? 0;
-          const sub = Math.min(rem, req.quantity);
-          if (rem) ampLockRemaining.set(req.enclosure.enclosure, rem - sub);
-          rowUnlockedCounts[i] = req.quantity - sub;
-        }
+        const lockedShares = rowLockedShares(requests);
+        const rowUnlockedCounts = requests.map((req, i) => req.quantity - lockedShares[i]);
         // Number multiple arrays of the same enclosure type (Array 1, Array 2, …),
         // counting only rows that will actually render (a fully amp-locked row is hidden).
         const typeTotals = new Map<string, number>();
@@ -502,6 +534,13 @@ export default function EnclosureSelector({
                 : encRigRow?.deployments?.[0]?.mode;
             const rowDeploy = encRigRow?.deployments?.find((d) => d.mode === rowDeployMode);
             const rowRiggingCode = rowDeploy?.default_rigging ?? encRigRow?.recommended_rigging;
+
+            // Per-array limits for the current deployment (hard cap at max; amber warning past safe)
+            const rowMax = rowDeploy?.max ?? null;
+            const rowSafe = rowDeploy?.safe ?? null;
+            const atMax = rowMax != null && request.quantity >= rowMax;
+            const overSafe = rowSafe != null && request.quantity > rowSafe && (rowMax == null || request.quantity <= rowMax);
+            const deployWord = rowDeployMode === "ground_stack" ? "stacked" : rowDeployMode === "surface_mount" ? "mounted" : "flown";
 
             // "Array N" label when this enclosure type has more than one row
             const arrayNum = rowArrayNums[index];
@@ -641,6 +680,11 @@ export default function EnclosureSelector({
                       )}
                     </div>
                   )}
+                  {overSafe && (
+                    <div className="text-[11px] font-medium text-amber-600 dark:text-amber-500 whitespace-nowrap" title={`L-Acoustics safe ${deployWord} limit is ${rowSafe}${rowMax != null ? `; absolute max ${rowMax}` : ""}`}>
+                      ⚠ over safe {deployWord} limit ({rowSafe})
+                    </div>
+                  )}
                 </div>
 
                 {/* Quantity controls */}
@@ -669,7 +713,8 @@ export default function EnclosureSelector({
                     onClick={() =>
                       handleQuantityChange(index, request.quantity + 1)
                     }
-                    disabled={isLocked}
+                    disabled={isLocked || atMax}
+                    title={atMax ? `Max ${rowMax} ${deployWord} for ${request.enclosure.enclosure}` : undefined}
                     className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     +
