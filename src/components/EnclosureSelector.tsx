@@ -681,7 +681,7 @@ export default function EnclosureSelector({
             return (
               <div
                 key={request.id}
-                className={`relative flex items-center gap-3 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
+                className={`relative flex items-center gap-2 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
                 style={isLocked ? { borderColor: lockGold } : undefined}
               >
                 {/* Enclosure Image — spans the row height; grows taller when a second control line is present */}
@@ -695,9 +695,9 @@ export default function EnclosureSelector({
                   </div>
                 )}
                 {/* Right column: stacked control lines */}
-                <div className="flex-1">
+                <div className="flex-1 pr-2">
                 {/* Top line: name with the enclosure count to its right */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                 <div>
                   <div className="flex items-center">
                     <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
