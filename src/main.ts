@@ -79,7 +79,7 @@ function showValidationErrorDialog(result: DataLoadResult): void {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1645,
+    width: 1535,
     height: 800,
     minWidth: 900,
     minHeight: 600,

@@ -1019,7 +1019,7 @@ function CableLossDisplay({
   return (
     <div className="flex items-center gap-2 text-[10px]">
       <span className={`font-medium ${lossColor}`}>
-        {result.lossDb.toFixed(1)} dB
+        {result.lossDb.toFixed(1)} dB <span className="font-normal text-gray-500 dark:text-neutral-500">avg loss</span>
       </span>
       <span className={`font-medium ${dfColor}`}>
         DF {result.dampingFactor.toFixed(0)}

@@ -281,7 +281,7 @@ function BugReportButton() {
       )}
       <button
         onClick={() => setOpen(!open)}
-        className="rounded-lg bg-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 shadow transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
+        className="rounded-lg bg-gray-200 px-2 py-1 text-[11px] font-medium text-gray-600 shadow transition-colors hover:bg-gray-300 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600"
       >
         Bug Report / Feature Request
       </button>
@@ -835,7 +835,7 @@ export default function App() {
       {/* Main Content */}
       <main className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel - Enclosure Selection */}
-        <section className="w-1/3 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-transparent">
+        <section className="w-2/5 flex flex-col overflow-hidden border-r border-gray-300 bg-white dark:border-neutral-800 dark:bg-transparent">
           <ZoneTabBar
             zones={zones}
             activeZoneId={activeZoneId}
@@ -874,7 +874,7 @@ export default function App() {
         </section>
 
         {/* Right Panel - Amplifier Recommendation */}
-        <section className="w-2/3 overflow-hidden bg-gray-50 dark:bg-black/70">
+        <section className="w-3/5 overflow-hidden bg-gray-50 dark:bg-black/70">
           <SolverResults
             zoneSolutions={zoneSolutions}
             activeZoneId={activeZoneId}

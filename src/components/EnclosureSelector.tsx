@@ -113,6 +113,12 @@ export default function EnclosureSelector({
     "Syva Low Syva",
   ]);
 
+  // Enclosures that should not expose a per-channel multiple control — deployed
+  // individually, so the count is the only quantity the user sets.
+  const noPerChannelEnclosures = new Set([
+    "Syva",
+  ]);
+
   // Subwoofer enclosures
   const subwooferEnclosureNames = new Set([
     "SB6i",
@@ -567,12 +573,28 @@ export default function EnclosureSelector({
             const overSafe = rowSafe != null && request.quantity > rowSafe && (rowMax == null || request.quantity <= rowMax);
             const deployWord = rowDeployMode === "ground_stack" ? "stacked" : rowDeployMode === "surface_mount" ? "mounted" : "flown";
 
-            // "Array N" label when this enclosure type has more than one row
+            // "Array N" label only when this enclosure can actually be flown/stacked in
+            // multiples. Enclosures that cap at 1 in every deployment (e.g. Syva, Soka,
+            // X8, the Syva Low Syva hybrid) are single units, never arrays. A deployment
+            // with no known limit is treated as "could be an array" so we only hide the
+            // label when we're confident the count can never exceed 1.
             const arrayNum = rowArrayNums[index];
-            const showArrayLabel = true;
+            const encDeployments = encRigRow?.deployments ?? [];
+            const canFormArray =
+              encDeployments.length === 0 ||
+              encDeployments.some((d) =>
+                d.max == null && d.safe == null ? true : Math.max(d.max ?? 0, d.safe ?? 0) > 1
+              );
+            const showArrayLabel = canFormArray;
 
-            // ×N per-channel control — only for enclosures with per_output > 1 on an enabled amp
+            // ×N per-channel control — only for enclosures with per_output > 1 on an enabled amp.
+            // Hidden for hybrids (Syva Low Syva) and enclosures deployed individually (Syva).
             const perChannelControl = (() => {
+              if (
+                hybridEnclosureNames.has(request.enclosure.enclosure) ||
+                noPerChannelEnclosures.has(request.enclosure.enclosure)
+              )
+                return null;
               let maxPerOutput = 1;
               for (const key of Object.keys(request.enclosure.max_enclosures)) {
                 const lim = request.enclosure.max_enclosures[key];
@@ -612,17 +634,19 @@ export default function EnclosureSelector({
               const hasParts = riggingPartsList.length > 0;
               if (!hasDeps && !hasParts && !encRigRow?.rigging_pdf) return null;
               return (
-                <div className="flex items-center gap-1.5 text-[10px]">
+                <div className="flex min-w-0 flex-1 items-center gap-1.5 text-[10px]">
                   {hasDeps && (
                   <select
                     value={rowDeployMode}
                     onChange={(e) => handleDeploymentChange(index, e.target.value)}
                     disabled={request.locked}
                     title="Deployment — changes the default rigging hardware"
-                    className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                    className="flex-shrink-0 rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
                   >
                     {deps.map((d) => (
-                      <option key={d.mode} value={d.mode}>{d.label}</option>
+                      // Strip parentheticals for display ("Flown (truss / motor)" → "Flown")
+                      // so the native select reserves less width — keeps the whole row on one line.
+                      <option key={d.mode} value={d.mode}>{d.label.replace(/\s*\([^)]*\)/g, "")}</option>
                     ))}
                   </select>
                   )}
@@ -632,7 +656,7 @@ export default function EnclosureSelector({
                       onChange={(e) => handleRiggingCodeChange(index, e.target.value)}
                       disabled={request.locked}
                       title="Rigging hardware for this array"
-                      className="max-w-[12rem] rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                      className="min-w-0 max-w-[12rem] rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
                     >
                       {riggingPartsList.map((p) => (
                         <option key={p.code} value={p.code}>
@@ -645,7 +669,7 @@ export default function EnclosureSelector({
                     <button
                       type="button"
                       onClick={() => onShowRigging?.(encRigRow.rigging_pdf!)}
-                      className="text-blue-600 hover:underline dark:text-blue-400"
+                      className="flex-shrink-0 whitespace-nowrap text-blue-600 hover:underline dark:text-blue-400"
                       title="Open the rigging manual PDF for the current rigging hardware"
                     >
                       Show rigging
@@ -694,11 +718,15 @@ export default function EnclosureSelector({
                     />
                   </div>
                 )}
-                {/* Right column: stacked control lines */}
-                <div className="flex-1 pr-2">
+                {/* Right column: stacked control lines. min-w-0 keeps it bounded to its
+                    flex share so the inner deployment/rigging selects shrink instead of
+                    overflowing the card on enclosures with very long rigging options. */}
+                <div className="min-w-0 flex-1 pr-2">
                 {/* Top line: name with the enclosure count to its right */}
                 <div className="flex items-center gap-2">
-                <div>
+                {/* Min-width name column so the count starts at a consistent x for names up
+                    to this width; longer names extend it and nudge the count slightly. */}
+                <div className="min-w-[7rem] flex-shrink-0">
                   <div className="flex items-center">
                     <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                       {request.enclosure.enclosure}
@@ -796,9 +824,11 @@ export default function EnclosureSelector({
 
                 </div>
 
-                {/* Secondary controls */}
+                {/* Secondary controls — weight on the left, deployment/rigging to its
+                    right on a single row. nowrap + shrinkable selects keep it on one
+                    line so switching deployment never wraps/reflows the card. */}
                 {hasBottomRow && (
-                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                  <div className="mt-1.5 flex items-center gap-x-2">
                     {weightControl}
                     {deploymentControl}
                   </div>
