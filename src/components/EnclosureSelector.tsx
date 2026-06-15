@@ -701,9 +701,9 @@ export default function EnclosureSelector({
                 )}
                 {/* Right column: stacked control lines */}
                 <div className="flex-1">
-                {/* Top line: name, quantity, lock, remove */}
+                {/* Top line: name with the enclosure count to its right */}
                 <div className="flex items-center gap-3">
-                <div className="flex-1">
+                <div>
                   <div className="flex items-center">
                     <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                       {request.enclosure.enclosure}
