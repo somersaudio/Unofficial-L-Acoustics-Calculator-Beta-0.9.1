@@ -43,9 +43,15 @@ npm run publish -- --arch=arm64
 echo "==> [2/5] macOS x64 (build, sign, notarize)…"
 npm run make -- --arch=x64
 
-# 3/5 — upload the Intel zip to the same release
+# 3/5 — upload the Intel zip to the same release.
+# Match the CURRENT version explicitly — a stale zip from a previous release left in
+# out/ would otherwise sort ahead of it and get uploaded by mistake.
 echo "==> [3/5] Uploading macOS x64 to ${TAG}…"
-X64_ZIP="$(ls out/make/zip/darwin/x64/*x64*.zip | head -1)"
+X64_ZIP="$(ls out/make/zip/darwin/x64/*x64-${VERSION}.zip | head -1)"
+if [ -z "${X64_ZIP}" ] || [ ! -f "${X64_ZIP}" ]; then
+  echo "ERROR: no x64 zip for ${VERSION} in out/make/zip/darwin/x64/" >&2
+  exit 1
+fi
 gh release upload "${TAG}" "${X64_ZIP}" -R "${REPO}" --clobber
 
 # 4/5 — make the release live (so update.electronjs.org serves it)
