@@ -10,6 +10,7 @@ function serializeAmpInstance(instance: AmpInstance): AmpInstanceSerialized {
       enclosures: output.enclosures.map((e) => ({
         enclosureName: e.enclosure.enclosure,
         count: e.count,
+        sourceArrayId: e.sourceArrayId,
       })),
     })),
     rackGroupId: instance.rackGroupId,
@@ -51,7 +52,7 @@ function deserializeAmpInstance(
       .map((e) => {
         const enclosure = enclosureMap.get(e.enclosureName);
         if (!enclosure) return null;
-        return { enclosure, count: e.count };
+        return { enclosure, count: e.count, sourceArrayId: e.sourceArrayId };
       })
       .filter((e): e is NonNullable<typeof e> => e !== null);
 
@@ -98,7 +99,7 @@ export function deserializeZones(
   const enclosureMap = new Map(enclosureCatalog.map((e) => [e.enclosure, e]));
   const ampConfigMap = new Map((ampConfigs ?? []).map((a) => [a.key, a]));
 
-  return serialized.map((sz) => ({
+  const zones: Zone[] = serialized.map((sz) => ({
     id: sz.id,
     name: sz.name,
     requests: sz.requests
@@ -114,4 +115,42 @@ export function deserializeZones(
       .map((ai) => deserializeAmpInstance(ai, enclosureMap, ampConfigMap))
       .filter((ai): ai is NonNullable<typeof ai> => ai !== null),
   }));
+
+  // Migration: amps locked before source-array provenance existed have no sourceArrayId.
+  // Attribute each unstamped entry's count to this zone's same-type arrays (unlocked rows
+  // first, matching the old distribution), splitting an entry that spans multiple arrays —
+  // so old projects load with exact per-array locked counts and don't double-count.
+  for (const zone of zones) {
+    const needsBackfill = zone.lockedAmpInstances.some((amp) =>
+      amp.outputs.some((o) => o.enclosures.some((e) => e.sourceArrayId === undefined))
+    );
+    if (!needsBackfill) continue;
+    const slotsByName = new Map<string, Array<{ id: string; remaining: number }>>();
+    for (const req of [...zone.requests].sort((a, b) => Number(Boolean(a.locked)) - Number(Boolean(b.locked)))) {
+      const list = slotsByName.get(req.enclosure.enclosure) ?? [];
+      list.push({ id: req.id, remaining: req.quantity });
+      slotsByName.set(req.enclosure.enclosure, list);
+    }
+    for (const amp of zone.lockedAmpInstances) {
+      for (const output of amp.outputs) {
+        const rebuilt: typeof output.enclosures = [];
+        for (const entry of output.enclosures) {
+          if (entry.sourceArrayId !== undefined) { rebuilt.push(entry); continue; }
+          let left = entry.count;
+          for (const slot of slotsByName.get(entry.enclosure.enclosure) ?? []) {
+            if (left <= 0) break;
+            if (slot.remaining <= 0) continue;
+            const take = Math.min(left, slot.remaining);
+            rebuilt.push({ enclosure: entry.enclosure, count: take, sourceArrayId: slot.id });
+            slot.remaining -= take;
+            left -= take;
+          }
+          if (left > 0) rebuilt.push({ enclosure: entry.enclosure, count: left }); // no matching row — leave unattributed
+        }
+        output.enclosures = rebuilt;
+      }
+    }
+  }
+
+  return zones;
 }

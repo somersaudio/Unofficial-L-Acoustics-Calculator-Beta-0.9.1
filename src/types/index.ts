@@ -194,6 +194,7 @@ export interface OutputAllocation {
   enclosures: Array<{
     enclosure: Enclosure;
     count: number;
+    sourceArrayId?: string; // id of the EnclosureRequest (array) these enclosures came from
   }>;
   totalEnclosures: number;
   impedanceOhms: number; // Calculated impedance for this output
@@ -423,7 +424,7 @@ export interface AmpInstanceSerialized {
   ampConfigKey: string;
   outputs: Array<{
     outputIndex: number;
-    enclosures: Array<{ enclosureName: string; count: number }>;
+    enclosures: Array<{ enclosureName: string; count: number; sourceArrayId?: string }>;
   }>;
   rackGroupId?: string;
 }

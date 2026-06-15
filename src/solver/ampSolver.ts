@@ -79,12 +79,14 @@ function consolidateOutputs(
   allAmpConfigs: AmpConfig[]
 ): OutputAllocation[] | null {
   // Group enclosures by type - for multi-channel, count units not per-channel entries
-  const enclosuresByType = new Map<string, { enclosure: Enclosure; totalCount: number }>();
+  const enclosuresByType = new Map<string, { enclosure: Enclosure; totalCount: number; sourceArrayId?: string }>();
   const seenMultiChannelGroups = new Set<string>();
 
   for (const output of outputs) {
     for (const entry of output.enclosures) {
-      const key = entry.enclosure.enclosure;
+      // Key by enclosure name + source array so two same-type arrays that share this amp
+      // keep distinct provenance (their counts aren't collapsed onto one array's id).
+      const key = entry.enclosure.enclosure + "|" + (entry.sourceArrayId ?? "");
       const channelsPerUnit = getChannelsPerUnit(entry.enclosure, ampConfigKey);
 
       if (channelsPerUnit > 1) {
@@ -99,7 +101,7 @@ function consolidateOutputs(
       if (existing) {
         existing.totalCount += entry.count;
       } else {
-        enclosuresByType.set(key, { enclosure: entry.enclosure, totalCount: entry.count });
+        enclosuresByType.set(key, { enclosure: entry.enclosure, totalCount: entry.count, sourceArrayId: entry.sourceArrayId });
       }
     }
   }
@@ -112,9 +114,9 @@ function consolidateOutputs(
 
   // Calculate the minimum outputs needed if we pack each type optimally
   let minOutputsNeeded = 0;
-  const typeAllocations: Array<{ enclosure: Enclosure; count: number; outputsNeeded: number; perOutput: number }> = [];
+  const typeAllocations: Array<{ enclosure: Enclosure; count: number; outputsNeeded: number; perOutput: number; sourceArrayId?: string }> = [];
 
-  for (const { enclosure, totalCount } of enclosuresByType.values()) {
+  for (const { enclosure, totalCount, sourceArrayId } of enclosuresByType.values()) {
     const limits = enclosure.max_enclosures[ampConfigKey];
     if (!limits) return null; // Not compatible
 
@@ -122,7 +124,7 @@ function consolidateOutputs(
     const groupsNeeded = Math.ceil(totalCount / limits.per_output);
     const outputsNeeded = groupsNeeded * channelsPerUnit;
     minOutputsNeeded += outputsNeeded;
-    typeAllocations.push({ enclosure, count: totalCount, outputsNeeded, perOutput: limits.per_output });
+    typeAllocations.push({ enclosure, count: totalCount, outputsNeeded, perOutput: limits.per_output, sourceArrayId });
   }
 
   // Check if consolidation can free up any outputs
@@ -147,7 +149,7 @@ function consolidateOutputs(
 
   // Allocate each enclosure type, packing as tightly as possible
   let outputIdx = 0;
-  for (const { enclosure, count, perOutput } of typeAllocations) {
+  for (const { enclosure, count, perOutput, sourceArrayId } of typeAllocations) {
     let remaining = count;
     const channelsPerUnit = getChannelsPerUnit(enclosure, ampConfigKey);
     const limits = enclosure.max_enclosures[ampConfigKey];
@@ -164,7 +166,7 @@ function consolidateOutputs(
         for (let c = 0; c < channelsPerUnit; c++) {
           const oi = group[c];
           const sectionZ = getSectionImpedance(enclosure, c);
-          newOutputs[oi].enclosures.push({ enclosure, count: toStack });
+          newOutputs[oi].enclosures.push({ enclosure, count: toStack, sourceArrayId });
           newOutputs[oi].totalEnclosures = toStack;
           newOutputs[oi].impedanceOhms = calculateParallelImpedance(sectionZ, toStack);
           if (limits?.min_impedance_override !== undefined) {
@@ -178,7 +180,7 @@ function consolidateOutputs(
       while (remaining > 0 && outputIdx < ampConfig.outputs) {
         const toAllocate = Math.min(remaining, perOutput);
 
-        newOutputs[outputIdx].enclosures.push({ enclosure, count: toAllocate });
+        newOutputs[outputIdx].enclosures.push({ enclosure, count: toAllocate, sourceArrayId });
         newOutputs[outputIdx].totalEnclosures = toAllocate;
         newOutputs[outputIdx].impedanceOhms = calculateParallelImpedance(
           enclosure.nominal_impedance_ohms,
@@ -515,6 +517,17 @@ export function getMinimumEnclosureCount(
  *    - Stack enclosures until impedance is acceptable, then spread at that count
  * 3. If not parallelAllowed: spread 1 per output (existing behavior)
  */
+/** Stamp the source array id onto freshly-allocated enclosure entries (those that don't
+ *  have one yet), so each enclosure records which EnclosureRequest (array) it came from.
+ *  Entries already stamped (e.g. another array sharing this amp) keep their own id. */
+function stampSourceArray(outputs: OutputAllocation[], sourceArrayId: string): void {
+  for (const o of outputs) {
+    for (const e of o.enclosures) {
+      if (e.sourceArrayId === undefined) e.sourceArrayId = sourceArrayId;
+    }
+  }
+}
+
 function allocateToOutputs(
   enclosure: Enclosure,
   count: number,
@@ -971,6 +984,7 @@ function solveSingleEnclosureType(
       bestCandidate.ampConfig,
       { perOutput: bestCandidate.perOutput, perAmplifier: bestCandidate.perAmplifier, minImpedanceOverride: bestCandidate.minImpedanceOverride }
     );
+    stampSourceArray(outputs, request.id);
 
     // Count how many of this amp type we've already created
     const ampIndex = ampInstances.filter((i) => i.ampConfig.key === bestCandidate.ampConfigKey).length;
@@ -1326,6 +1340,7 @@ function buildSharedSolution(
         currentLoad,  // Pass current load percentage, not enclosure count
         ampConfig.key
       );
+      stampSourceArray(outputs, request.id);
 
       console.log(`[buildSharedSolution] Merge result: allocated=${allocated}`);
 
@@ -1349,6 +1364,7 @@ function buildSharedSolution(
           );
           outputs = retryResult.outputs;
           allocated = retryResult.allocated;
+          stampSourceArray(outputs, request.id);
           console.log(`[buildSharedSolution] Retry merge result: allocated=${allocated}`);
         }
       }
@@ -1398,6 +1414,7 @@ function buildSharedSolution(
           currentLoad,
           ampInstance.ampConfig.key
         );
+        stampSourceArray(outputs, request.id);
 
         if (allocated > 0) {
           console.log(`[buildSharedSolution] Fitted ${allocated}x ${enclosure.enclosure} on existing ${ampInstance.id}`);
@@ -1447,6 +1464,7 @@ function buildSharedSolution(
           currentLoad,
           ampInstance.ampConfig.key
         );
+        stampSourceArray(outputs, request.id);
 
         if (allocated > 0) {
           console.log(`[buildSharedSolution] After upgrade, fitted ${allocated}x ${enclosure.enclosure} on ${ampInstance.id}`);
@@ -1496,6 +1514,7 @@ function buildSharedSolution(
         perAmplifier: chosenCandidate.perAmplifier,
         minImpedanceOverride: chosenCandidate.minImpedanceOverride,
       });
+      stampSourceArray(outputs, request.id);
 
       const ampIndex = ampInstances.filter((i) => i.ampConfig.key === chosenConfig.key).length;
 

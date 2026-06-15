@@ -564,60 +564,50 @@ export default function App() {
         (config) => !zone.disabledAmps.has(config.model)
       );
 
-      // Calculate enclosures already allocated to locked amps
-      // For multi-channel enclosures, only count on the primary channel to avoid double-counting
-      const lockedEnclosureCounts = new Map<string, number>();
+      // Enclosures already allocated to locked amps, attributed to their SOURCE ARRAY
+      // (req.id) via the sourceArrayId the solver stamps on each enclosure. Multi-channel
+      // enclosures are counted once per group (primary channel) to avoid double-counting.
+      const lockedByArray = new Map<string, number>();
       for (const lockedAmp of zone.lockedAmpInstances) {
         const seenMultiChannel = new Set<string>();
         for (const output of lockedAmp.outputs) {
           for (const entry of output.enclosures) {
+            if (!entry.sourceArrayId) continue; // legacy/unstamped — backfilled at load
             const name = entry.enclosure.enclosure;
             const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
 
             if (channelsPerUnit > 1) {
-              // Multi-channel enclosure: only count on primary channel (to avoid double-counting)
               const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
-              const groupKey = `${name}_${groupIdx}`;
+              const groupKey = `${entry.sourceArrayId}_${name}_${groupIdx}`;
               if (seenMultiChannel.has(groupKey)) continue;
               seenMultiChannel.add(groupKey);
             }
 
-            lockedEnclosureCounts.set(name, (lockedEnclosureCounts.get(name) ?? 0) + entry.count);
+            lockedByArray.set(entry.sourceArrayId, (lockedByArray.get(entry.sourceArrayId) ?? 0) + entry.count);
           }
         }
       }
 
-      // Per-row remaining quantity after subtracting locked-amp enclosures. The locked
-      // count is type-keyed (no array provenance), so distribute it greedily across rows
-      // of each type — same total as the old pooled subtraction, just per row.
-      const remainingLocked = new Map(lockedEnclosureCounts);
+      // Per-row remaining quantity after subtracting THIS array's own locked enclosures —
+      // exact per req.id, no cross-array redistribution.
       const remainingRows: EnclosureRequest[] = [];
       for (const req of zone.requests) {
-        const name = req.enclosure.enclosure;
-        const avail = remainingLocked.get(name) ?? 0;
-        const take = Math.min(req.quantity, avail);
-        if (avail) remainingLocked.set(name, avail - take);
-        const remaining = req.quantity - take;
+        const remaining = req.quantity - (lockedByArray.get(req.id) ?? 0);
         if (remaining > 0) remainingRows.push({ ...req, quantity: remaining });
       }
 
       // Build solver groups under an isolation policy. An "isolated" row (its own array)
-      // gets its own group → its own amp(s), never shared with another array. Non-isolated
-      // rows pool by enclosure type into a single group so the solver still packs/cross-fills
-      // them across types (today's behavior).
+      // gets its own group → its own amp(s), never shared. Non-isolated rows go into ONE
+      // pooled group UNMERGED (each keeps its own id) so the solver still packs them across
+      // arrays while every allocated enclosure stays attributable to its source array.
       const buildGroups = (isolateAll: boolean): EnclosureRequest[][] => {
         const groups: EnclosureRequest[][] = [];
-        const pooled = new Map<string, EnclosureRequest>();
+        const pooled: EnclosureRequest[] = [];
         for (const row of remainingRows) {
-          if (isolateAll || row.dedicatedAmp) {
-            groups.push([row]);
-          } else {
-            const existing = pooled.get(row.enclosure.enclosure);
-            if (existing) existing.quantity += row.quantity;
-            else pooled.set(row.enclosure.enclosure, { ...row });
-          }
+          if (isolateAll || row.dedicatedAmp) groups.push([row]);
+          else pooled.push(row);
         }
-        if (pooled.size > 0) groups.push([...pooled.values()]);
+        if (pooled.length > 0) groups.push(pooled);
         return groups;
       };
 
@@ -693,26 +683,26 @@ export default function App() {
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeEnabledAmpConfigs = activeZoneSolution?.enabledAmpConfigs ?? [];
 
-  // Calculate locked enclosure counts for the active zone
-  // For multi-channel enclosures, only count on the primary channel to avoid double-counting
-  const activeLockedEnclosureCounts = useMemo(() => {
+  // Locked enclosure counts for the active zone, keyed by SOURCE ARRAY (req.id) so each
+  // array's badge shows its OWN locked enclosures. Multi-channel counted once per group.
+  const activeLockedCountsByArray = useMemo(() => {
     const counts = new Map<string, number>();
     for (const lockedAmp of activeZone.lockedAmpInstances) {
       const seenMultiChannel = new Set<string>();
       for (const output of lockedAmp.outputs) {
         for (const entry of output.enclosures) {
+          if (!entry.sourceArrayId) continue;
           const name = entry.enclosure.enclosure;
           const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
 
           if (channelsPerUnit > 1) {
-            // Multi-channel enclosure: only count on primary channel (to avoid double-counting)
             const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
-            const groupKey = `${name}_${groupIdx}`;
+            const groupKey = `${entry.sourceArrayId}_${name}_${groupIdx}`;
             if (seenMultiChannel.has(groupKey)) continue;
             seenMultiChannel.add(groupKey);
           }
 
-          counts.set(name, (counts.get(name) ?? 0) + entry.count);
+          counts.set(entry.sourceArrayId, (counts.get(entry.sourceArrayId) ?? 0) + entry.count);
         }
       }
     }
@@ -867,7 +857,7 @@ export default function App() {
               requests={activeZone.requests}
               onRequestsChange={(reqs) => updateZone(activeZoneId, (z) => ({ ...z, requests: reqs }))}
               salesMode={salesMode}
-              lockedEnclosureCounts={activeLockedEnclosureCounts}
+              lockedCountsByArray={activeLockedCountsByArray}
               rackMode={rackMode}
               riggingParts={data.riggingParts}
               onShowRigging={handleShowRigging}

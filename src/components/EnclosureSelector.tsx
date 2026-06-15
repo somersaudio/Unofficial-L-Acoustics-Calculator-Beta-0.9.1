@@ -14,8 +14,8 @@ interface EnclosureSelectorProps {
   onRequestsChange: (requests: EnclosureRequest[]) => void;
   salesMode?: boolean;
   onBump?: () => void;
-  /** Map of enclosure name -> count of locked enclosures */
-  lockedEnclosureCounts?: Map<string, number>;
+  /** Map of array id (EnclosureRequest.id) -> count of THAT array's locked enclosures */
+  lockedCountsByArray?: Map<string, number>;
   /** Whether LA-RAK mode is active — shows ×N per ch control */
   rackMode?: boolean;
   /** Verified per-enclosure weights + rigging catalog (from data/rigging_parts.json) */
@@ -68,7 +68,7 @@ export default function EnclosureSelector({
   onRequestsChange,
   salesMode = false,
   onBump,
-  lockedEnclosureCounts = new Map(),
+  lockedCountsByArray = new Map(),
   rackMode = false,
   riggingParts,
   onShowRigging,
@@ -183,24 +183,9 @@ export default function EnclosureSelector({
     return { safe: dep?.safe ?? null, max: dep?.max ?? null };
   };
 
-  // How many of each row's enclosures are already locked into amps (distributed across
-  // rows of the same type, unlocked rows first). A clamp must never drop a row below its
-  // share — those enclosures physically exist and are allocated to a locked amp.
-  const rowLockedShares = (reqs: EnclosureRequest[]): number[] => {
-    const remaining = new Map(lockedEnclosureCounts);
-    const shares = new Array<number>(reqs.length).fill(0);
-    const order = reqs
-      .map((_, i) => i)
-      .sort((a, b) => Number(Boolean(reqs[a].locked)) - Number(Boolean(reqs[b].locked)));
-    for (const i of order) {
-      const name = reqs[i].enclosure.enclosure;
-      const rem = remaining.get(name) ?? 0;
-      const sub = Math.min(rem, reqs[i].quantity);
-      if (rem) remaining.set(name, rem - sub);
-      shares[i] = sub;
-    }
-    return shares;
-  };
+  // How many of a given row's enclosures sit on locked amps — exact per array (req.id),
+  // straight from the solver's source-array stamp. A clamp must never drop a row below this.
+  const lockedShareForRow = (req: EnclosureRequest): number => lockedCountsByArray.get(req.id) ?? 0;
 
   const handleAddEnclosure = () => {
     if (!selectedEnclosure) return;
@@ -276,7 +261,7 @@ export default function EnclosureSelector({
       if (max != null) effectiveQuantity = Math.min(effectiveQuantity, max);
     }
     // Never clamp below this row's amp-locked share (those enclosures physically exist)
-    effectiveQuantity = Math.max(effectiveQuantity, rowLockedShares(requests)[index]);
+    effectiveQuantity = Math.max(effectiveQuantity, lockedShareForRow(req));
     if (effectiveQuantity < 1) return;
 
     const wasBumped = newQuantity < minCount;
@@ -317,7 +302,7 @@ export default function EnclosureSelector({
     // Re-clamp the array down to the new deployment's max (e.g. flown 20 → stacked 9),
     // but never below this row's amp-locked share (those enclosures physically exist).
     const { max } = limitsFor(next.enclosure.enclosure, mode);
-    if (max != null) next.quantity = Math.max(Math.min(next.quantity, max), rowLockedShares(requests)[index]);
+    if (max != null) next.quantity = Math.max(Math.min(next.quantity, max), lockedShareForRow(next));
     newReqs[index] = next;
     onRequestsChange(newReqs);
   };
@@ -438,10 +423,6 @@ export default function EnclosureSelector({
       {/* Enclosure arrays. A partially amp-locked array stays a single card; its locked
           portion is shown inline (the per-amp breakdown lives in the amp panel on the right). */}
       {requests.length > 0 && (() => {
-        // Distribute amp-locked counts across rows of the same enclosure type, draining
-        // UNLOCKED rows first so a pinned (locked) row isn't hidden while an unlocked
-        // row of the same type remains. Supports multiple arrays of one type.
-        const lockedShares = rowLockedShares(requests);
         // Each array renders as ONE card showing its full count, with the amp-locked
         // portion marked inline — so a partially-locked array is never split into two
         // cards. Number every row (Array 1, Array 2, …); always shown so the format is
@@ -458,8 +439,9 @@ export default function EnclosureSelector({
             const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
             const showBumpMessage = bumpedIndices.has(index);
             const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
-            // How many of this array sit on a locked amp (shown inline as a badge, below).
-            const lockedCount = lockedShares[index];
+            // How many of THIS array's enclosures sit on a locked amp (exact, by source
+            // array id) — shown inline as a badge below.
+            const lockedCount = lockedCountsByArray.get(request.id) ?? 0;
 
             // Per-row deployment + the rigging piece it implies (drives this array's weight).
             // Fall back to the first deployment if the saved mode is stale/unknown.
