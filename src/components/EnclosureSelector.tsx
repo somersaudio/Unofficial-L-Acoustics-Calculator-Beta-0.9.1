@@ -213,30 +213,45 @@ export default function EnclosureSelector({
     const effectiveQuantity = Math.max(quantity, minCount);
     const wasBumped = effectiveQuantity > quantity;
 
-    // Merge into an existing UNLOCKED row of this type. If there isn't one
-    // (none exist, or every row of this type is locked), start a new row so the
-    // added enclosures don't disturb a locked array.
-    const existingIndex = requests.findIndex(
-      (r) => r.enclosure.enclosure === selectedEnclosure && !r.locked
-    );
+    // Fill the first UNLOCKED row of this type that still has room (never a locked
+    // row), then spill any overflow into new array row(s) — each capped at its
+    // deployment's max — so a full array doesn't block adding more.
+    const newRequests = [...requests];
+    let remaining = effectiveQuantity;
+    let flashIndex = -1;
 
-    if (existingIndex >= 0) {
-      const target = requests[existingIndex];
+    const fillIdx = newRequests.findIndex((r) => {
+      if (r.enclosure.enclosure !== selectedEnclosure || r.locked) return false;
+      const { max } = limitsFor(r.enclosure.enclosure, r.deploymentMode);
+      return max == null || r.quantity < max;
+    });
+    if (fillIdx >= 0) {
+      const target = newRequests[fillIdx];
       const { max } = limitsFor(target.enclosure.enclosure, target.deploymentMode);
-      let q = target.quantity + effectiveQuantity;
-      if (max != null) q = Math.min(q, max);
-      const newRequests = [...requests];
-      newRequests[existingIndex] = { ...target, quantity: q };
-      onRequestsChange(newRequests);
-    } else {
-      const { max } = limitsFor(selectedEnclosure);
-      const q = max != null ? Math.min(effectiveQuantity, max) : effectiveQuantity;
-      onRequestsChange([...requests, { id: crypto.randomUUID(), enclosure, quantity: q }]);
-      if (wasBumped) {
-        // The new request will be at the end
-        setBumpedIndices(new Set([requests.length]));
-        onBump?.();
-      }
+      const room = max == null ? remaining : max - target.quantity;
+      const add = Math.min(remaining, room);
+      newRequests[fillIdx] = { ...target, quantity: target.quantity + add };
+      remaining -= add;
+    }
+
+    // New arrays inherit the deployment of an existing array of this type (else default).
+    const inheritMode =
+      fillIdx >= 0
+        ? newRequests[fillIdx].deploymentMode
+        : newRequests.find((r) => r.enclosure.enclosure === selectedEnclosure)?.deploymentMode;
+    const { max: newMax } = limitsFor(selectedEnclosure, inheritMode);
+    while (remaining > 0) {
+      const cap = newMax == null ? remaining : Math.min(remaining, newMax);
+      if (flashIndex < 0) flashIndex = newRequests.length;
+      newRequests.push({ id: crypto.randomUUID(), enclosure, quantity: Math.max(cap, minCount), deploymentMode: inheritMode });
+      remaining -= cap;
+      if (newMax == null) break;
+    }
+
+    onRequestsChange(newRequests);
+    if (wasBumped && flashIndex >= 0) {
+      setBumpedIndices(new Set([flashIndex]));
+      onBump?.();
     }
 
     // Reset form
