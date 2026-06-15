@@ -149,7 +149,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A10-BUMP",
+          "default_rigging": "KS21-OUTRIG",
           "safe": 4,
           "max": 4
         },
@@ -349,7 +349,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A10i-BUMP",
+          "default_rigging": "Ai-FIXBRACKET",
           "safe": 4,
           "max": 4
         },
@@ -478,7 +478,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15-BUMP",
+          "default_rigging": "KS21-OUTRIG",
           "safe": 4,
           "max": 4
         },
@@ -660,7 +660,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15i-BUMP",
+          "default_rigging": "Ai-FIXBRACKET",
           "safe": 4,
           "max": 4
         },
@@ -780,7 +780,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K1-BUMP",
+          "default_rigging": "K1-CHARIOT",
           "safe": 4,
           "max": 4
         }
@@ -902,7 +902,9 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K1-BUMP"
+          "default_rigging": "K1-CHARIOT",
+          "safe": 4,
+          "max": 4
         }
       ],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/LOUDSPEAKERS/K1-SB/EN/Owner's Manual/K1_OM_EN.pdf"
@@ -1049,7 +1051,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K2-BUMP",
+          "default_rigging": "K2-CHARIOT",
           "safe": 4,
           "max": 6
         }
@@ -1180,7 +1182,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K3-BUMP",
+          "default_rigging": "K3-CHARIOT",
           "safe": 4,
           "max": 6
         }
@@ -1284,7 +1286,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "K3i-BUMP",
+          "default_rigging": "K3i-TILTBRACKET",
           "safe": 4,
           "max": 6
         },
@@ -1395,7 +1397,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15-BUMP",
+          "default_rigging": "KS21-CHARIOT",
           "safe": 3,
           "max": 3
         }
@@ -1508,7 +1510,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "A15i-BUMP",
+          "default_rigging": "Ai-FIXBRACKET",
           "safe": 4,
           "max": 4
         },
@@ -1573,7 +1575,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "KS28-BUMP",
+          "default_rigging": "KS28-CHARIOT",
           "safe": 4,
           "max": 4
         }
@@ -2079,8 +2081,8 @@
           "mode": "flown",
           "label": "Flown (truss / motor)",
           "default_rigging": "KIBU-SB",
-          "max": 8,
-          "safe": 8
+          "max": 6,
+          "safe": 6
         },
         {
           "mode": "ground_stack",
