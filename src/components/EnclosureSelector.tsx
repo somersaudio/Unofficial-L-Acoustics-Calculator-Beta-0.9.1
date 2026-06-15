@@ -684,9 +684,9 @@ export default function EnclosureSelector({
                 className={`relative flex items-center gap-2 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
                 style={isLocked ? { borderColor: lockGold } : undefined}
               >
-                {/* Enclosure Image — spans the row height; grows taller when a second control line is present */}
+                {/* Enclosure Image — consistent size across all rows that have a second control line */}
                 {imageUrl && (
-                  <div className={`w-[88px] flex-shrink-0 overflow-hidden rounded ${hasBottomRow && request.quantity > 1 ? "h-[72px]" : "h-[50px]"}`}>
+                  <div className={`w-[88px] flex-shrink-0 overflow-hidden rounded ${hasBottomRow ? "h-[72px]" : "h-[50px]"}`}>
                     <img
                       src={imageUrl}
                       alt={request.enclosure.enclosure}
