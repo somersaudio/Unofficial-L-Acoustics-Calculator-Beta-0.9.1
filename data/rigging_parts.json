@@ -1992,7 +1992,7 @@
         {
           "mode": "ground_stack",
           "label": "Ground-stacked",
-          "default_rigging": "L2-BUMP",
+          "default_rigging": "L2-CHARIOT",
           "safe": 1,
           "max": 1
         }
