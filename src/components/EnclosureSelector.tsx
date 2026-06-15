@@ -455,11 +455,80 @@ export default function EnclosureSelector({
             // Skip if all are locked (they're shown in the locked section above)
             if (unlockedCount <= 0) return null;
 
+            // ×N per-channel control — only for enclosures with per_output > 1 on an enabled amp
+            const perChannelControl = (() => {
+              let maxPerOutput = 1;
+              for (const key of Object.keys(request.enclosure.max_enclosures)) {
+                const lim = request.enclosure.max_enclosures[key];
+                if (lim && lim.per_output > maxPerOutput) maxPerOutput = lim.per_output;
+              }
+              const minPerOutput = request.enclosure.preferredPerOutput ?? 1;
+              const currentPerOutput = request.perOutput ?? minPerOutput;
+              if (maxPerOutput <= 1) return null;
+              return (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handlePerOutputChange(index, Math.max(minPerOutput, currentPerOutput - 1))}
+                    disabled={currentPerOutput <= minPerOutput}
+                    className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                  >
+                    -
+                  </button>
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                    ×{currentPerOutput} per ch
+                  </span>
+                  <button
+                    onClick={() => handlePerOutputChange(index, Math.min(maxPerOutput, currentPerOutput + 1))}
+                    disabled={currentPerOutput >= maxPerOutput}
+                    className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                  >
+                    +
+                  </button>
+                </div>
+              );
+            })();
+
+            // Deployment (rigging) dropdown + Show-rigging link
+            const deploymentControl = (() => {
+              const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
+              const deps = encRig?.deployments;
+              if (!deps || deps.length === 0) return null;
+              const selMode = deploymentSelections?.[request.enclosure.enclosure] ?? deps[0].mode;
+              return (
+                <div className="flex items-center gap-1.5 text-[10px]">
+                  <select
+                    value={selMode}
+                    onChange={(e) => onDeploymentChange?.(request.enclosure.enclosure, e.target.value)}
+                    title="Deployment — changes the default rigging hardware"
+                    className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                  >
+                    {deps.map((d) => (
+                      <option key={d.mode} value={d.mode}>{d.label}</option>
+                    ))}
+                  </select>
+                  {encRig?.rigging_pdf && (
+                    <button
+                      type="button"
+                      onClick={() => onShowRigging?.(encRig.rigging_pdf!)}
+                      className="text-blue-600 hover:underline dark:text-blue-400"
+                      title="Open the rigging manual PDF for the current rigging hardware"
+                    >
+                      Show rigging
+                    </button>
+                  )}
+                </div>
+              );
+            })();
+
+            const hasBottomRow = Boolean(perChannelControl || deploymentControl);
+
             return (
               <div
                 key={`${request.enclosure.enclosure}-${index}`}
-                className="relative flex items-center gap-3 rounded-lg border py-0.5 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
+                className="relative rounded-lg border py-1 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
               >
+                {/* Top line: image, weight, name, quantity, remove */}
+                <div className="flex items-center gap-3">
                 {/* Enclosure Image */}
                 {imageUrl && (
                   <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded">
@@ -509,36 +578,6 @@ export default function EnclosureSelector({
                       )}
                     </div>
                   )}
-                  {(() => {
-                    const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
-                    const deps = encRig?.deployments;
-                    if (!deps || deps.length === 0) return null;
-                    const selMode = deploymentSelections?.[request.enclosure.enclosure] ?? deps[0].mode;
-                    return (
-                      <div className="mt-0.5 flex items-center gap-1.5 text-[10px]">
-                        <select
-                          value={selMode}
-                          onChange={(e) => onDeploymentChange?.(request.enclosure.enclosure, e.target.value)}
-                          title="Deployment — changes the default rigging hardware"
-                          className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
-                        >
-                          {deps.map((d) => (
-                            <option key={d.mode} value={d.mode}>{d.label}</option>
-                          ))}
-                        </select>
-                        {encRig?.rigging_pdf && (
-                          <button
-                            type="button"
-                            onClick={() => onShowRigging?.(encRig.rigging_pdf!)}
-                            className="text-blue-600 hover:underline dark:text-blue-400"
-                            title="Open the rigging manual PDF for the current rigging hardware"
-                          >
-                            Show rigging
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })()}
                 </div>
 
                 {/* Quantity controls */}
@@ -572,39 +611,6 @@ export default function EnclosureSelector({
                   </button>
                 </div>
 
-                {/* ×N per channel control — for enclosures with per_output > 1 on any enabled amp */}
-                {(() => {
-                  let maxPerOutput = 1;
-                  for (const key of Object.keys(request.enclosure.max_enclosures)) {
-                    const lim = request.enclosure.max_enclosures[key];
-                    if (lim && lim.per_output > maxPerOutput) maxPerOutput = lim.per_output;
-                  }
-                  const minPerOutput = request.enclosure.preferredPerOutput ?? 1;
-                  const currentPerOutput = request.perOutput ?? minPerOutput;
-                  if (maxPerOutput <= 1) return null;
-                  return (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handlePerOutputChange(index, Math.max(minPerOutput, currentPerOutput - 1))}
-                        disabled={currentPerOutput <= minPerOutput}
-                        className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                      >
-                        -
-                      </button>
-                      <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                        ×{currentPerOutput} per ch
-                      </span>
-                      <button
-                        onClick={() => handlePerOutputChange(index, Math.min(maxPerOutput, currentPerOutput + 1))}
-                        disabled={currentPerOutput >= maxPerOutput}
-                        className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
-                      >
-                        +
-                      </button>
-                    </div>
-                  );
-                })()}
-
                 <button
                   onClick={() => handleRemoveRequest(index)}
                   disabled={lockedCount > 0}
@@ -629,6 +635,15 @@ export default function EnclosureSelector({
                     />
                   </svg>
                 </button>
+                </div>
+
+                {/* Secondary controls on their own line to avoid crowding the row */}
+                {hasBottomRow && (
+                  <div className={`mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 ${imageUrl ? "pl-[92px]" : ""}`}>
+                    {perChannelControl}
+                    {deploymentControl}
+                  </div>
+                )}
               </div>
             );
           })}
