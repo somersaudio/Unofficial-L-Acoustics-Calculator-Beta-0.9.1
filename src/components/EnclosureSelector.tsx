@@ -198,6 +198,8 @@ export default function EnclosureSelector({
     );
 
     if (existingIndex >= 0) {
+      // Don't modify a locked row — it's pinned "as is"
+      if (requests[existingIndex].locked) return;
       const newRequests = [...requests];
       newRequests[existingIndex] = {
         ...newRequests[existingIndex],
@@ -244,6 +246,12 @@ export default function EnclosureSelector({
   const handlePerOutputChange = (index: number, value: number) => {
     const newReqs = [...requests];
     newReqs[index] = { ...newReqs[index], perOutput: value };
+    onRequestsChange(newReqs);
+  };
+
+  const handleToggleLock = (index: number) => {
+    const newReqs = [...requests];
+    newReqs[index] = { ...newReqs[index], locked: !newReqs[index].locked };
     onRequestsChange(newReqs);
   };
 
@@ -469,7 +477,7 @@ export default function EnclosureSelector({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handlePerOutputChange(index, Math.max(minPerOutput, currentPerOutput - 1))}
-                    disabled={currentPerOutput <= minPerOutput}
+                    disabled={currentPerOutput <= minPerOutput || request.locked}
                     className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     -
@@ -479,7 +487,7 @@ export default function EnclosureSelector({
                   </span>
                   <button
                     onClick={() => handlePerOutputChange(index, Math.min(maxPerOutput, currentPerOutput + 1))}
-                    disabled={currentPerOutput >= maxPerOutput}
+                    disabled={currentPerOutput >= maxPerOutput || request.locked}
                     className="h-6 w-6 rounded border border-gray-300 bg-gray-100 text-xs text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     +
@@ -499,8 +507,9 @@ export default function EnclosureSelector({
                   <select
                     value={selMode}
                     onChange={(e) => onDeploymentChange?.(request.enclosure.enclosure, e.target.value)}
+                    disabled={request.locked}
                     title="Deployment — changes the default rigging hardware"
-                    className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
+                    className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
                   >
                     {deps.map((d) => (
                       <option key={d.mode} value={d.mode}>{d.label}</option>
@@ -522,10 +531,14 @@ export default function EnclosureSelector({
 
             const hasBottomRow = Boolean(perChannelControl || deploymentControl);
 
+            const isLocked = Boolean(request.locked);
+            const lockGold = document.documentElement.classList.contains("dark") ? "#b59e5f" : "#7A6B3A";
+
             return (
               <div
                 key={`${request.enclosure.enclosure}-${index}`}
-                className="relative flex items-center gap-3 rounded-lg border py-1 px-3 border-gray-300 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800"
+                className={`relative flex items-center gap-3 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
+                style={isLocked ? { borderColor: lockGold } : undefined}
               >
                 {/* Enclosure Image — spans the row height; grows taller when a second control line is present */}
                 {imageUrl && (
@@ -588,7 +601,7 @@ export default function EnclosureSelector({
                     onClick={() =>
                       handleQuantityChange(index, request.quantity - 1)
                     }
-                    disabled={unlockedCount <= Math.max(minCount - lockedCount, 1)}
+                    disabled={isLocked || unlockedCount <= Math.max(minCount - lockedCount, 1)}
                     className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     -
@@ -597,31 +610,51 @@ export default function EnclosureSelector({
                     type="number"
                     min={1}
                     value={unlockedCount}
+                    disabled={isLocked}
                     onChange={(e) => {
                       const newUnlocked = parseInt(e.target.value) || 1;
                       handleQuantityChange(index, lockedCount + newUnlocked);
                     }}
-                    className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={() =>
                       handleQuantityChange(index, request.quantity + 1)
                     }
-                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
+                    disabled={isLocked}
+                    className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     +
                   </button>
                 </div>
 
+                {/* Lock this row "as is" — freezes its controls; still solved normally */}
+                <button
+                  onClick={() => handleToggleLock(index)}
+                  className="rounded p-1 transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700"
+                  style={isLocked ? { backgroundColor: `${lockGold}33`, color: lockGold } : undefined}
+                  title={isLocked ? "Unlock this enclosure row" : "Lock this enclosure row so it can't be changed"}
+                >
+                  {isLocked ? (
+                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5 text-gray-400 dark:text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </button>
+
                 <button
                   onClick={() => handleRemoveRequest(index)}
-                  disabled={lockedCount > 0}
+                  disabled={lockedCount > 0 || isLocked}
                   className={`rounded p-1 ${
-                    lockedCount > 0
+                    lockedCount > 0 || isLocked
                       ? "cursor-not-allowed text-gray-300 dark:text-neutral-600"
                       : "text-gray-400 hover:bg-red-50 hover:text-red-600 dark:text-neutral-500 dark:hover:bg-red-950/50 dark:hover:text-red-500"
                   }`}
-                  title={lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
+                  title={isLocked ? "Unlock to remove" : lockedCount > 0 ? "Cannot remove - has locked enclosures" : "Remove"}
                 >
                   <svg
                     className="h-5 w-5"

@@ -173,6 +173,7 @@ export interface EnclosureRequest {
   enclosure: Enclosure;
   quantity: number;
   perOutput?: number; // ×N per channel in LA-RAK spread mode (default: 1)
+  locked?: boolean; // Row pinned "as is" — its controls are frozen; still solved normally
 }
 
 /** Allocation of enclosures to a single amplifier output */
@@ -417,7 +418,7 @@ export interface AmpInstanceSerialized {
 export interface ZoneSerialized {
   id: string;
   name: string;
-  requests: Array<{ enclosureName: string; quantity: number }>;
+  requests: Array<{ enclosureName: string; quantity: number; perOutput?: number; locked?: boolean }>;
   disabledAmps: string[];
   lockedAmpInstances?: AmpInstanceSerialized[];
 }

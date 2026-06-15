@@ -24,6 +24,8 @@ export function serializeZones(zones: Zone[]): ZoneSerialized[] {
     requests: zone.requests.map((r) => ({
       enclosureName: r.enclosure.enclosure,
       quantity: r.quantity,
+      perOutput: r.perOutput,
+      locked: r.locked,
     })),
     disabledAmps: Array.from(zone.disabledAmps),
     lockedAmpInstances: zone.lockedAmpInstances.map(serializeAmpInstance),
@@ -98,7 +100,7 @@ export function deserializeZones(
       .map((r) => {
         const enclosure = enclosureMap.get(r.enclosureName);
         if (!enclosure) return null;
-        return { enclosure, quantity: r.quantity };
+        return { enclosure, quantity: r.quantity, perOutput: r.perOutput, locked: r.locked };
       })
       .filter((r): r is NonNullable<typeof r> => r !== null),
     disabledAmps: new Set(sz.disabledAmps),
