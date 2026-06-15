@@ -117,21 +117,35 @@ export function deserializeZones(
   }));
 
   // Migration: amps locked before source-array provenance existed have no sourceArrayId.
-  // Attribute each unstamped entry's count to this zone's same-type arrays (unlocked rows
-  // first, matching the old distribution), splitting an entry that spans multiple arrays —
-  // so old projects load with exact per-array locked counts and don't double-count.
+  // Attribute each unstamped enclosure to this zone's same-type arrays (unlocked rows first,
+  // matching the old distribution), so old projects load with exact per-array locked counts.
+  //
+  // Counts are in BOXES, not amp channels. A multi-channel enclosure (e.g. K1, whose
+  // signal_channels span 4 outputs) appears as one entry per channel, all with the same
+  // box count — so summing raw entry.count would over-count by the channel multiplier.
+  // We collapse each box-group (the channelsPerUnit consecutive outputs that carry one set
+  // of boxes) to a single box count, distribute THAT once, then write the same per-array
+  // split onto every channel of the group. groupIdx mirrors the badge-counting logic in
+  // App.tsx so the migrated stamps and the live badge agree.
+  const groupIdxOf = (e: Enclosure, outputIndex: number) =>
+    Math.floor(outputIndex / Math.max(1, e.signal_channels?.length ?? 1));
   for (const zone of zones) {
     const needsBackfill = zone.lockedAmpInstances.some((amp) =>
       amp.outputs.some((o) => o.enclosures.some((e) => e.sourceArrayId === undefined))
     );
     if (!needsBackfill) continue;
-    // Counts already attributed to an array (entries that DO have a stamp) — so the
-    // backfill only fills each array's REMAINING capacity and never over-attributes.
+    // Boxes already attributed to an array (stamped entries) — counted once per box-group so
+    // the backfill only fills each array's REMAINING capacity and never over-attributes.
     const alreadyStamped = new Map<string, number>();
     for (const amp of zone.lockedAmpInstances) {
+      const seen = new Set<string>();
       for (const output of amp.outputs) {
         for (const e of output.enclosures) {
-          if (e.sourceArrayId) alreadyStamped.set(e.sourceArrayId, (alreadyStamped.get(e.sourceArrayId) ?? 0) + e.count);
+          if (!e.sourceArrayId) continue;
+          const key = `${e.sourceArrayId}_${e.enclosure.enclosure}_${groupIdxOf(e.enclosure, output.outputIndex)}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          alreadyStamped.set(e.sourceArrayId, (alreadyStamped.get(e.sourceArrayId) ?? 0) + e.count);
         }
       }
     }
@@ -142,20 +156,40 @@ export function deserializeZones(
       slotsByName.set(req.enclosure.enclosure, list);
     }
     for (const amp of zone.lockedAmpInstances) {
+      // Distribute each unstamped box-group ONCE (decrementing slot capacity once per group),
+      // then apply the resulting array split to every channel of the group.
+      const splitByGroup = new Map<string, Array<{ id?: string; count: number }>>();
+      for (const output of amp.outputs) {
+        for (const entry of output.enclosures) {
+          if (entry.sourceArrayId !== undefined) continue;
+          const name = entry.enclosure.enclosure;
+          const gkey = `${groupIdxOf(entry.enclosure, output.outputIndex)}_${name}`;
+          if (splitByGroup.has(gkey)) continue;
+          let left = entry.count; // boxes in this group
+          const parts: Array<{ id?: string; count: number }> = [];
+          for (const slot of slotsByName.get(name) ?? []) {
+            if (left <= 0) break;
+            if (slot.remaining <= 0) continue;
+            const take = Math.min(left, slot.remaining);
+            parts.push({ id: slot.id, count: take });
+            slot.remaining -= take;
+            left -= take;
+          }
+          if (left > 0) parts.push({ count: left }); // no matching row — leave unattributed
+          splitByGroup.set(gkey, parts);
+        }
+      }
       for (const output of amp.outputs) {
         const rebuilt: typeof output.enclosures = [];
         for (const entry of output.enclosures) {
           if (entry.sourceArrayId !== undefined) { rebuilt.push(entry); continue; }
-          let left = entry.count;
-          for (const slot of slotsByName.get(entry.enclosure.enclosure) ?? []) {
-            if (left <= 0) break;
-            if (slot.remaining <= 0) continue;
-            const take = Math.min(left, slot.remaining);
-            rebuilt.push({ enclosure: entry.enclosure, count: take, sourceArrayId: slot.id });
-            slot.remaining -= take;
-            left -= take;
+          const gkey = `${groupIdxOf(entry.enclosure, output.outputIndex)}_${entry.enclosure.enclosure}`;
+          const parts = splitByGroup.get(gkey) ?? [{ count: entry.count }];
+          for (const p of parts) {
+            rebuilt.push(p.id !== undefined
+              ? { enclosure: entry.enclosure, count: p.count, sourceArrayId: p.id }
+              : { enclosure: entry.enclosure, count: p.count });
           }
-          if (left > 0) rebuilt.push({ enclosure: entry.enclosure, count: left }); // no matching row — leave unattributed
         }
         output.enclosures = rebuilt;
       }

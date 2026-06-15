@@ -2145,8 +2145,15 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
               if (rackName && onRackNameChange) {
                 onRackNameChange(rackGroupId, rackName);
               }
-              // Collect all amps to lock, attach rackGroupId
-              const instancesToLock = rackDistributeMode ? transformedInstances : instances;
+              // Collect all amps to lock, attach rackGroupId.
+              // Lock the RAW instances, NOT the channel-spread display transform: the spread
+              // transform interleaves different arrays' box-channels onto shared outputs, which
+              // scrambles each box's sourceArrayId provenance (a single box's 4 channels can end
+              // up stamped with different arrays → double-counted badges). The locked rack
+              // re-applies the spread transform at render time (rackDistributeMode="spread"), so
+              // the displayed layout is unchanged. This matches the per-amp lock path, which also
+              // locks raw and re-transforms only for display.
+              const instancesToLock = instances;
               const ampsToLock = instancesToLock
                 .filter(inst => !(lockedAmpIds?.has(inst.id)))
                 .map(inst => ({ ...inst, rackGroupId }));
