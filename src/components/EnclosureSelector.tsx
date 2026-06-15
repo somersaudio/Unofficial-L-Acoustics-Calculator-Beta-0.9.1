@@ -25,6 +25,8 @@ interface EnclosureSelectorProps {
   rackMode?: boolean;
   /** Verified per-enclosure weights + rigging catalog (from data/rigging_parts.json) */
   riggingParts?: RiggingPartsData;
+  /** Selected rigging piece per enclosure name (added to the stack weight) */
+  riggingSelections?: Record<string, string>;
 }
 
 /** Fading "Minimum enclosure count" message */
@@ -73,6 +75,7 @@ export default function EnclosureSelector({
   lockedAmpEnclosures = [],
   rackMode = false,
   riggingParts,
+  riggingSelections,
 }: EnclosureSelectorProps) {
   const [selectedEnclosure, setSelectedEnclosure] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -457,11 +460,16 @@ export default function EnclosureSelector({
                   </div>
                 )}
                 {(() => {
-                  const encW = riggingParts?.enclosures?.[request.enclosure.enclosure]?.weight_kg;
+                  const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
+                  const encW = encRig?.weight_kg;
                   if (typeof encW !== "number") return null;
-                  const stackKg = encW * request.quantity;
+                  const selCode = riggingSelections?.[request.enclosure.enclosure] ?? encRig?.recommended_rigging;
+                  const selPart = selCode ? encRig?.rigging_parts.find((p) => p.code === selCode) : undefined;
+                  const rigKg = selPart?.weight_kg ?? 0;
+                  const stackKg = encW * request.quantity + rigKg;
+                  const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg`;
                   return (
-                    <div className="flex-shrink-0 text-right leading-tight" title={`Stack weight: ${request.quantity} × ${encW} kg`}>
+                    <div className="flex-shrink-0 text-right leading-tight" title={title}>
                       <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                         {Math.round(stackKg)}<span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> kg</span>
                       </div>

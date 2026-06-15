@@ -324,6 +324,10 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Custom rack names, keyed by rackGroupId (locked) or "unlocked-{idx}" (unlocked)
   const [rackNameMap, setRackNameMap] = useState<Record<string, string>>({});
+  // Selected rigging piece per enclosure name (shared: amp-line dropdown + left-panel stack weight)
+  const [riggingSelections, setRiggingSelections] = useState<Record<string, string>>({});
+  const handleRiggingChange = (enclosureName: string, code: string) =>
+    setRiggingSelections((prev) => ({ ...prev, [enclosureName]: code }));
 
   // Restore zones from localStorage once data is loaded
   const [zonesRestored, setZonesRestored] = useState(false);
@@ -827,6 +831,7 @@ export default function App() {
               lockedAmpEnclosures={activeLockedAmpEnclosures}
               rackMode={rackMode}
               riggingParts={data.riggingParts}
+              riggingSelections={riggingSelections}
             />
           </div>
           {/* Recommended Configuration — stuck to bottom */}
@@ -895,6 +900,9 @@ export default function App() {
             onRackNameChange={(rackKey, name) => setRackNameMap(prev => ({ ...prev, [rackKey]: name }))}
             perOutputMap={perOutputMap}
             hintsEnabled={hintsEnabled}
+            riggingParts={data.riggingParts}
+            riggingSelections={riggingSelections}
+            onRiggingChange={handleRiggingChange}
             onMoveEnclosure={(move: EnclosureMoveResult) => {
               // Find the active zone's current solution to get amp instances
               const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
