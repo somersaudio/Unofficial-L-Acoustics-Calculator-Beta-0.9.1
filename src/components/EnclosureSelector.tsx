@@ -25,11 +25,6 @@ interface EnclosureSelectorProps {
   rackMode?: boolean;
   /** Verified per-enclosure weights + rigging catalog (from data/rigging_parts.json) */
   riggingParts?: RiggingPartsData;
-  /** Selected rigging piece per enclosure name (added to the stack weight) */
-  riggingSelections?: Record<string, string>;
-  /** Selected deployment mode per enclosure name */
-  deploymentSelections?: Record<string, string>;
-  onDeploymentChange?: (enclosureName: string, mode: string) => void;
   /** Open the rigging manual PDF for the current rigging hardware */
   onShowRigging?: (url: string) => void;
   /** Show stack weight in lb (true) or kg (false) */
@@ -82,9 +77,6 @@ export default function EnclosureSelector({
   lockedAmpEnclosures = [],
   rackMode = false,
   riggingParts,
-  riggingSelections,
-  deploymentSelections,
-  onDeploymentChange,
   onShowRigging,
   weightInLbs = true,
 }: EnclosureSelectorProps) {
@@ -192,14 +184,14 @@ export default function EnclosureSelector({
     const effectiveQuantity = Math.max(quantity, minCount);
     const wasBumped = effectiveQuantity > quantity;
 
-    // Check if this enclosure type already exists in requests
+    // Merge into an existing UNLOCKED row of this type. If there isn't one
+    // (none exist, or every row of this type is locked), start a new row so the
+    // added enclosures don't disturb a locked array.
     const existingIndex = requests.findIndex(
-      (r) => r.enclosure.enclosure === selectedEnclosure
+      (r) => r.enclosure.enclosure === selectedEnclosure && !r.locked
     );
 
     if (existingIndex >= 0) {
-      // Don't modify a locked row — it's pinned "as is"
-      if (requests[existingIndex].locked) return;
       const newRequests = [...requests];
       newRequests[existingIndex] = {
         ...newRequests[existingIndex],
@@ -207,7 +199,7 @@ export default function EnclosureSelector({
       };
       onRequestsChange(newRequests);
     } else {
-      onRequestsChange([...requests, { enclosure, quantity: effectiveQuantity }]);
+      onRequestsChange([...requests, { id: crypto.randomUUID(), enclosure, quantity: effectiveQuantity }]);
       if (wasBumped) {
         // The new request will be at the end
         setBumpedIndices(new Set([requests.length]));
@@ -222,6 +214,7 @@ export default function EnclosureSelector({
 
   const handleRemoveRequest = (index: number) => {
     const newRequests = requests.filter((_, i) => i !== index);
+    setBumpedIndices(new Set()); // indices shift on removal — clear stale bump flags
     onRequestsChange(newRequests);
   };
 
@@ -252,6 +245,12 @@ export default function EnclosureSelector({
   const handleToggleLock = (index: number) => {
     const newReqs = [...requests];
     newReqs[index] = { ...newReqs[index], locked: !newReqs[index].locked };
+    onRequestsChange(newReqs);
+  };
+
+  const handleDeploymentChange = (index: number, mode: string) => {
+    const newReqs = [...requests];
+    newReqs[index] = { ...newReqs[index], deploymentMode: mode };
     onRequestsChange(newReqs);
   };
 
@@ -450,18 +449,63 @@ export default function EnclosureSelector({
       )}
 
       {/* Unlocked Enclosures */}
-      {requests.length > 0 && (
+      {requests.length > 0 && (() => {
+        // Distribute amp-locked counts across rows of the same enclosure type, draining
+        // UNLOCKED rows first so a pinned (locked) row isn't hidden while an unlocked
+        // row of the same type remains. Supports multiple arrays of one type.
+        const ampLockRemaining = new Map(lockedEnclosureCounts);
+        const rowUnlockedCounts = new Array<number>(requests.length).fill(0);
+        const order = requests
+          .map((_, i) => i)
+          .sort((a, b) => Number(Boolean(requests[a].locked)) - Number(Boolean(requests[b].locked)));
+        for (const i of order) {
+          const req = requests[i];
+          const rem = ampLockRemaining.get(req.enclosure.enclosure) ?? 0;
+          const sub = Math.min(rem, req.quantity);
+          if (rem) ampLockRemaining.set(req.enclosure.enclosure, rem - sub);
+          rowUnlockedCounts[i] = req.quantity - sub;
+        }
+        // Number multiple arrays of the same enclosure type (Array 1, Array 2, …),
+        // counting only rows that will actually render (a fully amp-locked row is hidden).
+        const typeTotals = new Map<string, number>();
+        requests.forEach((r, i) => {
+          if (rowUnlockedCounts[i] > 0) {
+            typeTotals.set(r.enclosure.enclosure, (typeTotals.get(r.enclosure.enclosure) ?? 0) + 1);
+          }
+        });
+        const typeSeen = new Map<string, number>();
+        const rowArrayNums = requests.map((r, i) => {
+          if (rowUnlockedCounts[i] <= 0) return 0; // hidden row — not rendered
+          const n = (typeSeen.get(r.enclosure.enclosure) ?? 0) + 1;
+          typeSeen.set(r.enclosure.enclosure, n);
+          return n;
+        });
+        return (
         <div className="space-y-2">
           {requests.map((request, index) => {
             const compat = compatibilityMap.get(request.enclosure.enclosure);
             const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
             const showBumpMessage = bumpedIndices.has(index);
             const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
-            const lockedCount = lockedEnclosureCounts.get(request.enclosure.enclosure) ?? 0;
-            const unlockedCount = request.quantity - lockedCount;
+            const unlockedCount = rowUnlockedCounts[index];
+            const lockedCount = request.quantity - unlockedCount;
 
             // Skip if all are locked (they're shown in the locked section above)
             if (unlockedCount <= 0) return null;
+
+            // Per-row deployment + the rigging piece it implies (drives this array's weight).
+            // Fall back to the first deployment if the saved mode is stale/unknown.
+            const encRigRow = riggingParts?.enclosures?.[request.enclosure.enclosure];
+            const rowDeployMode =
+              request.deploymentMode && encRigRow?.deployments?.some((d) => d.mode === request.deploymentMode)
+                ? request.deploymentMode
+                : encRigRow?.deployments?.[0]?.mode;
+            const rowDeploy = encRigRow?.deployments?.find((d) => d.mode === rowDeployMode);
+            const rowRiggingCode = rowDeploy?.default_rigging ?? encRigRow?.recommended_rigging;
+
+            // "Array N" label when this enclosure type has more than one row
+            const arrayNum = rowArrayNums[index];
+            const showArrayLabel = (typeTotals.get(request.enclosure.enclosure) ?? 0) > 1;
 
             // ×N per-channel control — only for enclosures with per_output > 1 on an enabled amp
             const perChannelControl = (() => {
@@ -496,17 +540,15 @@ export default function EnclosureSelector({
               );
             })();
 
-            // Deployment (rigging) dropdown + Show-rigging link
+            // Deployment (rigging) dropdown + Show-rigging link — per row
             const deploymentControl = (() => {
-              const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
-              const deps = encRig?.deployments;
+              const deps = encRigRow?.deployments;
               if (!deps || deps.length === 0) return null;
-              const selMode = deploymentSelections?.[request.enclosure.enclosure] ?? deps[0].mode;
               return (
                 <div className="flex items-center gap-1.5 text-[10px]">
                   <select
-                    value={selMode}
-                    onChange={(e) => onDeploymentChange?.(request.enclosure.enclosure, e.target.value)}
+                    value={rowDeployMode}
+                    onChange={(e) => handleDeploymentChange(index, e.target.value)}
                     disabled={request.locked}
                     title="Deployment — changes the default rigging hardware"
                     className="rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-300 focus:outline-none"
@@ -515,10 +557,10 @@ export default function EnclosureSelector({
                       <option key={d.mode} value={d.mode}>{d.label}</option>
                     ))}
                   </select>
-                  {encRig?.rigging_pdf && (
+                  {encRigRow?.rigging_pdf && (
                     <button
                       type="button"
-                      onClick={() => onShowRigging?.(encRig.rigging_pdf!)}
+                      onClick={() => onShowRigging?.(encRigRow.rigging_pdf!)}
                       className="text-blue-600 hover:underline dark:text-blue-400"
                       title="Open the rigging manual PDF for the current rigging hardware"
                     >
@@ -536,7 +578,7 @@ export default function EnclosureSelector({
 
             return (
               <div
-                key={`${request.enclosure.enclosure}-${index}`}
+                key={request.id}
                 className={`relative flex items-center gap-3 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
                 style={isLocked ? { borderColor: lockGold } : undefined}
               >
@@ -555,10 +597,10 @@ export default function EnclosureSelector({
                 {/* Top line: weight, name, quantity, remove */}
                 <div className="flex items-center gap-3">
                 {(() => {
-                  const encRig = riggingParts?.enclosures?.[request.enclosure.enclosure];
+                  const encRig = encRigRow;
                   const encW = encRig?.weight_kg;
                   if (typeof encW !== "number") return null;
-                  const selCode = riggingSelections?.[request.enclosure.enclosure] ?? encRig?.recommended_rigging;
+                  const selCode = rowRiggingCode;
                   const selPart = selCode ? encRig?.rigging_parts.find((p) => p.code === selCode) : undefined;
                   const rigKg = selPart?.weight_kg ?? 0;
                   const stackKg = encW * request.quantity + rigKg;
@@ -575,7 +617,7 @@ export default function EnclosureSelector({
                 })()}
                 <div className="flex-1">
                   <div className="flex items-center">
-                    <span className="font-medium text-gray-900 dark:text-gray-200">
+                    <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                       {request.enclosure.enclosure}
                     </span>
                     <MinCountMessage
@@ -583,13 +625,19 @@ export default function EnclosureSelector({
                       key={showBumpMessage ? Date.now() : "stable"}
                     />
                   </div>
-                  {!salesMode && (
+                  {(showArrayLabel || !salesMode) && (
                     <div className="text-xs text-gray-500 dark:text-neutral-500">
-                      {request.enclosure.nominal_impedance_ohms}Ω
-                      {compat?.isLimitedCompatibility && (
-                        <span className="ml-2">
-                          ({compat.autoSelectedAmp?.model} only)
-                        </span>
+                      {showArrayLabel && (
+                        <span className="font-semibold text-gray-600 dark:text-neutral-300 whitespace-nowrap">Array {arrayNum}</span>
+                      )}
+                      {showArrayLabel && !salesMode && <span className="mx-1">·</span>}
+                      {!salesMode && (
+                        <>
+                          {request.enclosure.nominal_impedance_ohms}Ω
+                          {compat?.isLimitedCompatibility && (
+                            <span className="ml-2">({compat.autoSelectedAmp?.model} only)</span>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
@@ -684,7 +732,8 @@ export default function EnclosureSelector({
             );
           })}
         </div>
-      )}
+        );
+      })()}
 
       {requests.length === 0 && (
         <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-neutral-700 dark:text-neutral-500">

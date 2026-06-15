@@ -2659,7 +2659,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
                 value={rigging.selections[riggingPrimaryEnc] ?? riggingEnc.recommended_rigging ?? ""}
                 onChange={(e) => rigging.onChange?.(riggingPrimaryEnc, e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                title="Rigging hardware for this stack (adds to the stack weight in the left panel)"
+                title="Rigging hardware for this enclosure type on this amp line"
                 className="ml-1 max-w-[12rem] rounded border border-gray-300 bg-white px-1 py-0.5 text-[10px] text-gray-600 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 focus:outline-none"
               >
                 <option value="">No rigging</option>

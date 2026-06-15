@@ -328,18 +328,13 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Custom rack names, keyed by rackGroupId (locked) or "unlocked-{idx}" (unlocked)
   const [rackNameMap, setRackNameMap] = useState<Record<string, string>>({});
-  // Selected rigging piece per enclosure name (shared: amp-line dropdown + left-panel stack weight)
+  // Selected rigging piece per enclosure name, shown on the amp line (right panel).
+  // The left-panel stack weight is driven separately by each row's own deployment.
   const [riggingSelections, setRiggingSelections] = useState<Record<string, string>>({});
   const handleRiggingChange = (enclosureName: string, code: string) =>
     setRiggingSelections((prev) => ({ ...prev, [enclosureName]: code }));
-  // Deployment selection per enclosure (left panel); changing it sets that mode's default rigging
-  const [deploymentSelections, setDeploymentSelections] = useState<Record<string, string>>({});
-  const handleDeploymentChange = (enclosureName: string, mode: string) => {
-    setDeploymentSelections((prev) => ({ ...prev, [enclosureName]: mode }));
-    if (state.status !== "ready") return;
-    const dep = state.data.riggingParts?.enclosures?.[enclosureName]?.deployments?.find((d) => d.mode === mode);
-    if (dep) setRiggingSelections((prev) => ({ ...prev, [enclosureName]: dep.default_rigging }));
-  };
+  // Deployment is now stored per-row on each EnclosureRequest (see EnclosureSelector),
+  // so two arrays of the same enclosure type can use different deployments.
   const handleShowRigging = (url: string) => { void window.electronAPI.openExternal?.(url); };
 
   // Restore zones from localStorage once data is loaded
@@ -552,8 +547,23 @@ export default function App() {
         }
       }
 
+      // Aggregate multiple rows of the same enclosure type into one solver input.
+      // The left panel may hold several rows of one type (e.g. separate locked
+      // arrays), but the calculator solves the pooled total, "as usual".
+      // (perOutput is not consumed by the solver — only quantity matters here.)
+      const aggregatedRequests = new Map<string, typeof zone.requests[number]>();
+      for (const req of zone.requests) {
+        const name = req.enclosure.enclosure;
+        const existing = aggregatedRequests.get(name);
+        if (existing) {
+          existing.quantity += req.quantity;
+        } else {
+          aggregatedRequests.set(name, { ...req });
+        }
+      }
+
       // Subtract locked enclosures from requests to get remaining
-      const remainingRequests = zone.requests
+      const remainingRequests = [...aggregatedRequests.values()]
         .map((req) => {
           const lockedCount = lockedEnclosureCounts.get(req.enclosure.enclosure) ?? 0;
           const remaining = req.quantity - lockedCount;
@@ -705,7 +715,8 @@ export default function App() {
     const map: Record<string, number> = {};
     for (const req of activeZone.requests) {
       if (req.perOutput && req.perOutput > 1) {
-        map[req.enclosure.enclosure] = req.perOutput;
+        // Max across multiple rows of the same type (matches the solver aggregation)
+        map[req.enclosure.enclosure] = Math.max(map[req.enclosure.enclosure] ?? 0, req.perOutput);
       }
     }
     return map;
@@ -848,9 +859,6 @@ export default function App() {
               lockedAmpEnclosures={activeLockedAmpEnclosures}
               rackMode={rackMode}
               riggingParts={data.riggingParts}
-              riggingSelections={riggingSelections}
-              deploymentSelections={deploymentSelections}
-              onDeploymentChange={handleDeploymentChange}
               onShowRigging={handleShowRigging}
               weightInLbs={weightInLbs}
             />
@@ -880,7 +888,8 @@ export default function App() {
             useFeet={useFeet}
             onAdjustEnclosure={(enclosureName, delta) => {
               updateZone(activeZoneId, (zone) => {
-                const idx = zone.requests.findIndex((r) => r.enclosure.enclosure === enclosureName);
+                // Adjust an unlocked row of this type; never touch a locked (pinned) row
+                const idx = zone.requests.findIndex((r) => r.enclosure.enclosure === enclosureName && !r.locked);
                 if (idx < 0) return zone;
                 const newQuantity = zone.requests[idx].quantity + delta;
                 if (newQuantity < 1) return zone;
