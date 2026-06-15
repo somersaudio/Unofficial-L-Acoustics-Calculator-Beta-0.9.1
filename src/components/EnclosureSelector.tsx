@@ -667,7 +667,7 @@ export default function EnclosureSelector({
               const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg / ${Math.round(stackKg * 2.20462)} lb`;
               return (
                 <div className="flex-shrink-0 leading-tight" title={title}>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{stackValue}</span>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-neutral-500">{stackValue}</span>
                   <span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> {unit}</span>
                 </div>
               );
@@ -711,7 +711,7 @@ export default function EnclosureSelector({
                   {(showArrayLabel || !salesMode) && (
                     <div className="text-xs text-gray-500 dark:text-neutral-500">
                       {showArrayLabel && (
-                        <span className="font-semibold text-gray-600 dark:text-neutral-300 whitespace-nowrap">Array {arrayNum}</span>
+                        <span className="font-semibold text-gray-500 dark:text-neutral-500 whitespace-nowrap">Array {arrayNum}</span>
                       )}
                       {/* Impedance kept for layout but hidden — array impedance is variable */}
                       {showArrayLabel && !salesMode && <span className="mx-1 invisible">·</span>}
