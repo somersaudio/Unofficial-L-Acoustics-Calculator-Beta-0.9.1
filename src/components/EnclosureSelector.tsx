@@ -610,7 +610,25 @@ export default function EnclosureSelector({
               );
             })();
 
-            const hasBottomRow = Boolean(perChannelControl || deploymentControl);
+            // Stack weight — shown on the bottom line, left of the deployment dropdown
+            const weightControl = (() => {
+              const encW = encRigRow?.weight_kg;
+              if (typeof encW !== "number") return null;
+              const selPart = rowRiggingCode ? encRigRow?.rigging_parts.find((p) => p.code === rowRiggingCode) : undefined;
+              const rigKg = selPart?.weight_kg ?? 0;
+              const stackKg = encW * request.quantity + rigKg;
+              const stackValue = weightInLbs ? Math.round(stackKg * 2.20462) : Math.round(stackKg);
+              const unit = weightInLbs ? "lb" : "kg";
+              const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg / ${Math.round(stackKg * 2.20462)} lb`;
+              return (
+                <div className="flex-shrink-0 leading-tight" title={title}>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{stackValue}</span>
+                  <span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> {unit}</span>
+                </div>
+              );
+            })();
+
+            const hasBottomRow = Boolean(weightControl || perChannelControl || deploymentControl);
 
             const isLocked = Boolean(request.locked);
             const lockGold = document.documentElement.classList.contains("dark") ? "#b59e5f" : "#7A6B3A";
@@ -633,27 +651,8 @@ export default function EnclosureSelector({
                 )}
                 {/* Right column: stacked control lines */}
                 <div className="flex-1">
-                {/* Top line: weight, name, quantity, remove */}
+                {/* Top line: name, quantity, lock, remove */}
                 <div className="flex items-center gap-3">
-                {(() => {
-                  const encRig = encRigRow;
-                  const encW = encRig?.weight_kg;
-                  if (typeof encW !== "number") return null;
-                  const selCode = rowRiggingCode;
-                  const selPart = selCode ? encRig?.rigging_parts.find((p) => p.code === selCode) : undefined;
-                  const rigKg = selPart?.weight_kg ?? 0;
-                  const stackKg = encW * request.quantity + rigKg;
-                  const stackValue = weightInLbs ? Math.round(stackKg * 2.20462) : Math.round(stackKg);
-                  const unit = weightInLbs ? "lb" : "kg";
-                  const title = `${request.quantity} × ${encW} kg${rigKg ? ` + ${selPart?.code} ${rigKg} kg` : ""} = ${Math.round(stackKg)} kg / ${Math.round(stackKg * 2.20462)} lb`;
-                  return (
-                    <div className="flex-shrink-0 text-right leading-tight" title={title}>
-                      <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {stackValue}<span className="text-[10px] font-normal text-gray-400 dark:text-neutral-500"> {unit}</span>
-                      </div>
-                    </div>
-                  );
-                })()}
                 <div className="flex-1">
                   <div className="flex items-center">
                     <span className="font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
@@ -768,6 +767,7 @@ export default function EnclosureSelector({
                 {/* Secondary controls on their own line to avoid crowding the row */}
                 {hasBottomRow && (
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                    {weightControl}
                     {deploymentControl}
                     {perChannelControl}
                   </div>
