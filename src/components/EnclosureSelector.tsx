@@ -708,17 +708,9 @@ export default function EnclosureSelector({
                       key={showBumpMessage ? Date.now() : "stable"}
                     />
                   </div>
-                  {(showArrayLabel || !salesMode) && (
+                  {showArrayLabel && (
                     <div className="text-xs text-gray-500 dark:text-neutral-500">
-                      {showArrayLabel && (
-                        <span className="font-semibold text-gray-600 dark:text-neutral-300 whitespace-nowrap">Array {arrayNum}</span>
-                      )}
-                      {showArrayLabel && !salesMode && <span className="mx-1">·</span>}
-                      {!salesMode && (
-                        <>
-                          {request.enclosure.nominal_impedance_ohms}Ω
-                        </>
-                      )}
+                      <span className="font-semibold text-gray-600 dark:text-neutral-300 whitespace-nowrap">Array {arrayNum}</span>
                     </div>
                   )}
                 </div>
