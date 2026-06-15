@@ -179,7 +179,14 @@ export interface EnclosureRequest {
   locked?: boolean; // Row pinned "as is" — its controls are frozen; still solved normally
   deploymentMode?: string; // Per-row deployment selection (drives this array's default rigging/weight)
   riggingCode?: string; // Per-row rigging-part override (defaults to the deployment's default rigging)
+  dedicatedAmp?: boolean; // Keep this array on its own amp(s) — never share an amp with another array
 }
+
+/** How the solver may share amplifiers across separate enclosure arrays.
+ *  allow    = pool same-type arrays and pack tightest (may share an amp across arrays)
+ *  prefer   = keep arrays separate when it costs no extra amps, else pool
+ *  separate = never share an amp across arrays (each array gets its own amps) */
+export type AmpSharingMode = "allow" | "prefer" | "separate";
 
 /** Allocation of enclosures to a single amplifier output */
 export interface OutputAllocation {
@@ -399,6 +406,8 @@ export interface Zone {
   disabledAmps: Set<string>;
   /** Amp instances that are locked and won't be modified by the solver */
   lockedAmpInstances: AmpInstance[];
+  /** Per-zone override of the global amp-sharing mode (undefined = inherit global) */
+  ampSharingMode?: AmpSharingMode;
 }
 
 /** Zone paired with its computed solver result */
@@ -423,9 +432,10 @@ export interface AmpInstanceSerialized {
 export interface ZoneSerialized {
   id: string;
   name: string;
-  requests: Array<{ id?: string; enclosureName: string; quantity: number; perOutput?: number; locked?: boolean; deploymentMode?: string; riggingCode?: string }>;
+  requests: Array<{ id?: string; enclosureName: string; quantity: number; perOutput?: number; locked?: boolean; deploymentMode?: string; riggingCode?: string; dedicatedAmp?: boolean }>;
   disabledAmps: string[];
   lockedAmpInstances?: AmpInstanceSerialized[];
+  ampSharingMode?: AmpSharingMode;
 }
 
 /** Project file format for save/load */
@@ -438,5 +448,6 @@ export interface ProjectFile {
     rackMode?: boolean;
     cableGaugeMm2: number;
     useFeet: boolean;
+    ampSharingMode?: AmpSharingMode;
   };
 }
