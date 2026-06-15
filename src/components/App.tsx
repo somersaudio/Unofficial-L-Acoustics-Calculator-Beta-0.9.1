@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile, AmpInstance } from "../types";
+import type { DataLoadResult, Zone, ZoneWithSolution, ProjectFile, AmpInstance, AmpSharingMode, EnclosureRequest, SolverSolution } from "../types";
 import { CABLE_GAUGES } from "../types";
-import EnclosureSelector, { type LockedAmpEnclosureInfo } from "./EnclosureSelector";
+import EnclosureSelector from "./EnclosureSelector";
 import SolverResults, { RecommendedConfig } from "./SolverResults";
 import type { EnclosureMoveResult } from "./EnclosureDragDrop";
 import ZoneTabBar from "./ZoneTabBar";
@@ -94,6 +94,8 @@ function SettingsModal({
   setHintsEnabled,
   matrixEnabled,
   setMatrixEnabled,
+  ampSharingMode,
+  setAmpSharingMode,
 }: {
   open: boolean;
   onClose: () => void;
@@ -103,6 +105,8 @@ function SettingsModal({
   setHintsEnabled: (v: boolean) => void;
   matrixEnabled: boolean;
   setMatrixEnabled: (v: boolean) => void;
+  ampSharingMode: AmpSharingMode;
+  setAmpSharingMode: (v: AmpSharingMode) => void;
 }) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
 
@@ -161,6 +165,37 @@ function SettingsModal({
                   <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${hintsEnabled ? "translate-x-6" : "translate-x-1"}`} />
                 </button>
               </label>
+
+              {/* Amp sharing across arrays */}
+              <div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">Amp sharing across arrays</div>
+                <div className="text-xs text-gray-500 dark:text-neutral-500 mb-2">How amps may be shared between separate array hangs</div>
+                <div className="flex gap-1 rounded-lg bg-gray-100 p-1 dark:bg-neutral-800">
+                  {([
+                    { v: "allow" as const, label: "Allow", hint: "Pack tightest — amps may be shared across arrays" },
+                    { v: "prefer" as const, label: "Prefer separate", hint: "Keep arrays apart unless it costs extra amps" },
+                    { v: "separate" as const, label: "Never share", hint: "Every array gets its own amp(s)" },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.v}
+                      onClick={() => setAmpSharingMode(opt.v)}
+                      title={opt.hint}
+                      className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                        ampSharingMode === opt.v
+                          ? "bg-white text-gray-900 shadow-sm dark:bg-neutral-700 dark:text-white"
+                          : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-1.5 text-xs text-gray-500 dark:text-neutral-500">
+                  {ampSharingMode === "allow" && "Amps are packed as tightly as possible; one amp can power enclosures from two different arrays."}
+                  {ampSharingMode === "prefer" && "Arrays stay on their own amps when that uses no more amps than packing tight; otherwise they share."}
+                  {ampSharingMode === "separate" && "Each array is always given its own amp(s) — never shared. May use more amps."}
+                </div>
+              </div>
             </div>
           )}
           {activeTab === "display" && (
@@ -325,6 +360,11 @@ export default function App() {
     const saved = localStorage.getItem("hintsEnabled");
     return saved ? JSON.parse(saved) : true;
   });
+  // How amps may be shared across separate arrays (allow | prefer | separate)
+  const [ampSharingMode, setAmpSharingMode] = useState<AmpSharingMode>(() => {
+    const saved = localStorage.getItem("ampSharingMode");
+    return saved ? JSON.parse(saved) : "allow";
+  });
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Custom rack names, keyed by rackGroupId (locked) or "unlocked-{idx}" (unlocked)
   const [rackNameMap, setRackNameMap] = useState<Record<string, string>>({});
@@ -371,6 +411,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("hintsEnabled", JSON.stringify(hintsEnabled));
   }, [hintsEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem("ampSharingMode", JSON.stringify(ampSharingMode));
+  }, [ampSharingMode]);
 
   useEffect(() => {
     async function loadData() {
@@ -473,10 +517,10 @@ export default function App() {
     const project: ProjectFile = {
       version: 1,
       zones: serializeZones(zones),
-      settings: { darkMode, salesMode, rackMode, cableGaugeMm2, useFeet },
+      settings: { darkMode, salesMode, rackMode, cableGaugeMm2, useFeet, ampSharingMode },
     };
     await window.electronAPI.saveProject(JSON.stringify(project, null, 2));
-  }, [zones, darkMode, salesMode, rackMode, cableGaugeMm2, useFeet]);
+  }, [zones, darkMode, salesMode, rackMode, cableGaugeMm2, useFeet, ampSharingMode]);
 
   const handleLoadProject = useCallback(async () => {
     if (state.status !== "ready") return;
@@ -493,6 +537,7 @@ export default function App() {
         setDarkMode(project.settings.darkMode);
         setSalesMode(project.settings.salesMode);
         setRackMode(project.settings.rackMode ?? false);
+        if (project.settings.ampSharingMode) setAmpSharingMode(project.settings.ampSharingMode);
         setCableGaugeMm2(project.settings.cableGaugeMm2);
         setUseFeet(project.settings.useFeet);
       }
@@ -542,36 +587,74 @@ export default function App() {
         }
       }
 
-      // Aggregate multiple rows of the same enclosure type into one solver input.
-      // The left panel may hold several rows of one type (e.g. separate locked
-      // arrays), but the calculator solves the pooled total, "as usual".
-      // (perOutput is not consumed by the solver — only quantity matters here.)
-      const aggregatedRequests = new Map<string, typeof zone.requests[number]>();
+      // Per-row remaining quantity after subtracting locked-amp enclosures. The locked
+      // count is type-keyed (no array provenance), so distribute it greedily across rows
+      // of each type — same total as the old pooled subtraction, just per row.
+      const remainingLocked = new Map(lockedEnclosureCounts);
+      const remainingRows: EnclosureRequest[] = [];
       for (const req of zone.requests) {
         const name = req.enclosure.enclosure;
-        const existing = aggregatedRequests.get(name);
-        if (existing) {
-          existing.quantity += req.quantity;
-        } else {
-          aggregatedRequests.set(name, { ...req });
-        }
+        const avail = remainingLocked.get(name) ?? 0;
+        const take = Math.min(req.quantity, avail);
+        if (avail) remainingLocked.set(name, avail - take);
+        const remaining = req.quantity - take;
+        if (remaining > 0) remainingRows.push({ ...req, quantity: remaining });
       }
 
-      // Subtract locked enclosures from requests to get remaining
-      const remainingRequests = [...aggregatedRequests.values()]
-        .map((req) => {
-          const lockedCount = lockedEnclosureCounts.get(req.enclosure.enclosure) ?? 0;
-          const remaining = req.quantity - lockedCount;
-          if (remaining <= 0) return null;
-          return { ...req, quantity: remaining };
-        })
-        .filter((r): r is NonNullable<typeof r> => r !== null);
+      // Build solver groups under an isolation policy. An "isolated" row (its own array)
+      // gets its own group → its own amp(s), never shared with another array. Non-isolated
+      // rows pool by enclosure type into a single group so the solver still packs/cross-fills
+      // them across types (today's behavior).
+      const buildGroups = (isolateAll: boolean): EnclosureRequest[][] => {
+        const groups: EnclosureRequest[][] = [];
+        const pooled = new Map<string, EnclosureRequest>();
+        for (const row of remainingRows) {
+          if (isolateAll || row.dedicatedAmp) {
+            groups.push([row]);
+          } else {
+            const existing = pooled.get(row.enclosure.enclosure);
+            if (existing) existing.quantity += row.quantity;
+            else pooled.set(row.enclosure.enclosure, { ...row });
+          }
+        }
+        if (pooled.size > 0) groups.push([...pooled.values()]);
+        return groups;
+      };
 
-      // Solve for remaining enclosures only
-      const solverResult =
-        remainingRequests.length > 0
-          ? solveAmplifierAllocation(remainingRequests, enabledAmpConfigs)
-          : null;
+      // Solve each group independently and merge. Amp ids are UUIDs, so concatenating
+      // instances from multiple solver calls is safe; the summary is recomputed below.
+      const solveGroups = (groups: EnclosureRequest[][]): SolverSolution => {
+        const results = groups.map((g) => solveAmplifierAllocation(g, enabledAmpConfigs));
+        const ampInstances = results.flatMap((r) => r.ampInstances);
+        return {
+          success: results.every((r) => r.success),
+          errorMessage: results.find((r) => !r.success)?.errorMessage,
+          ampInstances,
+          summary: {
+            totalAmplifiers: ampInstances.length,
+            totalEnclosuresAllocated: ampInstances.reduce((s, a) => s + a.totalEnclosures, 0),
+            ampConfigsUsed: [...new Map(ampInstances.map((a) => [a.ampConfig.key, a.ampConfig])).values()],
+            maxPowerRank: Math.max(...ampInstances.map((a) => a.ampConfig.powerRank), 0),
+          },
+        };
+      };
+
+      // Amp-sharing mode: per-zone override, else the global setting. Rows flagged
+      // dedicatedAmp are always isolated regardless of mode.
+      const effectiveMode: AmpSharingMode = zone.ampSharingMode ?? ampSharingMode;
+      let solverResult: SolverSolution | null = null;
+      if (remainingRows.length > 0) {
+        if (effectiveMode === "separate") {
+          solverResult = solveGroups(buildGroups(true));
+        } else if (effectiveMode === "prefer") {
+          // Keep every array on its own amps only when it costs no extra amps; else pack tight.
+          const separate = solveGroups(buildGroups(true));
+          const shared = solveGroups(buildGroups(false));
+          solverResult = separate.ampInstances.length <= shared.ampInstances.length ? separate : shared;
+        } else {
+          solverResult = solveGroups(buildGroups(false));
+        }
+      }
 
       // Combine locked amps with newly solved amps
       // Put solved amps first (they represent "remaining" allocations), locked amps at end
@@ -604,7 +687,7 @@ export default function App() {
 
       return { zone, solution, enabledAmpConfigs };
     });
-  }, [state, zones]);
+  }, [state, zones, ampSharingMode]);
 
   // Get active zone's enabled amp configs for the EnclosureSelector
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
@@ -635,75 +718,6 @@ export default function App() {
     }
     return counts;
   }, [activeZone.lockedAmpInstances]);
-
-  // Build detailed locked enclosure info per amp/rack for EnclosureSelector display
-  const activeLockedAmpEnclosures = useMemo<LockedAmpEnclosureInfo[]>(() => {
-    // Group locked amps by rackGroupId (for LA-RAK) or individual amp
-    const rackGroups = new Map<string, AmpInstance[]>();
-
-    for (const amp of activeZone.lockedAmpInstances) {
-      if (amp.ampConfig.key === "LA12X" && (rackMode || amp.rackGroupId)) {
-        // Group LA12X by rackGroupId
-        const groupId = amp.rackGroupId ?? amp.id;
-        if (!rackGroups.has(groupId)) {
-          rackGroups.set(groupId, []);
-        }
-        rackGroups.get(groupId)!.push(amp);
-      } else {
-        // Individual amp
-        rackGroups.set(amp.id, [amp]);
-      }
-    }
-
-    // Build the info array
-    const result: LockedAmpEnclosureInfo[] = [];
-    let rackNumber = 1;
-    const ampNumbers = new Map<string, number>(); // model -> next number
-
-    for (const [groupId, amps] of rackGroups) {
-      const enclosures = new Map<string, number>();
-
-      for (const amp of amps) {
-        const seenMultiChannel = new Set<string>();
-        for (const output of amp.outputs) {
-          for (const entry of output.enclosures) {
-            const name = entry.enclosure.enclosure;
-            const channelsPerUnit = entry.enclosure.signal_channels?.length ?? 1;
-
-            if (channelsPerUnit > 1) {
-              const groupIdx = Math.floor(output.outputIndex / channelsPerUnit);
-              const groupKey = `${name}_${groupIdx}`;
-              if (seenMultiChannel.has(groupKey)) continue;
-              seenMultiChannel.add(groupKey);
-            }
-
-            enclosures.set(name, (enclosures.get(name) ?? 0) + entry.count);
-          }
-        }
-      }
-
-      // Determine label — use stored rack name if available
-      let label: string;
-      if (amps[0].ampConfig.key === "LA12X" && (rackMode || amps[0].rackGroupId)) {
-        const rackKey = amps[0].rackGroupId ?? groupId;
-        label = rackNameMap[rackKey] ?? `LA-RAK #${rackNumber}`;
-        rackNumber++;
-      } else {
-        const model = amps[0].ampConfig.model;
-        const num = (ampNumbers.get(model) ?? 0) + 1;
-        ampNumbers.set(model, num);
-        label = `${model} #${num}`;
-      }
-
-      result.push({
-        ampLabel: label,
-        ampId: groupId,
-        enclosures,
-      });
-    }
-
-    return result;
-  }, [activeZone.lockedAmpInstances, rackMode, rackNameMap]);
 
   // Per-output override map for spread mode (enclosure name -> perOutput)
   const perOutputMap = useMemo(() => {
@@ -830,6 +844,8 @@ export default function App() {
         setHintsEnabled={setHintsEnabled}
         matrixEnabled={matrixEnabled}
         setMatrixEnabled={setMatrixEnabled}
+        ampSharingMode={ampSharingMode}
+        setAmpSharingMode={setAmpSharingMode}
       />
 
       {/* Main Content */}
@@ -852,7 +868,6 @@ export default function App() {
               onRequestsChange={(reqs) => updateZone(activeZoneId, (z) => ({ ...z, requests: reqs }))}
               salesMode={salesMode}
               lockedEnclosureCounts={activeLockedEnclosureCounts}
-              lockedAmpEnclosures={activeLockedAmpEnclosures}
               rackMode={rackMode}
               riggingParts={data.riggingParts}
               onShowRigging={handleShowRigging}

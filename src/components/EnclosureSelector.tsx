@@ -3,12 +3,9 @@ import type { Enclosure, EnclosureRequest, AmpConfig, EnclosureCompatibility, Ri
 import { getEnclosureCompatibility, getMinimumEnclosureCount } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
 
-/** Info about locked enclosures per amplifier/rack */
-export interface LockedAmpEnclosureInfo {
-  ampLabel: string; // e.g., "LA-RAK #1" or "LA4X #2"
-  ampId: string;
-  enclosures: Map<string, number>; // enclosure name -> count
-}
+/** Rigging-dropdown sentinel: "no rigging — set straight on the floor".
+ *  Adds no weight and removes the rigging-based max-count ceiling. */
+const NO_RIGGING = "N/A";
 
 interface EnclosureSelectorProps {
   enclosures: Enclosure[];
@@ -19,8 +16,6 @@ interface EnclosureSelectorProps {
   onBump?: () => void;
   /** Map of enclosure name -> count of locked enclosures */
   lockedEnclosureCounts?: Map<string, number>;
-  /** Detailed locked enclosure info per amp/rack for grouping display */
-  lockedAmpEnclosures?: LockedAmpEnclosureInfo[];
   /** Whether LA-RAK mode is active — shows ×N per ch control */
   rackMode?: boolean;
   /** Verified per-enclosure weights + rigging catalog (from data/rigging_parts.json) */
@@ -74,7 +69,6 @@ export default function EnclosureSelector({
   salesMode = false,
   onBump,
   lockedEnclosureCounts = new Map(),
-  lockedAmpEnclosures = [],
   rackMode = false,
   riggingParts,
   onShowRigging,
@@ -276,8 +270,11 @@ export default function EnclosureSelector({
     const encName = req.enclosure.enclosure;
     const minCount = minCountMap.get(encName) ?? 1;
     let effectiveQuantity = Math.max(newQuantity, minCount);
-    const { max } = limitsFor(encName, req.deploymentMode);
-    if (max != null) effectiveQuantity = Math.min(effectiveQuantity, max);
+    // No rigging ("on the floor") removes the rigging-based max ceiling.
+    if (req.riggingCode !== NO_RIGGING) {
+      const { max } = limitsFor(encName, req.deploymentMode);
+      if (max != null) effectiveQuantity = Math.min(effectiveQuantity, max);
+    }
     // Never clamp below this row's amp-locked share (those enclosures physically exist)
     effectiveQuantity = Math.max(effectiveQuantity, rowLockedShares(requests)[index]);
     if (effectiveQuantity < 1) return;
@@ -303,6 +300,13 @@ export default function EnclosureSelector({
   const handleToggleLock = (index: number) => {
     const newReqs = [...requests];
     newReqs[index] = { ...newReqs[index], locked: !newReqs[index].locked };
+    onRequestsChange(newReqs);
+  };
+
+  // Toggle "keep this array on its own amp(s)" — never share an amp with another array.
+  const handleToggleDedicated = (index: number) => {
+    const newReqs = [...requests];
+    newReqs[index] = { ...newReqs[index], dedicatedAmp: !newReqs[index].dedicatedAmp };
     onRequestsChange(newReqs);
   };
 
@@ -431,106 +435,19 @@ export default function EnclosureSelector({
         )}
       </div>
 
-      {/* Locked Enclosures - Grouped by Amplifier */}
-      {lockedAmpEnclosures.length > 0 && (
-        <div className="space-y-3">
-          {lockedAmpEnclosures.map((ampInfo) => {
-            // Get all enclosures for this amp
-            const enclosureEntries = Array.from(ampInfo.enclosures.entries()).filter(([, count]) => count > 0);
-            if (enclosureEntries.length === 0) return null;
-
-            const isDark = document.documentElement.classList.contains('dark');
-            const goldColor = isDark ? '#b59e5f' : '#7A6B3A';
-            const goldColorLight = isDark ? '#b59e5f33' : '#b59e5f22';
-
-            return (
-              <div
-                key={ampInfo.ampId}
-                className="rounded-lg border overflow-hidden"
-                style={{ borderColor: goldColor, backgroundColor: goldColorLight }}
-              >
-                {/* Amp label header */}
-                <div className="flex items-center gap-2 px-3 py-1.5 border-b" style={{ borderColor: goldColor }}>
-                  <svg className="h-4 w-4" fill={goldColor} viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-medium text-gray-800 dark:text-white text-sm">
-                    {ampInfo.ampLabel}
-                  </span>
-                </div>
-
-                {/* Enclosures list */}
-                <div className="divide-y" style={{ borderColor: `${goldColor}66` }}>
-                  {enclosureEntries.map(([encName, count]) => {
-                    const enclosure = enclosures.find(e => e.enclosure === encName);
-                    const imageUrl = getEnclosureImage(encName, count);
-
-                    return (
-                      <div
-                        key={encName}
-                        className="flex items-center gap-3 py-0.5 px-3"
-                      >
-                        {/* Enclosure Image */}
-                        {imageUrl && (
-                          <div className="h-[50px] w-[80px] flex-shrink-0 overflow-hidden rounded opacity-60">
-                            <img
-                              src={imageUrl}
-                              alt={encName}
-                              className="h-full w-full object-contain"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 opacity-80">
-                          <span className="font-medium" style={{ color: goldColor }}>
-                            {encName}
-                          </span>
-                          {!salesMode && enclosure && (
-                            <div className="text-xs" style={{ color: goldColor, opacity: 0.7 }}>
-                              {enclosure.nominal_impedance_ohms}Ω
-                            </div>
-                          )}
-                        </div>
-                        {/* ×N per ch badge (if perOutput > 1) */}
-                        {(() => {
-                          const req = requests.find(r => r.enclosure.enclosure === encName);
-                          const perOut = req?.perOutput ?? enclosure?.preferredPerOutput ?? 1;
-                          if (perOut <= 1) return null;
-                          return (
-                            <span className="text-[11px] font-medium whitespace-nowrap" style={{ color: goldColor, opacity: 0.7 }}>
-                              ×{perOut} per ch
-                            </span>
-                          );
-                        })()}
-                        {/* Locked count */}
-                        <span
-                          className="w-16 rounded border px-2 py-1 text-center text-sm font-medium"
-                          style={{ borderColor: goldColor, backgroundColor: goldColorLight, color: goldColor }}
-                        >
-                          {count}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Unlocked Enclosures */}
+      {/* Enclosure arrays. A partially amp-locked array stays a single card; its locked
+          portion is shown inline (the per-amp breakdown lives in the amp panel on the right). */}
       {requests.length > 0 && (() => {
         // Distribute amp-locked counts across rows of the same enclosure type, draining
         // UNLOCKED rows first so a pinned (locked) row isn't hidden while an unlocked
         // row of the same type remains. Supports multiple arrays of one type.
         const lockedShares = rowLockedShares(requests);
-        const rowUnlockedCounts = requests.map((req, i) => req.quantity - lockedShares[i]);
-        // Number each array of an enclosure type (Array 1, Array 2, …), counting only
-        // rows that will actually render (a fully amp-locked row is hidden). Always shown
-        // — including for a lone array — so the row format doesn't change when a second is added.
+        // Each array renders as ONE card showing its full count, with the amp-locked
+        // portion marked inline — so a partially-locked array is never split into two
+        // cards. Number every row (Array 1, Array 2, …); always shown so the format is
+        // stable even for a lone array.
         const typeSeen = new Map<string, number>();
-        const rowArrayNums = requests.map((r, i) => {
-          if (rowUnlockedCounts[i] <= 0) return 0; // hidden row — not rendered
+        const rowArrayNums = requests.map((r) => {
           const n = (typeSeen.get(r.enclosure.enclosure) ?? 0) + 1;
           typeSeen.set(r.enclosure.enclosure, n);
           return n;
@@ -541,11 +458,8 @@ export default function EnclosureSelector({
             const minCount = minCountMap.get(request.enclosure.enclosure) ?? 1;
             const showBumpMessage = bumpedIndices.has(index);
             const imageUrl = getEnclosureImage(request.enclosure.enclosure, request.quantity);
-            const unlockedCount = rowUnlockedCounts[index];
-            const lockedCount = request.quantity - unlockedCount;
-
-            // Skip if all are locked (they're shown in the locked section above)
-            if (unlockedCount <= 0) return null;
+            // How many of this array sit on a locked amp (shown inline as a badge, below).
+            const lockedCount = lockedShares[index];
 
             // Per-row deployment + the rigging piece it implies (drives this array's weight).
             // Fall back to the first deployment if the saved mode is stale/unknown.
@@ -560,15 +474,18 @@ export default function EnclosureSelector({
             // validated against the parts list so the <select> value always matches an option.
             const riggingPartsList = encRigRow?.rigging_parts ?? [];
             const riggingCodeExists = (c?: string) => !!c && riggingPartsList.some((p) => p.code === c);
-            const selectedRiggingCode = riggingCodeExists(request.riggingCode)
+            const riggingCodeValid = (c?: string) => c === NO_RIGGING || riggingCodeExists(c);
+            const selectedRiggingCode = riggingCodeValid(request.riggingCode)
               ? request.riggingCode
               : riggingCodeExists(rowRiggingCode)
                 ? rowRiggingCode
                 : riggingPartsList[0]?.code;
 
-            // Per-array limits for the current deployment (hard cap at max; amber warning past safe)
-            const rowMax = rowDeploy?.max ?? null;
-            const rowSafe = rowDeploy?.safe ?? null;
+            // Per-array limits for the current deployment (hard cap at max; amber warning past safe).
+            // "On the floor" (N/A, no rigging) lifts the rigging-based ceiling and warning entirely.
+            const noRigging = selectedRiggingCode === NO_RIGGING;
+            const rowMax = noRigging ? null : (rowDeploy?.max ?? null);
+            const rowSafe = noRigging ? null : (rowDeploy?.safe ?? null);
             const atMax = rowMax != null && request.quantity >= rowMax;
             const overSafe = rowSafe != null && request.quantity > rowSafe && (rowMax == null || request.quantity <= rowMax);
             const deployWord = rowDeployMode === "ground_stack" ? "stacked" : rowDeployMode === "surface_mount" ? "mounted" : "flown";
@@ -663,6 +580,10 @@ export default function EnclosureSelector({
                           {p.code}{p.weight_kg != null ? ` (${p.weight_kg} kg)` : ""}
                         </option>
                       ))}
+                      {/* On the floor — no rigging hardware, no added weight (ground-stack) */}
+                      {(rowDeployMode === "ground_stack" || selectedRiggingCode === NO_RIGGING) && (
+                        <option value={NO_RIGGING}>N/A</option>
+                      )}
                     </select>
                   )}
                   {encRigRow?.rigging_pdf && (
@@ -675,6 +596,18 @@ export default function EnclosureSelector({
                       Show rigging
                     </button>
                   )}
+                  {/* Keep this array on its own amp(s) — never share an amp with another array */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleDedicated(index)}
+                    className="flex-shrink-0 rounded p-0.5 transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    style={request.dedicatedAmp ? { backgroundColor: "#3b82f633", color: "#3b82f6" } : undefined}
+                    title={request.dedicatedAmp ? "This array is kept on its own amp(s). Click to allow sharing." : "Keep this array on its own amp(s) — don't share an amp with other arrays"}
+                  >
+                    <svg className={`h-3.5 w-3.5 ${request.dedicatedAmp ? "" : "text-gray-400 dark:text-neutral-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                    </svg>
+                  </button>
                 </div>
               );
             })();
@@ -757,7 +690,7 @@ export default function EnclosureSelector({
                     onClick={() =>
                       handleQuantityChange(index, request.quantity - 1)
                     }
-                    disabled={isLocked || unlockedCount <= Math.max(minCount - lockedCount, 1)}
+                    disabled={isLocked || request.quantity <= Math.max(minCount, lockedCount, 1)}
                     className="h-8 w-8 rounded border border-gray-300 bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-600"
                   >
                     -
@@ -765,11 +698,10 @@ export default function EnclosureSelector({
                   <input
                     type="number"
                     min={1}
-                    value={unlockedCount}
+                    value={request.quantity}
                     disabled={isLocked}
                     onChange={(e) => {
-                      const newUnlocked = parseInt(e.target.value) || 1;
-                      handleQuantityChange(index, lockedCount + newUnlocked);
+                      handleQuantityChange(index, parseInt(e.target.value) || 1);
                     }}
                     className="w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-900 dark:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
@@ -784,6 +716,19 @@ export default function EnclosureSelector({
                     +
                   </button>
                 </div>
+                {/* Amp-locked portion of this array, shown inline so the array stays one card */}
+                {lockedCount > 0 && (
+                  <span
+                    className="inline-flex items-center gap-0.5 text-[11px] font-medium whitespace-nowrap"
+                    style={{ color: lockGold }}
+                    title={`${lockedCount} on a locked amp — fixed`}
+                  >
+                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    {lockedCount} locked
+                  </span>
+                )}
                 {perChannelControl}
                 </div>
 
