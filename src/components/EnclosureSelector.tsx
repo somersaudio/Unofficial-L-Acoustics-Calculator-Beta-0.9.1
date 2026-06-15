@@ -715,11 +715,6 @@ export default function EnclosureSelector({
                       )}
                     </div>
                   )}
-                  {overSafe && (
-                    <div className="text-[11px] font-medium text-amber-600 dark:text-amber-500 whitespace-nowrap" title={`L-Acoustics safe ${deployWord} limit is ${rowSafe}${rowMax != null ? `; absolute max ${rowMax}` : ""}`}>
-                      ⚠ over safe {deployWord} limit ({rowSafe})
-                    </div>
-                  )}
                 </div>
 
                 {/* Quantity controls */}
@@ -806,6 +801,11 @@ export default function EnclosureSelector({
                     {weightControl}
                     {deploymentControl}
                     {perChannelControl}
+                  </div>
+                )}
+                {overSafe && (
+                  <div className="mt-1 text-[11px] font-medium text-amber-600 dark:text-amber-500 whitespace-nowrap" title={`L-Acoustics safe ${deployWord} limit is ${rowSafe}${rowMax != null ? `; absolute max ${rowMax}` : ""}`}>
+                    ⚠ over safe {deployWord} limit ({rowSafe})
                   </div>
                 )}
                 </div>
