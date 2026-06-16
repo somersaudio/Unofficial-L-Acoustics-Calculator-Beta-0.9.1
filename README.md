@@ -1,9 +1,9 @@
-# Unofficial L-Acoustics Calculator Beta 0.9.1
+# Unofficial L-Acoustics Calculator Beta 0.9.3
 
 **Built from L-Acoustics' own amplifier and enclosure specifications**, this professional audio engineering tool automatically solves amplifier-to-enclosure matching with real-time impedance validation, cable loss frequency analysis, and intelligent LA-RAK grouping across multi-zone deployments. Per-output signal routing, damping factor analysis, and one-click PDF reports.
 
 **Author:** somersaudio
-**Version:** 0.9.1
+**Version:** 0.9.3
 **License:** Proprietary — All rights reserved
 
 ---

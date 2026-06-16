@@ -35,6 +35,11 @@ git push origin HEAD
 GITHUB_TOKEN="$(gh auth token)"
 export GITHUB_TOKEN
 
+# Clean previous build artifacts so a stale same-name zip from an earlier version can
+# never be picked up (this is the class of bug that mis-uploaded the x64 build in v0.9.2).
+echo "==> Cleaning out/ before building…"
+rm -rf out
+
 # 1/5 — macOS Apple Silicon: build + sign + notarize + upload (creates the draft release)
 echo "==> [1/5] macOS arm64 (build, sign, notarize, upload)…"
 npm run publish -- --arch=arm64

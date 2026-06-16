@@ -79,7 +79,7 @@ function showValidationErrorDialog(result: DataLoadResult): void {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1535,
+    width: 1680,
     height: 800,
     minWidth: 900,
     minHeight: 600,
@@ -88,7 +88,7 @@ const createWindow = () => {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    title: "Unofficial L-Acoustics Calculator Beta 0.9.1",
+    title: "Unofficial L-Acoustics Calculator Beta 0.9.3",
   });
 
   // Load the index.html of the app.
