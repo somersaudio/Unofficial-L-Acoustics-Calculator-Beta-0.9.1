@@ -2019,6 +2019,8 @@ export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Re
         for (let gi = 0; gi < groups.length; gi++) {
           const count = outputs[groups[gi][0]].totalEnclosures;
           if (count >= limits.per_output) continue;
+          // Never stack a DIFFERENT enclosure type onto an occupied group (e.g. Kara + Kiva).
+          if (count > 0 && !outputs[groups[gi][0]].enclosures.some(e => e.enclosure.enclosure === enclosure.enclosure)) continue;
           if (count > 0 && count < minPerGroup && count > bestWarnCount) {
             bestWarnCount = count;
             bestGi = gi;
@@ -2084,6 +2086,8 @@ export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Re
           const oi = order[idx];
           const count = outputs[oi].totalEnclosures;
           if (count >= limits.per_output) continue;
+          // Never stack a DIFFERENT enclosure type onto an occupied channel.
+          if (count > 0 && !outputs[oi].enclosures.some(e => e.enclosure.enclosure === enclosure.enclosure)) continue;
           if (count > 0 && count < minPerOutput && count > bestWarnCount) {
             bestWarnCount = count;
             bestIdx = idx;
@@ -2495,6 +2499,8 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
           const { ampIdx, group } = rackGroups[gi];
           const count = allOutputs[ampIdx][group[0]].totalEnclosures;
           if (count >= limits.per_output) continue;
+          // Never stack a DIFFERENT enclosure type onto an occupied group.
+          if (count > 0 && !allOutputs[ampIdx][group[0]].enclosures.some(e => e.enclosure.enclosure === enclosure.enclosure)) continue;
           if (count > 0 && count < minPerGroup && count > bestWarnCount) {
             bestWarnCount = count;
             bestGi = gi;
@@ -2558,6 +2564,8 @@ export function spreadRackInstances(instances: AmpInstance[], perOutputOverrides
           const { ampIdx, oi } = rackChannelOrder[idx];
           const count = allOutputs[ampIdx][oi].totalEnclosures;
           if (count >= limits.per_output) continue;
+          // Never stack a DIFFERENT enclosure type onto an occupied channel.
+          if (count > 0 && !allOutputs[ampIdx][oi].enclosures.some(e => e.enclosure.enclosure === enclosure.enclosure)) continue;
           if (count > 0 && count < minPerOutput && count > bestWarnCount) {
             bestWarnCount = count;
             bestIdx = idx;
