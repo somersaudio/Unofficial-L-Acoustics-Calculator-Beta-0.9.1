@@ -15,7 +15,12 @@ const config: ForgeConfig = {
     extraResource: ['./data'],
     name: 'L-Acoustic Amp Calc',
     osxSign: {
-      identity: 'Developer ID Application: John Somers (RY46BRL9M2)',
+      // Pin the signing identity by SHA-1 fingerprint, not by name: the login keychain holds
+      // multiple "Developer ID Application: John Somers (RY46BRL9M2)" certs, which makes the
+      // name ambiguous (codesign then refuses and falls back to an adhoc signature, breaking
+      // notarization). The fingerprint is unambiguous. (Clean up the duplicate certs to revert
+      // to the portable name-based identity.)
+      identity: 'DCA9DCBB5E6128BE7845A46DD4905630F292B8A4',
       optionsForFile: () => ({
         hardenedRuntime: true,
         entitlements: './entitlements.plist',
