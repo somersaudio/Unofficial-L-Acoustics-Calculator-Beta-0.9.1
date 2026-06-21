@@ -1,0 +1,74 @@
+{
+  "enclosure": "Kara",
+  "product": "Kara",
+  "type": "line source",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "55 - 20000",
+    "max_spl_db": 141,
+    "max_spl_note": "141 dB peak at 1 m, free field, pink noise crest factor 4, [KARA] preset (current 2022 Owner's Manual figure). The legacy 2017 System User Manual specs 139 dB measured with the stricter 10 dB crest-factor pink noise; reseller pages cite 139/141/142. Extends to 32 Hz only when paired with an SB18 LF element. L-Acoustics publishes bandwidth at -10 dB only; no -3 dB figure exists.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Horizontal: 110 degrees symmetric, fixed (no secondary lobes). Vertical: variable, set by number of elements and array curvature (WST line source), inter-element angles 0 to 10 degrees.",
+    "components": "2-way active, bi-amplified: LF 2 x 8\" neodymium weather-resistant cone drivers (bass-reflex loaded); HF 1 x 3\" neodymium diaphragm compression driver on DOSC waveguide. RMS power handling LF 450 W, HF 80 W."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "2-way active, bi-amplified: one amp channel drives LF, one drives HF"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 6
+    },
+    "per_amplifier_note": "Per the LA8 manual Table 3, the LA8 drives 3 KARA per output pair (1/2 and 3/4) for 6 KARA total: 3 / 6. App value: 4 per LA4X (and per LA4 in the original era); the 2022 OM adds LA12X. Touring racks (LA-RAK / LA-RAK II AVB) house three LA8 / three LA12X.",
+    "preset_names": [
+      "[KARA]",
+      "[KARA_FI]"
+    ],
+    "preset_note": "[KARA] is the reference long-throw preset (full-range response); [KARA_FI] is the flat short-throw fill preset with a 100 Hz HPF. SB18 companion presets [SB18_60]/[SB_60_C] (60 Hz crossover, separated/cardioid) and [SB_100]/[SB_100_C] (100 Hz crossover, coupled/cardioid) extend the low end."
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4), wired in parallel: 1 IN + 1 LINK for daisy-chaining. Pinout: 1+/1- = LF, 2+/2- = HF (L-Acoustics 2-way active pinout).",
+    "breakouts": "Multi-enclosure cabling via DOFILL-LA8 (8-point PA-COM to 2x 4-point speakON, feeds two 2-way active enclosures) or DO3WFILL (8-point PA-COM to 3x speakON, one 2-way active + two passive); DOSUB-LA8 (8-point PA-COM to 4x 2-point speakON, four subs). DO cables (8-point PA-COM trunk) and SP cables (4-point speakON) complete the loom; upstream multipin is PA-COM/CA-COM on the LA-RAK."
+  },
+  "physical": {
+    "weight_kg": 26,
+    "weight_note": "26 kg / 57 lb net (2022 Kara_OM_EN.pdf).",
+    "dimensions_mm": "703 (H) x 250 (W) x 482 (D) mm; 27.7 x 9.8 x 19 in",
+    "protection_rating": "IP55",
+    "cabinet": "Premium (first) grade Baltic birch plywood; coated steel front grill with acoustically neutral 3D Airnet fabric; high-grade steel rigging with anti-corrosion coating. Finish: Dark grey brown (Pantone 426 C); Pure white RAL 9010 was offered on the KARAi install version. Note: older 2017 System User Manual states IP45; current official rating is IP55."
+  },
+  "deployment": {
+    "modes": [
+      "Flown line source array (M-BUMP frame, optional M-BAR)",
+      "Flown array on KARA-MINIBU mini-bumper",
+      "Ground-stacked / platform-stacked array"
+    ],
+    "max_per_flown_array": "M-BUMP (+ optional M-BAR): up to 24 KARA (nominal max single array); with KARA-PULLBACK pullback: 16 KARA. Mixed flown: 12 KARA + 4 SB18. KARA-MINIBU: up to 6 KARA. Ground-stacked (no accessory): 4 KARA, or 9 KARA + 4 SB18 mixed on M-BUMP+M-BAR+M-JACK+KARA-ANGARMEX platform.",
+    "inter_element_angles": "0, 1, 2, 3, 4, 5, 7.5, 10 degrees (discrete steps; range 0 to 10 degrees)",
+    "rigging_accessories": [
+      "M-BUMP",
+      "M-BAR",
+      "M-JACK",
+      "KARA-ANGARMEX",
+      "KARA-MINIBU",
+      "KARA-MINIBUEX",
+      "KARA-PULLBACK"
+    ]
+  },
+  "usage": [
+    "Original (2009) variable-curvature WST line source: the modular 2-way active K-Series box that the current Kara II later replaced, suited to medium/long-throw FOH, central clusters and side hangs in touring and install.",
+    "Each KARA is a bi-amplified 2-way needing 2 amp channels (LF + HF); on the legacy controllers budget 6 KARA per LA8 (3 per output pair) and 4 per LA4X/LA4, with LA12X supported per the 2022 Owner's Manual.",
+    "Drive with [KARA] for the reference long-throw response and [KARA_FI] for flat short-throw fills (100 Hz HPF); fixed 110 degrees horizontal coverage means curvature is shaped purely by the vertical inter-element angles (0 to 10 degrees).",
+    "Extend the low end with SB18 subwoofers (system reaches 32 Hz) using the [SB18_60]/[SB_60_C] 60 Hz or [SB_100]/[SB_100_C] 100 Hz crossover presets, separated or cardioid as the room needs.",
+    "Fly on M-BUMP (+ optional M-BAR) up to 24 KARA, on KARA-MINIBU up to 6 KARA, or ground-stack up to 4 KARA (9 KARA + 4 SB18 mixed); set negative site angle with KARA-PULLBACK and extra downtilt with KARA-ANGARMEX.",
+    "Always model the array in SOUNDVISION before rigging to confirm mechanical safety factors and tilt; the IP55 rating and birch enclosure suit touring and limited outdoor exposure."
+  ],
+  "source_manual": "Kara Owner's Manual (EN) version 2.1 (2022 revision; Kara_OM_EN.pdf, includes rigging manual + specifications appendix); KARA System User Manual (EN) v2.1 (legacy 2017, cabling/preset focused); KARA Product Information v8.0 (ML)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip"
+}

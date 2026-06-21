@@ -130,9 +130,15 @@ export default function EnclosureSelector({
     "K1-SB",
     "Syva Low",
     "Syva Sub",
+    // Discontinued subs — shown under Legacy (legacy wins in categorization) but kept here so
+    // they get the same subwoofer options/defaults (ground-stacked + N/A) as current subs.
+    "SB218",
+    "dV-SUB",
   ]);
 
-  // LA4-only enclosures (Legacy category)
+  // Discontinued / previous-generation enclosures (Legacy category). Verified against
+  // L-Acoustics' official archived-products list (l-acoustics.com/archives-product).
+  // Legacy takes precedence over SUB and Full Range, so discontinued subs live here too.
   const legacyEnclosureNames = new Set([
     "8XT",
     "12XT (Active)",
@@ -144,11 +150,21 @@ export default function EnclosureSelector({
     "MTD112b",
     "MTD115b (Active)",
     "MTD115b (Passive)",
-    "ARCS Wide/Focus",
+    "ARCS Wide/Focus", // ARCS WIFO — archived (succeeded by the A Series)
     "ARCS",
+    "ARCS II",         // archived
     "Kiva",
     "Kilo",
     "SB118",
+    // Discontinued line arrays (archived; were LA8-era, not LA4-only):
+    "V-DOSC",
+    "dV-DOSC",
+    "Kudo",
+    "Kara",            // original Kara — superseded by Kara II / Kara IIi
+    // Discontinued subwoofers (archived):
+    "SB218",
+    "dV-SUB",
+    "SB28",            // archived — superseded by KS28 (still common in the field; see note)
   ]);
 
   // Categorize enclosures
@@ -205,30 +221,38 @@ export default function EnclosureSelector({
     let remaining = effectiveQuantity;
     let flashIndex = -1;
 
+    // A no-rigging ("on the floor") array has no max-enclosure ceiling.
+    const rowMaxOf = (encName: string, mode: string | undefined, rigging: string | undefined) =>
+      rigging === NO_RIGGING ? null : limitsFor(encName, mode).max;
+
     const fillIdx = newRequests.findIndex((r) => {
       if (r.enclosure.enclosure !== selectedEnclosure || r.locked) return false;
-      const { max } = limitsFor(r.enclosure.enclosure, r.deploymentMode);
+      const max = rowMaxOf(r.enclosure.enclosure, r.deploymentMode, r.riggingCode);
       return max == null || r.quantity < max;
     });
     if (fillIdx >= 0) {
       const target = newRequests[fillIdx];
-      const { max } = limitsFor(target.enclosure.enclosure, target.deploymentMode);
+      const max = rowMaxOf(target.enclosure.enclosure, target.deploymentMode, target.riggingCode);
       const room = max == null ? remaining : max - target.quantity;
       const add = Math.min(remaining, room);
       newRequests[fillIdx] = { ...target, quantity: target.quantity + add };
       remaining -= add;
     }
 
-    // New arrays inherit the deployment of an existing array of this type (else default).
-    const inheritMode =
-      fillIdx >= 0
-        ? newRequests[fillIdx].deploymentMode
-        : newRequests.find((r) => r.enclosure.enclosure === selectedEnclosure)?.deploymentMode;
-    const { max: newMax } = limitsFor(selectedEnclosure, inheritMode);
+    // New arrays inherit an existing array of this type. A subwoofer with no array to inherit
+    // from defaults to ground-stacked "on the floor" (N/A rigging) — the typical sub deployment.
+    const isSub = subwooferEnclosureNames.has(selectedEnclosure);
+    const inheritFrom =
+      fillIdx >= 0 ? newRequests[fillIdx] : newRequests.find((r) => r.enclosure.enclosure === selectedEnclosure);
+    const inheritMode = inheritFrom?.deploymentMode ?? (isSub ? "ground_stack" : undefined);
+    // Subs default to N/A rigging (unless inheriting an explicit choice); non-subs keep the
+    // prior behavior of leaving rigging unset so the deployment's default rigging applies.
+    const inheritRigging = isSub ? (inheritFrom?.riggingCode ?? NO_RIGGING) : undefined;
+    const newMax = rowMaxOf(selectedEnclosure, inheritMode, inheritRigging);
     while (remaining > 0) {
       const cap = newMax == null ? remaining : Math.min(remaining, newMax);
       if (flashIndex < 0) flashIndex = newRequests.length;
-      newRequests.push({ id: crypto.randomUUID(), enclosure, quantity: Math.max(cap, minCount), deploymentMode: inheritMode });
+      newRequests.push({ id: crypto.randomUUID(), enclosure, quantity: Math.max(cap, minCount), deploymentMode: inheritMode, riggingCode: inheritRigging });
       remaining -= cap;
       if (newMax == null) break;
     }

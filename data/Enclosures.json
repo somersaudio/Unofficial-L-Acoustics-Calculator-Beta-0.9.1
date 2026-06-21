@@ -35,7 +35,7 @@
         "LF": "Syva Low",
         "PA": "Syva"
       },
-      "impedance_notes": "Hybrid system: Syva Low (4\u03a9 LF) + Syva (8\u03a9 PA). Requires 2 channels: LF at 4\u03a9, PA at 8\u03a9. LA12X supports 2 per output pair (LF 2\u03a9, PA 4\u03a9 parallel).",
+      "impedance_notes": "Hybrid system: Syva Low (4Ω LF) + Syva (8Ω PA). Requires 2 channels: LF at 4Ω, PA at 8Ω. LA12X supports 2 per output pair (LF 2Ω, PA 4Ω parallel).",
       "parallelAllowed": true
     },
     {
@@ -60,6 +60,10 @@
         "LA2Xi_SE": {
           "per_output": 4,
           "per_amplifier": 16
+        },
+        "LA8": {
+          "per_output": 6,
+          "per_amplifier": 24
         }
       },
       "nominal_impedance_ohms": 16,
@@ -194,6 +198,10 @@
         "LA12X": {
           "per_output": 2,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 2
         }
       },
       "nominal_impedance_ohms": 8,
@@ -209,6 +217,10 @@
       "enclosure": "K1-SB",
       "max_enclosures": {
         "LA12X": {
+          "per_output": 1,
+          "per_amplifier": 4
+        },
+        "LA8": {
           "per_output": 1,
           "per_amplifier": 4
         }
@@ -233,6 +245,10 @@
         "LA4X": {
           "per_output": 1,
           "per_amplifier": 1
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 3
         }
       },
       "nominal_impedance_ohms": 8,
@@ -245,7 +261,7 @@
       "impedance_sections_ohms": {
         "HF": 16
       },
-      "impedance_notes": "PDF specifies K2 HF section is 16\u03a9; other section(s) not specified in that rule, so nominal is defaulted to 8\u03a9 per the document's 'all others are 8\u03a9' statement.",
+      "impedance_notes": "PDF specifies K2 HF section is 16Ω; other section(s) not specified in that rule, so nominal is defaulted to 8Ω per the document's 'all others are 8Ω' statement.",
       "parallelAllowed": true
     },
     {
@@ -545,6 +561,10 @@
         "LA2Xi_BTL": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -579,6 +599,10 @@
         "LA2Xi_BTL": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -924,6 +948,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 8
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 12
         }
       },
       "nominal_impedance_ohms": 8,
@@ -938,6 +966,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
         }
       },
       "nominal_impedance_ohms": 8,
@@ -953,6 +985,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -967,6 +1003,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 4
         }
       },
       "nominal_impedance_ohms": 8,
@@ -982,6 +1022,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
         }
       },
       "nominal_impedance_ohms": 8,
@@ -996,6 +1040,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1011,6 +1059,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 8
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 12
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1025,6 +1077,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1039,6 +1095,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 4
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1054,6 +1114,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1068,6 +1132,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1082,6 +1150,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 2
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1097,6 +1169,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 8
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 12
         }
       },
       "nominal_impedance_ohms": 16,
@@ -1111,6 +1187,10 @@
         "LA4": {
           "per_output": 2,
           "per_amplifier": 8
+        },
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 12
         }
       },
       "nominal_impedance_ohms": 16,
@@ -1125,6 +1205,10 @@
         "LA4": {
           "per_output": 1,
           "per_amplifier": 4
+        },
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 8
         }
       },
       "nominal_impedance_ohms": 8,
@@ -1132,6 +1216,163 @@
         "SB"
       ],
       "parallelAllowed": true
+    },
+    {
+      "enclosure": "ARCS II",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
+      "parallelAllowed": true,
+      "notes": [
+        "2-way active constant-curvature WST (1x15\" LF + 1x3\" HF), 8Ω LF / 8Ω HF.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "Kara",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
+      "parallelAllowed": true,
+      "notes": [
+        "Original Kara: 2-way active modular WST (2x8\" LF + 1.5\" HF), 8Ω. Superseded by Kara II / Kara IIi.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "Kudo",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 3
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "signal_channels": [
+        "LF",
+        "LF",
+        "MF",
+        "HF"
+      ],
+      "parallelAllowed": true,
+      "notes": [
+        "Active 3-way variable-curvature WST, quad-amplified (2x12\" LF + 4x5\" MF + 2x1.5\" HF). LF 2x8Ω, MF 8Ω, HF 8Ω.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "V-DOSC",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 2,
+          "per_amplifier": 2
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "impedance_sections_ohms": {
+        "HF": 16
+      },
+      "impedance_notes": "HF section is 16Ω per the V-DOSC spec sheet; LF sections 8Ω each, MF 8Ω. Nominal defaulted to 8Ω.",
+      "signal_channels": [
+        "LF",
+        "LF",
+        "MF",
+        "HF"
+      ],
+      "parallelAllowed": true,
+      "notes": [
+        "Flagship 3-way WST line source (2x15\" LF + 4x7\" MF + 2x HF). LF 2x8Ω, MF 8Ω, HF 16Ω.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "dV-DOSC",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 3,
+          "per_amplifier": 6
+        }
+      },
+      "nominal_impedance_ohms": 8,
+      "signal_channels": [
+        "LF",
+        "HF"
+      ],
+      "parallelAllowed": true,
+      "notes": [
+        "2-way bi-amplified compact WST line source (2x8\"), 8Ω LF / 8Ω HF. Companion sub: dV-SUB.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "SB28",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 4,
+      "signal_channels": [
+        "SB"
+      ],
+      "parallelAllowed": false,
+      "notes": [
+        "High-power subwoofer, 2x18\" direct-radiating, 4Ω. One amp channel per cabinet (no parallel at 4Ω).",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "SB218",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 4,
+      "signal_channels": [
+        "SB"
+      ],
+      "parallelAllowed": false,
+      "notes": [
+        "Subwoofer, 2x18\" front-loaded vented, 4Ω. Companion sub for V-DOSC / ARCS. One amp channel per cabinet.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
+    },
+    {
+      "enclosure": "dV-SUB",
+      "max_enclosures": {
+        "LA8": {
+          "per_output": 1,
+          "per_amplifier": 4
+        }
+      },
+      "nominal_impedance_ohms": 2.7,
+      "signal_channels": [
+        "SB"
+      ],
+      "parallelAllowed": false,
+      "notes": [
+        "Subwoofer / LF extension for dV-DOSC, 3x15\", 2.7Ω (at the amplifier minimum-impedance floor). One amp channel per cabinet.",
+        "Legacy enclosure; LA8 capacity from LA8_UM_EN_11.0 Table 3 (max enclosures per LA8). Not listed for current X/A/K-series amplifiers."
+      ]
     }
   ]
 }

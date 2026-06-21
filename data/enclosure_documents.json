@@ -4262,6 +4262,374 @@
         }
       ],
       "notes": "DISCONTINUED/LEGACY product. SB118 is a real, distinct L-Acoustics product (single-18\\\" dual bass-reflex subwoofer, companion to KUDO/dV-DOSC/ARCS/KIVA/XT, range down to 32 Hz) - NOT the same as the newer SB18/SB18i. Because it is discontinued, it does NOT appear in the live Documentation Center (?choice=SB118 returns no results). Its complete official document set is delivered ONLY as a single ARCHIVES bundle at l-acoustics.com/archives-product/ (English, 2.17 MB). Verified live (HTTP 200, Content-Length 2,279,378, Last-Modified 2024-11-01). The zip contains exactly 3 files: SB118_UM_ML_2-0.pdf (52-page multilanguage user manual), DCE-SB118_EN.pdf, and DCE-SB118_FR.pdf. Individual files are NOT separately downloadable from the blob (404) - they exist only inside documents.zip. Rigging is handled as an integrated chapter (\\\"Stacking or flying the SB118\\\", rigging inspection, rigging components) inside the user manual; there is no standalone rigging manual. No separate datasheet, dimensional drawing (.dwg), GLL/Soundvision, or pinout document is published in the archive - electroacoustic specs, dimensions, connectors and wiring are all inside the user manual's Specifications section. Third-party mirrors of the user manual exist (ManualsLib, Scribd) but the l-acoustics.com archive bundle is the authoritative source."
+    },
+    {
+      "enclosure": "V-DOSC",
+      "product": "V-DOSC",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "V-DOSC ARCHIVES documents bundle (documents.zip) - contains the EC Declaration of Conformity (V-DOSC_certification_EN.pdf) ONLY; 33,025 bytes, Last-Modified 2024-11-01",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/V-DOSC/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "V-DOSC EC Declaration of Conformity (V-DOSC_certification_EN.pdf) - L-Acoustics SA, Marcoussis; LVD 2006/95/EC + Machinery 2006/42/EC; EN60065 + EN ISO 12100-1:2004; signed Christophe Pignon, 1 January 2010 (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/V-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "V-DOSC Operator Manual (EN) v4, June 2005, 158 pp - NOT in the official archive bundle; sourced from an l-acoustics.com mirror (en_vdosc_manual.pdf)",
+          "url": "https://sonoruss.ru/upload/iblock/435/en_vdosc_manual.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "V-DOSC datasheet ('Specs V-DOSC 0903') - verbatim L-Acoustics spec sheet; NOT in the archive bundle; third-party mirror (vdosc_Line_Array_Spec.pdf)",
+          "url": "http://concertaudio.com/Audio_Line_Array/vdosc_Line_Array_Spec.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY flagship (introduced 1992, 3-way active WST line source). No live l-acoustics.com product page. The official ARCHIVES bundle (documents.zip) is VERIFIED live (HTTP 200, 33,025 bytes, Last-Modified Fri 01 Nov 2024) but contains exactly ONE file - V-DOSC_certification_EN.pdf, the EC Declaration of Conformity ONLY. The Operator Manual (v4, 2005) and the datasheet are NOT inside the official archive; they exist as separate documents sourced from mirrors of the original l-acoustics.com files and are flagged source=third-party. Individual files are not separately addressable on the CDN. No official product image asset exists (probed CDN paths return 404). Rigging is documented in the Operator Manual (no standalone rigging manual in the archive)."
+    },
+    {
+      "enclosure": "dV-DOSC",
+      "product": "dV-DOSC",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "dV-DOSC ARCHIVES documents bundle (documents.zip) - contains the dV-DOSC + dV-SUB User Manual (EN + FR) and the EC Declaration of Conformity",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "dV-DOSC + dV-SUB User/Operator Manual (EN, Version 3.0, June 2005, 150 pp; includes rigging chapter and full Specifications) - dV_UM_EN_3-0.pdf",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "dV-DOSC + dV-SUB User/Operator Manual (FR, Version 3.0) - dV_UM_FR_3-0.pdf",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "dV-DOSC + dV-SUB EC Declaration of Conformity (EN, signed Christophe Pignon, Marcoussis, dated 2010-01-01; LVD 2006/95/EC, Machinery 2006/42/EC, EN60065, EN ISO 12100-1:2004) - dV-DOSC_dV-SUB_certification_EN.pdf",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "dV-DOSC marketing datasheet (1-page) - third-party mirror fallback (not an L-Acoustics archive file)",
+          "url": "https://cdn-docs.av-iq.com/dataSheet/DV-DOSC.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. dV-DOSC is a real, distinct L-Acoustics product (2-way bi-amplified WST compact line source, launched 1999, companion sub dV-SUB). Because it is discontinued it does not appear in the live Documentation Center; its complete official document set is delivered ONLY as a single ARCHIVES bundle at l-acoustics.com/archives-product/ (English, ~23.6 MB). Verified live (HTTP 200, 24,710,785 bytes / application/octet-stream). The product folder casing is exactly 'dV-DOSC' (mixed case) - the uppercase 'DV-DOSC' path returns HTTP 404. The zip contains exactly 3 files: dV_UM_EN_3-0.pdf (150-page EN user manual), dV_UM_FR_3-0.pdf (FR), and dV-DOSC_dV-SUB_certification_EN.pdf (1-page EC Declaration of Conformity). Individual files are not separately downloadable from the blob; they exist only inside documents.zip. Rigging is handled as an integrated chapter inside the user manual; there is no standalone rigging manual or datasheet in the archive. A separate one-page marketing datasheet exists at third-party mirrors (av-iq) but is not an L-Acoustics archive file. Preset names and the 65 Hz - 20 kHz usable bandwidth were cross-checked against L-Acoustics Preset Guide v8.1."
+    },
+    {
+      "enclosure": "Kudo",
+      "product": "KUDO (Multi-Mode WST enclosure)",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "KUDO ARCHIVES documents bundle (documents.zip, 5.17 MB) - contains User Manual + Rigging Manual + EC Declaration of Conformity",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "KUDO User Manual (bilingual EN/FR, version 2.1, 51 pp; includes connection/cabling and full Specifications chapter) - KUDO_UM_ML_2-1.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "rigging_manual",
+          "title": "KUDO Rigging Procedures Manual (bilingual EN/FR, version 2.0; KBUMP/KLIFT/KJACKx2 procedures + rigging specs) - KUDO_RM_ML_2-0.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "KUDO EC Declaration of Conformity (CE; LVD 2006/95/EC + Machinery 2006/42/EC) - KUDO_certification_EN.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "L-Acoustics Preset Guide (official) - KUDO preset matrix [KUDOxx_yy] (50/80/110 deg x 25/40/60 Hz HPF)",
+          "url": "https://www.promusic.cz/sites/default/files/product/field_files/preset-guide_en.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. KUDO is a real, distinct L-Acoustics product (Multi-Mode WST variable-curvature line source, active 3-way quad-amplified, 2x12in LF / 4x5in MF / 2x1.75in HF, K-LOUVER, 87 kg). No longer in the live Documentation Center; the complete official doc set is delivered ONLY as a single ARCHIVES bundle (documents.zip, 5.17 MB, English) at l-acoustics.com/archives-product/. IMPORTANT: the CDN folder is 'Kudo' (capital K, lowercase rest) - the all-caps '.../ARCHIVES/KUDO/documents.zip' returns HTTP 404. Verified live (HTTP 200, 5.17 MB). The zip contains exactly 3 files: KUDO_UM_ML_2-1.pdf (51-pp bilingual user manual with embedded Specifications chapter), KUDO_RM_ML_2-0.pdf (rigging procedures manual), KUDO_certification_EN.pdf (EC DoC). Individual files are NOT separately addressable on the CDN - the direct URL for every KUDO document is the same archive zip; the in-zip filename is given in each title. No standalone datasheet exists in the archive (specs live inside the user manual). Preset names cross-checked against the official L-Acoustics Preset Guide (third-party promusic.cz mirror)."
+    },
+    {
+      "enclosure": "Kara",
+      "product": "Kara",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "Kara ARCHIVES documents bundle (documents.zip, ~46.7 MB, last modified 2024-11-01) - contains Owner's Manual + Product Information + EU Declaration of Conformity",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "Kara Owner's Manual (EN) version 2.1 (2022 revision; Kara_OM_EN.pdf, 51.1 MB) - includes full rigging manual + specifications appendix + dimensions + all accessories",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "other",
+          "title": "KARA Product Information v8.0 (multilingual; KARA_PI_ML.pdf, 536 KB) - safety + EU Declaration of Conformity reference",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "KARA EU Declaration of Conformity (EN; KARA_DoC_EN.pdf, 372 KB, image-scanned)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "KARA System User Manual (EN) v2.1 (legacy 2017, cabling/preset focused) - third-party mirror",
+          "url": "https://www.promusic.cz/sites/default/files/product/field_files/kara_um_en_2.1.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. The original KARA (2009) is a real, distinct product (2-way active modular WST line source, replaced by Kara II) - NOT the same as Kara II. Because it is discontinued it does NOT appear in the live Documentation Center; its complete official document set is delivered ONLY as a single ARCHIVES bundle at l-acoustics.com/archives-product/. The archive folder is 'Kara' (capital K, lowercase rest) - the 'KARA' path returns 404, 'Kara' returns 200 OK (Content-Length 49,002,594 bytes / ~46.7 MB, Last-Modified 2024-11-01). The zip contains exactly 3 files: Kara_OM_EN.pdf (51.1 MB, v2.1, 2022 - the full Owner's Manual with rigging chapter + specifications appendix), KARA_PI_ML.pdf (536 KB, Product Information v8.0), and KARA_DoC_EN.pdf (372 KB, EU Declaration of Conformity). Individual files are NOT separately downloadable from the blob - they exist only inside documents.zip, so rigging is handled as an integrated chapter inside the Owner's Manual; there is no standalone rigging manual. A companion KARAi (install) archive exists at .../ARCHIVES/Karai/documents.zip (200 OK, ~44.2 MB). A separate legacy System User Manual v2.1 (cabling/preset focused) is mirrored on reseller sites (promusic.cz). Specs differ between the 2017 docs (139 dB / IP45) and the 2022 OM (141 dB / IP55); current official figures are 141 dB / IP55."
+    },
+    {
+      "enclosure": "ARCS II",
+      "product": "ARCS II",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "ARCS II ARCHIVES bundle (documents.zip, 9.84 MB / 10,312,976 bytes) - contains UM EN/FR, RM EN/FR, Product Information (with EU/EC Declaration of Conformity), and ARCBUMP/ARCSPLA/BUMP3/LIFTBAR PI sheets",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "ARCS II User Manual (EN) v4.0, ref ARCSII_UM_EN_4.0, dated Dec 15 2021 - full Specifications in Appendix C - ARCSII_UM_EN.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip#documents/ARCSII_UM_EN.pdf",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "rigging_manual",
+          "title": "ARCS II Rigging Manual (EN) v2.0, ref ARCSII_RM_EN_2.0, dated Dec 15 2021 - ARCSII_RM_EN.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip#documents/ARCSII_RM_EN.pdf",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "ARCS II Product Information sheet (multilingual) v5.0, 2022-07-11 - contains EU/EC Declaration of Conformity (Marcoussis, Nov 15 2013; 2006/42/EC + 2006/95/EC; EN ISO 12100, EN 60065) + safety instructions - ARCSII_PI_ML.pdf (inside documents.zip)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip#documents/ARCSII_PI_ML.pdf",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "ARCS II spec sheet ARCS II_SP_EN_4.0 (03-17) - standalone official spec sheet (not in archive zip; specs also reproduced as Appendix C of the UM) - arcsii_sp_en_4.0.pdf",
+          "url": "https://promusic.cz/sites/default/files/product/field_files/arcsii_sp_en_4.0.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. Real distinct product (separate archive entry ARCSII, distinct from original ARCS and ARCS WIDE/FOCUS / ARCS WIFO). The complete official doc set is delivered ONLY as a single ARCHIVES bundle, documents.zip (9.84 MB / 10,312,976 bytes), listed on the L-Acoustics archives index at https://www.l-acoustics.com/archives-product/ (entry ARCSII, English, zip). Verified live (HTTP 200, application/octet-stream). IMPORTANT: the product folder is ARCSII (no space, no underscore) - ARCS%20II and ARCS_II both return HTTP 404; only ARCSII resolves. Bundle contains 10 files: ARCSII_UM_EN.pdf (UM v4.0) + FR, ARCSII_RM_EN.pdf (RM v2.0) + FR, ARCSII_PI_ML.pdf (PI v5.0 with Declaration of Conformity), and ARCBUMP/ARCSPLA/BUMP3/LIFTBAR PI sheets. No standalone datasheet PDF is inside the zip (full Specifications live in UM Appendix C); a separate official SP sheet (ARCS II_SP_EN_4.0) exists externally and is mirrored at promusic.cz. Rigging handled via a standalone rigging manual (ARCSII_RM_EN) inside the archive, hence riggingHandling=archive_bundle. No official transparent-background PNG on an l-acoustics.com domain; the cleanest catalog image is the AV-iQ JPEG (500x648, 127 KB)."
+    },
+    {
+      "enclosure": "SB28",
+      "product": "SB28",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "SB28 ARCHIVES documents bundle (documents.zip) - contains User Manual + Rigging Manual + CAD Files + Product Information pack (with EC Declaration of Conformity)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "SB28 Subwoofer User Manual (EN, version 3.0, 2017-03-30) - SB28_UM_EN_3.0.pdf; includes operating modes, connection, preset descriptions and full Specifications appendix",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "rigging_manual",
+          "title": "SB28 Rigging Manual (EN, version 2.0, 2021-12-14) - SB28_RM_EN_2.0.pdf; ground-stacking, flying with BUMPSUB-2/SB28CHAIN, max configurations",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "SB28 Product Information (multilingual, v6.0, 2022-07-11) - SB28_PI_ML.pdf; contains the EC Declaration of Conformity (2006/42/EC Machinery Directive, 2006/95/EC Low Voltage Directive; EN ISO 12100, EN 60065)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "SB28 Datasheet (1-page) - SB28_Datasheet.pdf; not inside the official zip, mirrored at av-iq (host has a TLS cert issue but data matches the manual)",
+          "url": "https://cdn-docs.av-iq.com/dataSheet/SB28_Datasheet.pdf",
+          "format": "pdf",
+          "source": "third-party",
+          "httpStatus": null
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. Real, distinct L-Acoustics product (2x18-inch high-power subwoofer, 2007-2008 debut of laminar L-Vents venting; companion to K1/K2/KUDO/KARA/V-DOSC; succeeded by the KS28). Because it is discontinued it does not appear in the live Documentation Center; its complete official doc set is delivered ONLY as a single ARCHIVES bundle at the URL below. Verified live (HTTP 200, Content-Length 10,544,407 / ~10.06 MB, Last-Modified 2024-11-01). The zip contains SB28_UM_EN_3.0.pdf, SB28_UM_ML.pdf, SB28_RM_EN_2.0.pdf, SB28_CAD_Files.zip and SB28_SYSTEM_PRODUCT_INFORMATION_pack_3.0.zip (which holds SB28_PI_ML.pdf with the EC Declaration of Conformity, plus BUMPSUB-2 and SB28CHAIN PI sheets). No standalone datasheet is inside the official zip; the genuine 1-page datasheet is mirrored at av-iq (TLS cert issue on that host, so WebFetch failed, but the data matches the manual)."
+    },
+    {
+      "enclosure": "SB218",
+      "product": "SB218",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "SB218 ARCHIVES documents bundle (documents.zip) - contains only the EC Declaration of Conformity (SB218_certification_EN.pdf)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB218/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "SB218 EC Declaration of Conformity (SB218_certification_EN.pdf, 37,695 bytes) - Loudspeaker enclosure SB218; LVD 2006/95/EC + Machinery Directive 2006/42/EC; EN60065, EN ISO 12100-1:2004; Marcoussis France, 2010-01-01, signed C. Pignon",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB218/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "SB218 datasheet (specs SB218 1202) - electroacoustic, physical, amplification and rigging specifications. Not in the official archive bundle; identical content mirrored at cdn-docs.av-iq.com/dataSheet/SB218.pdf",
+          "url": "https://cdn-docs.av-iq.com/dataSheet/SB218.pdf",
+          "format": "pdf",
+          "source": "av-iq.com (mirror)",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "V-DOSC Operator's Manual - SB218 specifications (p.134) and BUMPSUB rigging section (p.37); the SB218's full technical documentation lived inside the V-DOSC manual, not as a standalone manual",
+          "url": "https://www.manualslib.com/manual/1512344/L-Acoustics-V-Dosc.html?page=134",
+          "format": "html",
+          "source": "manualslib.com (mirror)",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY product. SB218 is a real, distinct L-Acoustics product (dual-18-inch front-loaded vented subwoofer, period companion to V-DOSC and ARCS, usable to 25 Hz at -10 dB). Because it predates the modern product-page CMS it has no standalone l-acoustics.com product page (/archives-product/sb218/ redirects to the homepage) and no hosted product image (blob image paths return 404). The official ARCHIVES bundle (documents.zip) is verified live (HTTP 200, application/octet-stream, 33,316 bytes / 33 kB; listed on l-acoustics.com/archives-product/, EN, ZIP, 33 kB) but contains ONLY one file: SB218_certification_EN.pdf, an EC Declaration of Conformity. It contains NO user manual, rigging manual, or datasheet. The full electroacoustic/physical/amplification/rigging specs come from the official SB218 datasheet (specs SB218 1202, mirrored at av-iq.com and juicesound.co.uk) and the V-DOSC Operator's Manual. NOTE/DISCREPANCY: the official datasheet states 4 ohms; some resale/catalog listings (DigitalResources, McCann) title it '5 ohms / 4400W' - that is a vendor catalog error and 4 ohms is authoritative."
+    },
+    {
+      "enclosure": "dV-SUB",
+      "product": "dV-SUB",
+      "riggingHandling": "archive_bundle",
+      "documents": [
+        {
+          "type": "other",
+          "title": "dV-DOSC / dV-SUB ARCHIVES documents bundle (documents.zip, ~24.7 MB) - contains the combined dV-DOSC dV-SUB User Manual (EN+FR) and the EC Declaration of Conformity",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "zip",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "dV-DOSC dV-SUB User Manual (EN) V3.0, June 2005, 150 pp - dV_UM_EN_3-0.pdf (covers both enclosures: descriptions, rigging system, presets, cabling, full Specifications and line drawings incl. Figure 92 dV-SUB Line Drawing p.143)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "user_manual",
+          "title": "dV-DOSC dV-SUB User Manual (FR) V3.0 - dV_UM_FR_3-0.pdf (French)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "conformity",
+          "title": "dV-DOSC / dV-SUB EC Declaration of Conformity (EN) - dV-DOSC_dV-SUB_certification_EN.pdf (Marcoussis, 1 Jan 2010; LVD 2006/95/EC, Machinery 2006/42/EC; EN60065, EN ISO 12100-1:2004)",
+          "url": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip",
+          "format": "pdf",
+          "source": "l-acoustics.com",
+          "httpStatus": 200
+        },
+        {
+          "type": "datasheet",
+          "title": "dV-SUB datasheet rev. dVS_SP_EN_1.0/02-09 (Feb 2009, 2 pp) - NOT in the official archive bundle; verbatim mirror only",
+          "url": "https://around-gmbh.de/wp-content/uploads/2019/03/Datasheet_dv_SUB.pdf",
+          "format": "pdf",
+          "source": "around-gmbh.de (third-party mirror)",
+          "httpStatus": 200
+        }
+      ],
+      "notes": "DISCONTINUED/LEGACY. The dV-SUB has NO standalone ARCHIVES folder - every casing/encoding of a dV-SUB blob path returns HTTP 404 (control: .../ARCHIVES/SB118/documents.zip returns 200, so the pattern is valid). Its official documentation is bundled inside the dV-DOSC archive: the User Manual is a combined dV-DOSC dV-SUB document and the EC Declaration covers both products. Verified live: HTTP 200/206, Content-Length 24,710,785 bytes (~24.7 MB), application/octet-stream, Last-Modified Fri 01 Nov 2024. The zip contains exactly 3 files: dV_UM_EN_3-0.pdf, dV_UM_FR_3-0.pdf, dV-DOSC_dV-SUB_certification_EN.pdf - there is NO standalone datasheet and NO standalone rigging manual; rigging is an integrated chapter inside the user manual. The official datasheet (rev dVS_SP_EN_1.0/02-09) was not locatable on the L-Acoustics blob (404 on guessed paths) and is included only as a third-party verbatim mirror. dV-DOSC appears on l-acoustics.com/archives-product/; dV-SUB does not appear as its own archive entry."
     }
   ]
 }

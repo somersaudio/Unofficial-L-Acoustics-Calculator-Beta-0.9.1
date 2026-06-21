@@ -230,6 +230,75 @@
       }
     },
     {
+      "amplifier": "LA8",
+      "outputs": 4,
+      "physicalOutputs": 2,
+      "powerRank": 2.5,
+      "operatingModes": [],
+      "maxOutputPower_W": {
+        "byLoad": {
+          "16_ohm": null,
+          "8_ohm": "4×1100W",
+          "4_ohm": "4×1800W",
+          "2_7_ohm": null
+        }
+      },
+      "wiring": {
+        "source": {
+          "pdf": "LA8_UM_EN_11.0.pdf",
+          "label": "LA8 Amplified Controller User Manual v11.0",
+          "version": "11.0"
+        },
+        "connector_family": "NL4",
+        "total_amp_channels": 4,
+        "inputs": {
+          "analog": "2x 3-point XLR (IN A, IN B) + 2x 3-point XLR LINK (A, B), passively paralleled",
+          "aes_ebu": "1x 3-point XLR (IN) + 1x 3-point XLR LINK (electronically buffered, failsafe relay)"
+        },
+        "physical_outputs": [
+          {
+            "output": 1,
+            "connector": "NL4",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH1 +",
+              "1-": "CH1 -",
+              "2+": "CH2 +",
+              "2-": "CH2 -"
+            }
+          },
+          {
+            "output": 2,
+            "connector": "NL4",
+            "channels_on_connector": 2,
+            "pins": {
+              "1+": "CH3 +",
+              "1-": "CH3 -",
+              "2+": "CH4 +",
+              "2-": "CH4 -"
+            }
+          }
+        ],
+        "ca_com": {
+          "connector": "CA-COM",
+          "points": 8,
+          "channels_on_connector": 4,
+          "pins": {
+            "A": "CH1 +",
+            "B": "CH1 -",
+            "C": "CH2 +",
+            "D": "CH2 -",
+            "E": "CH3 +",
+            "F": "CH3 -",
+            "G": "CH4 +",
+            "H": "CH4 -"
+          },
+          "note": "8-point CA-COM connector carries all four outputs. DO2W, DOFILL and DOSUB PA-COM cables are NOT compatible with the LA8 (manual section 4.4.4); all other L-Acoustics PA-COM cables can be used."
+        },
+        "modes": null
+      }
+    },
+    {
       "amplifier": "LA12X",
       "outputs": 4,
       "physicalOutputs": 2,

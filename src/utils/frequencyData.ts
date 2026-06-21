@@ -55,6 +55,14 @@ export const ENCLOSURE_LOW_FREQUENCY: Record<string, number> = {
   "MTD115b (Passive)": 40,
   "ARCS Wide/Focus": 50,
   "ARCS": 55,
+  "V-DOSC": 40,
+  "dV-DOSC": 65,
+  "Kudo": 35,
+  "Kara": 55,
+  "ARCS II": 50,
+  "SB28": 25,
+  "SB218": 25,
+  "dV-SUB": 35,
 };
 
 /**

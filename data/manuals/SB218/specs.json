@@ -1,0 +1,70 @@
+{
+  "enclosure": "SB218",
+  "product": "SB218",
+  "type": "subwoofer",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "28 - 140 Hz (+/-3 dB, X preset); usable bandwidth 28 - 200 Hz. Low-frequency limit 25 Hz (-10 dB). No upper limit beyond the sub passband",
+    "max_spl_db": 136,
+    "max_spl_note": "Per datasheet array table, half-space, 1 m, including preset EQ. Single enclosure: 130 dB continuous / 136 dB peak; two enclosures 136 / 142; four enclosures 142 / 148. Sensitivity 100.5 dB SPL (2.83 Vrms @ 1 m, 28-200 Hz band)",
+    "nominal_impedance_ohms": 4,
+    "directivity": "Omnidirectional as a single element. Low-frequency directivity control is array-derived: flown vertical column arrays (up to 8 deep) and ground-stacked horizontal line arrays using advanced electronic arc processing. No single rated coverage angle is published for the sub",
+    "components": "2 x 18-inch front-loaded LF transducers in an optimized bass-reflex (vented) enclosure. Each driver: 4.5 in (114 mm) edgewound copper-ribbon voice coil, die-cast aluminum basket, 9 mm (0.35 in) peak excursion, high-thermal-capacity vented magnet structure. RMS power handling 1100 W long-term (pink noise, 6 dB crest factor), 4400 W peak; 68 Vrms nominal drive"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "Passive single-band (one amp channel drives one SB218 as a single 4-ohm load; no onboard amplification, not bi-/quad-amplified)",
+      "Vertical column array (up to 8 enclosures, directivity by electronic arc processing)",
+      "Ground-stacked horizontal line array"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 4
+    },
+    "per_amplifier_note": "LA8 manual Table 3 figure for the SB218: 1 per output / 4 total per LA8. The SB218 is a 4-ohm passive load needing one channel per enclosure; the datasheet predates the LA-series controllers and originally named the analog-controller / LA24a / LA48a path, but modern L-Acoustics amplified controllers carry legacy presets",
+    "preset_names": [
+      "SB218_X"
+    ],
+    "preset_note": "The datasheet references an 'X preset' (the 28-140 Hz +/-3 dB response is quoted '(X preset)') and a recommended filtering preset of a 4th-order low-pass at 80-200 Hz plus a 4th-order high-pass at 25 Hz. A complete enumerated modern controller preset list (e.g. SB218_60 / SB218_100) could not be verified from an official source; 'SB218_X' is the best-estimate preset name pending confirmation"
+  },
+  "connection": {
+    "input_connector": "2x 4-point speakON (NL4); the second connector serves as a parallel link/loop-through for daisy-chaining subs onto one amp channel. Internal pinout uses points 1+/1- for the LF drivers; the exact pin/parallel-link wiring is not confirmed from an official source (manualzz mirror returned 403)",
+    "breakouts": "None. The SB218 uses standard NL4 speaker cables, not a multipin CA-COM / PA-COM breakout system"
+  },
+  "physical": {
+    "weight_kg": 106,
+    "weight_note": "Datasheet net weight 106 kg / 233.7 lb; shipping weight 112 kg / 246.9 lb. Vendor mirrors add roughly +9.5 kg / 21 lb for the SUBPLA dolly board",
+    "dimensions_mm": "1300 x 550 x 700 (W x H x D); 51.2 x 21.7 x 27.6 in. Shipping 1340 x 600 x 770 mm (52.8 x 23.6 x 30.3 in)",
+    "protection_rating": "Not published",
+    "cabinet": "24 mm Baltic birch plywood, internally braced with steel corner plates; sealed, screwed, rabbeted joints. Maroon-gray finish. Grille: black powder-coated/epoxy perforated steel 1.5 mm with 10 mm acoustically transparent foam"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (horizontal line array; optional SUBPLA dolly board)",
+      "Flown vertical column array via BUMPSUB flying bar (up to 8 enclosures)"
+    ],
+    "max_per_flown_array": "BUMPSUB rated for up to 8 SB218 enclosures in a vertical column at a 5:1 safety factor",
+    "inter_element_angles": "N/A. Flown SB218 arrays are straight vertical columns (0 degrees between elements); no splay-angle range is specified",
+    "rigging_accessories": [
+      "BUMPSUB (flying bar for vertical columns of up to 8 SB218; includes 4 shackles and 2 flying chains with Aeroquip double-stud fittings)",
+      "SUBPLA (removable front dolly board, optional)",
+      "SUBCOV (protective cover)"
+    ]
+  },
+  "usage": [
+    "Discontinued dual-18-inch front-loaded vented subwoofer, the period companion sub for V-DOSC and ARCS, extending the low end down to a 25 Hz usable limit (-10 dB).",
+    "Each cabinet is a 4-ohm passive single-band load needing one amplifier channel; per the LA8 manual Table 3 an LA8 drives 1 SB218 per output for up to 4 total, while period rigs used the analog controllers with LA24a / LA48a amplifiers.",
+    "Cross over with the 'X preset' (28-140 Hz +/-3 dB) or the recommended 4th-order low-pass at 80-200 Hz plus 4th-order high-pass at 25 Hz; connect via the 2x NL4 speakON, looping a second sub through the LINK onto one channel.",
+    "Build low-frequency directivity by array geometry rather than a fixed pattern: flown vertical columns up to 8 deep or ground-stacked horizontal line arrays using electronic arc processing.",
+    "Fly with the BUMPSUB flying bar (4 shackles, 2 Aeroquip-fitted chains) for up to 8 enclosures in a vertical column at 5:1; engage the recessed flytrack sections on each side as the four attachment points.",
+    "Ground-stack with the optional SUBPLA front dolly board and protect in transport with the SUBCOV cover; at 106 kg per cabinet there is no pole-mount option."
+  ],
+  "source_manual": "SB218 official datasheet PDF (specs SB218 1202); V-DOSC Operator's Manual (SB218 specifications and BUMPSUB rigging sections); SB218 EC Declaration of Conformity (SB218_certification_EN.pdf, 2010)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB218/documents.zip"
+}

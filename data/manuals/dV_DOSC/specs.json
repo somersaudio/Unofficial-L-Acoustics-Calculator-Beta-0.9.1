@@ -1,0 +1,82 @@
+{
+  "enclosure": "dV-DOSC",
+  "product": "dV-DOSC",
+  "type": "line source",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "65 - 20000",
+    "max_spl_db": 139,
+    "max_spl_note": "Continuous SPL at 1 m, free field (User Manual V3.0 spec), scales with array size: 1 enclosure 127 dB; 2 enclosures 133 dB flat / 131 dB at 15 deg max-curvature; 4 enclosures 139 dB flat / 135 dB at 30 deg max-curvature. The manual publishes continuous SPL per array size rather than a single peak figure; third-party datasheets quote approx 137 dB peak per enclosure.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Constant-curvature WST line source. Horizontal: 120 deg (-6 dB points, 100 deg at -3 dB), constant over the full range via coplanar WST symmetry. Vertical coverage is defined by the array geometry (nominally (N-1) x inter-element angle); 12 dV-DOSC tightly wrapped gives 90 deg vertical.",
+    "components": "Active bi-amplified 2-way: LF/MF 2 x 8\" weather-resistant loudspeaker, 2\" voice coil, bass-reflex loaded (each rated 16 ohm, paralleled to 8 ohm); HF 1 x 1.4\" exit neodymium compression driver (titanium diaphragm, 3\" edgewound aluminum voice coil) on the patented DOSC waveguide. Long-term power (100 Hz HPF, pink noise, 6 dB crest): LF/MF 380 Wrms / 1520 Wpeak; HF 66 Wrms / 260 Wpeak."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "active bi-amplified 2-way (one amp channel drives the LF/MF low section, a second amp channel drives the HF high section; crossover and processing done externally by the amplified controller, not a passive internal network)",
+      "up to 3 dV-DOSC paralleled per channel (8 ohm single / 4 ohm pair / 2.7 ohm trio)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 6
+    },
+    "per_amplifier_note": "LA8 manual Table 3 capacity for dV-DOSC: 3 per output / 6 total per LA8 (active 2-way uses two of the four LA8 outputs per group, with up to three enclosures paralleled per output at 2.7 ohm). The legacy V3.0 manual also lists analog amplified controllers LA17a / LA24a / LA48a (LA24a powers up to 2 dV-DOSC, LA48a recommended for 3 in parallel); LA4 / LA4X / LA12X carry onboard dV-DOSC presets per Preset Guide v8.1.",
+    "preset_names": [
+      "dV_FI",
+      "dV_LO",
+      "dV_LO_100",
+      "dV_HI",
+      "dV_HI_100",
+      "dV_dV-S_LO",
+      "dV_dV-S_HI",
+      "dV_dV-S_LO60",
+      "dV_dV-S_HI60"
+    ],
+    "preset_note": "Standalone onboard library (Preset Guide v8.1): [dV_LO] / [dV_HI] are the full-range reference presets (LO = flat HF, HI = +3 dB HF shelf), [dV_FI] is the HPF=100 Hz fill preset, and [dV_LO_100] / [dV_HI_100] add a 100 Hz 24 dB/oct HPF. With the dV-SUB use the hybrid [dV_dV-S_LO/HI] (X-over 100 Hz) or [dV_dV-S_LO60/HI60] (60 Hz HPF). V3.0-manual-era external-DSP names were 'dV 2W 100' / 'dV 2W 80' with LO/HI and 3-way/4-way INFRA variants."
+  },
+  "connection": {
+    "input_connector": "2x 4-point Neutrik speakON (NL4) sockets per enclosure (one IN, one LINK/through), carrying both the LF/MF and HF sections on separate pins. Up to 3 dV-DOSC may be paralleled/linked via the two speakON sockets, jumped with SP.7 (0.7 m) loudspeaker cables.",
+    "breakouts": "To the amp rack via SP7 / SP25 (7 m / 25 m) cables with the DO2W adapter + two CC4F, or via DO7 / DO25 cables with the DOFILL adapter (8-pin male CA-COM barrel to dual speakON breakout). System-drive multicore uses 19-pin CA-COM with COMB connectors (D2WAY/D3WAY/DSUB) for operating-mode selection. (dV-SUB uses a single 4-pin speakON, 1+/1-.)"
+  },
+  "physical": {
+    "weight_kg": 31.8,
+    "weight_note": "Net 31.8 kg / 70.1 lb (shipping 35 kg / 77.2 lb).",
+    "dimensions_mm": "695 (W) x 257 (H front) / 171 (H rear) x 476 (D) mm; 27.4 x 10.1 / 6.7 x 18.7 in. Trapezoidal enclosure with a 3.75 deg trapezoidal angle, so front and rear heights differ.",
+    "protection_rating": "Not published (drivers specified weather-resistant, but no formal IP/IK figure given in the User Manual or datasheet)",
+    "cabinet": "Baltic birch plywood (15 mm + 24 mm), folded construction with aluminum top and bottom plates and metal reinforcement; sealed, screwed cabinet. Finish: Maroon-gray high-resilient paint. Grille: black epoxy-coated perforated steel with acoustically transparent foam. Integrated flying hardware and handles."
+  },
+  "deployment": {
+    "modes": [
+      "flown vertical array (dV-BUMP / dV-BUMP2 flying bumper)",
+      "flown as downfill under a V-DOSC array (dV-DOWN adapter)",
+      "ground-stacked / variable-tilt stack (dV-BUMP stacking options, incl. on subwoofer or on V-DOSC)"
+    ],
+    "max_per_flown_array": "dV-BUMP/BUMP2 without extension bar (single or 2-point hang from the central spreader): max 24 dV-DOSC. With extension bar (single-point rear hang or 2-point hang): max 12 dV-DOSC. As downfill: up to 6 dV-DOSC flown below a V-DOSC array via dV-DOWN (3 dV-DOSC equal the weight of 1 V-DOSC).",
+    "inter_element_angles": "Convex (positive-curvature) arrays from flat (0 deg) up to 7.5 deg between cabinets, in roughly 1 deg increments, set with dV-ANGLE P1 / dV-ANGLE P2 bars. 7.5 deg is the WST limit that maintains up to 80% acoustic fill.",
+    "rigging_accessories": [
+      "dV-BUMP / dV-BUMP2 (flying bumper; 8 pick-point holes, optional extension bar adds holes 9-16)",
+      "dV-ANGLE P1 / dV-ANGLE P2 (inter-element angle bars, 0 to 7.5 deg)",
+      "dV-PIN81 (coupling/link pins, used in fours; e.g. to attach dV-DOWN)",
+      "dV-DOWN (downfill adapter for flying dV-DOSC below V-DOSC)",
+      "dV-PIN25 (dV-SUB coupling pins)",
+      "dV-ANGLESS / dV-ANGLESD / dV-ANGLESDP (dV-SUB attachment bars)",
+      "dV-SUBPLA (dV-SUB stacking plate)"
+    ]
+  },
+  "usage": [
+    "Constant-curvature WST compact line source (introduced 1999) for medium-throw FOH, side-fills, distributed delays and downfill duty in touring and install; the 120 deg horizontal pattern blankets a wide audience with relatively few boxes.",
+    "Every dV-DOSC is an active bi-amplified 2-way that needs two amp channels per enclosure (one for the 2x8\" LF/MF low section, one for the HF high section) - there is no passive crossover, all processing comes from the amplified controller.",
+    "On modern controllers budget 3 dV-DOSC per LA8 output / 6 total per LA8 (Table 3); LA4 / LA4X / LA12X also carry onboard dV-DOSC presets, and up to 3 enclosures parallel per channel (8 / 4 / 2.7 ohm for 1 / 2 / 3).",
+    "Load [dV_LO] (flat HF) or [dV_HI] (+3 dB HF shelf) for full-range arrays, [dV_FI] for short-throw fills, and switch to the [dV_dV-S_xx] hybrid presets when paired with dV-SUB (or add SB118 / SB218 for deeper extension down to 25 Hz).",
+    "Fly vertically on dV-BUMP/BUMP2 (up to 24 boxes, or 12 with the extension bar) using dV-ANGLE P1/P2 bars for 0 to 7.5 deg inter-element splay, or hang up to 6 dV-DOSC as downfill below V-DOSC via the dV-DOWN adapter.",
+    "Always model the array in ARRAY2004 / SOUNDVISION before rigging to set curvature and confirm the certified maximum-enclosure configuration; the V3.0 manual encodes mechanical limits as max-box configs rather than a single numeric WLL/safety factor."
+  ],
+  "source_manual": "dV-DOSC / dV-SUB User Manual (EN) Version 3.0, June 2005 (dV_UM_EN_3-0.pdf, 150 pp); cross-checked against L-Acoustics Preset Guide v8.1 (2016) for preset names and the 65 Hz - 20 kHz usable bandwidth",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
+}

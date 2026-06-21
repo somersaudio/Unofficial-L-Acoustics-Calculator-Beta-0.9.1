@@ -1,0 +1,73 @@
+{
+  "enclosure": "SB28",
+  "product": "SB28",
+  "type": "subwoofer",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "25 Hz low-frequency limit (-10 dB, [SB28_100] preset); upper limit set by preset to 60 Hz or 100 Hz. No -3 dB figure is published by L-Acoustics",
+    "max_spl_db": 142,
+    "max_spl_note": "142 dB peak at 1 m, half-space, pink noise crest factor 4, [SB28_100] preset",
+    "nominal_impedance_ohms": 4,
+    "directivity": "Selectable standard (omnidirectional) or cardioid; cardioid achieves rear SPL rejection using a block of four enclosures with one reversed plus the matching _C preset. No fixed coverage angle (subwoofer)",
+    "components": "2 x 18-inch neodymium direct-radiating weather-resistant transducers (4-inch voice coil, aluminium die-cast basket, vented magnet, high excursion) in a bass-reflex enclosure with laminar L-Vents. RMS power handling 1255 W"
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "STANDARD (omnidirectional)",
+      "CARDIOID (block of 4, 1 reversed)"
+    ],
+    "recommended_amplifiers": [
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 4
+    },
+    "per_amplifier_note": "LA8 manual Table 3: 1 SB28 per output / 4 SB28 total per LA8 (one enclosure per output channel; the two 18-inch transducers are internally wired in parallel to one 4 ohm load). The v3.0 spec table lists the SB28 as amplified by LA8 / LA12X, so LA12X also drives up to 4.",
+    "preset_names": [
+      "SB28_60",
+      "SB28_100",
+      "SB28_60_C",
+      "SB28_100_C"
+    ],
+    "preset_note": "Each SB28 uses one amplifier output channel (one SB signal channel). STANDARD presets [SB28_60]/[SB28_100] set the upper limit to 60 Hz or 100 Hz for coupling with the main system; the _C variants ([SB28_60_C]/[SB28_100_C]) are loaded on the reversed enclosure for cardioid operation. All four presets keep the -10 dB low-frequency limit at 25 Hz."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) input; pinout 1+/1- carry the LF transducers (2+/2- not used). No through/link output on the enclosure - distribution is done at the amplifier via breakout cables",
+    "breakouts": "From LA8 three options: DO cable (DO.7/DO10/DO25, 8-point PA-COM) to DOSUB-LA8 breakout (4x speakON, one per channel/sub); SP cable (SP.7/SP5/SP10/SP25) to SP-Y1 breakout (1 to 2 subs) via CC4FP adaptor; or DO cable to DO3WFILL breakout (one 2-way active plus two SB28, needs custom preset). Cardioid: connect the reversed sub to OUT 1"
+  },
+  "physical": {
+    "weight_kg": 93,
+    "weight_note": "User manual spec table lists 93 kg / 205 lb net",
+    "dimensions_mm": "1300 (W) x 551 (H) x 701 (D); 51.2 x 21.7 x 27.6 in",
+    "protection_rating": "N/A - no IP code published; L-Acoustics rates the SB28 only as weather-resistant and refers users to a separate weather-protection document",
+    "cabinet": "First-grade Baltic birch plywood; steel grille with anti-corrosion coating plus Airnet acoustically-neutral fabric front; aluminium rigging components; Dark Grey-brown PANTONE 426C finish"
+  },
+  "deployment": {
+    "modes": [
+      "Ground-stacked (horizontal or vertical blocks)",
+      "Flown in vertical arrays (BUMPSUB-2 + SB28CHAIN)",
+      "STANDARD arrangement",
+      "CARDIOID arrangement (block of 4, one element reversed)"
+    ],
+    "max_per_flown_array": "16 x SB28 flown on BUMPSUB-2 with SB28CHAIN; ground-stacked max/safe limit is 4 SB28 (stacking up to 8 permitted when supporting a flown array). Safety factor 4:1 per Machinery Directive 2006/42/EC",
+    "inter_element_angles": "Not applicable - SB28 arrays couple flat (0 degrees between enclosures); no splay-angle hardware. Max distance between adjacent acoustic centers 2.8 m (60 Hz preset) or 1.7 m (100 Hz preset)",
+    "rigging_accessories": [
+      "BUMPSUB-2 (lifting beam, provided with 2 bow shackles WLL 3.25 t each; lifts up to 16 SB28)",
+      "SB28CHAIN (lifting chains, sold as a pair; one pair per group of four; extendable by up to 3 additional pairs to reach 16 flown)",
+      "SB28PLA (removable front dolly)",
+      "Integrated handles and integrated rigging system (runners/tracks + pins for stacking)"
+    ]
+  },
+  "usage": [
+    "High-power dual-18 reference subwoofer used to extend the low end of large-format L-Acoustics line source systems (K1, K2, KUDO, KARA, V-DOSC) in touring and large installs; succeeded by the KS28.",
+    "Each SB28 is 4 ohms and needs one amplifier output channel: budget one LA8 (or LA12X) per four cabinets, with one enclosure per output.",
+    "Pick the [SB28_60] preset when crossing low to the mains and [SB28_100] when more sub bandwidth is wanted; both keep the -10 dB point at 25 Hz.",
+    "For directional bass, deploy in cardioid blocks of four with one reversed cabinet and load the _C preset on the reversed unit to reject rear-stage SPL, connecting the reversed sub to OUT 1.",
+    "Place cabinets directly side by side for proper coupling; if gaps are unavoidable, respect the 2.8 m (60 Hz) or 1.7 m (100 Hz) max acoustic-center spacing.",
+    "Ground-stack up to 4 cabinets (8 when supporting a flown array) or fly up to 16 on BUMPSUB-2 with SB28CHAIN; always validate flown or non-standard arrays in SOUNDVISION before rigging."
+  ],
+  "source_manual": "SB28 User Manual (EN) version 3.0 (SB28_UM_EN_3.0, 2017-03-30); SB28 Rigging Manual (EN) version 2.0 (SB28_RM_EN_2.0, 2021-12-14); Product Information v6.0 (SB28_PI_ML)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip"
+}

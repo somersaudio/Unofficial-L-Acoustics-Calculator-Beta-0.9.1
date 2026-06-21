@@ -33,6 +33,8 @@ interface SolverResultsProps {
   onRackNameChange?: (rackKey: string, name: string) => void;
   perOutputMap?: Record<string, number>;
   hintsEnabled?: boolean;
+  /** Reports the ACTUAL displayed amp/rack totals so the left-panel summary mirrors this panel exactly. */
+  onLayoutStats?: (ampCount: number, rakCount: number) => void;
 }
 
 /** Returns inline style for output label color that darkens as output index increases */
@@ -2875,7 +2877,7 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
 }
 
 /** Renders a single zone's solver results */
-function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false }: { solution: SolverSolution; salesMode: boolean; rackMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onLockRack?: (ampInstances: AmpInstance[]) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; onCombineLockedRacks?: (ampIds: string[]) => void; rackNameMap?: Record<string, string>; onRackNameChange?: (rackKey: string, name: string) => void; perOutputMap?: Record<string, number>; hintsEnabled?: boolean }) {
+function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, onLayoutStats }: { solution: SolverSolution; salesMode: boolean; rackMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onLockRack?: (ampInstances: AmpInstance[]) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; onCombineLockedRacks?: (ampIds: string[]) => void; rackNameMap?: Record<string, string>; onRackNameChange?: (rackKey: string, name: string) => void; perOutputMap?: Record<string, number>; hintsEnabled?: boolean; onLayoutStats?: (ampCount: number, rakCount: number) => void }) {
   // Track packed/spread state per amp index (independent per amp)
   const [packedMap, setPackedMap] = useState<Record<number, boolean>>({});
   const [spreadMap, setSpreadMap] = useState<Record<number, boolean>>({});
@@ -3050,6 +3052,15 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
     };
   }, [lockedAmpIds]);
 
+  // Mirror the ACTUAL displayed amp/rack totals up to the left-panel "Recommended Configuration"
+  // so the two panels can never disagree. The counts are computed below from the same arrays this
+  // panel renders, stashed in a ref during render, and reported after commit. (The effect is
+  // registered here — before any early return — so hook order stays stable.)
+  const layoutStatsRef = useRef<{ ampCount: number; rakCount: number }>({ ampCount: 0, rakCount: 0 });
+  useEffect(() => {
+    onLayoutStats?.(layoutStatsRef.current.ampCount, layoutStatsRef.current.rakCount);
+  });
+
   if (!solution.success) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/40">
@@ -3110,6 +3121,11 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
   let lockedColumnContent: React.ReactNode = null;
   let unlockedColumnContent: React.ReactNode = null;
 
+  // Actual displayed amp/rack totals — the left-panel "Recommended Configuration" mirrors
+  // these exact numbers so the two panels can never drift apart. Default to in-use amps.
+  let layoutAmpCount = solution.ampInstances.filter((i) => i.totalEnclosures > 0).length;
+  let layoutRakCount = 0;
+
   if (salesMode) {
     // Sales mode — everything goes to unlocked column (no locked racks)
     unlockedColumnContent = (() => {
@@ -3137,6 +3153,9 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
         <GroupedAmpCard key={key} instances={instances} />
       ))}</>;
     })();
+    layoutRakCount = rackMode
+      ? Math.ceil(solution.ampInstances.filter((i) => i.ampConfig.key === "LA12X" && i.totalEnclosures > 0).length / 3)
+      : 0;
   } else if (rackMode) {
     // Rack mode — split locked racks from unlocked
     const result = (() => {
@@ -3421,10 +3440,21 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
         </>
       );
 
-      return { locked, unlocked };
+      // Count the amps/racks actually rendered above (post-spread), so the summary mirrors them.
+      const ampCount =
+        lockedRacks.reduce((s, r) => s + r.filter((e) => e.instance.totalEnclosures > 0).length, 0) +
+        unlockedRacks.reduce((s, r) => s + r.filter((e) => e.instance.totalEnclosures > 0).length, 0) +
+        lockedOtherEntries.filter((e) => e.instance.totalEnclosures > 0).length +
+        unlockedOtherEntries.filter((e) => e.instance.totalEnclosures > 0).length;
+      const rakCount =
+        lockedRacks.filter((r) => r.some((e) => e.instance.totalEnclosures > 0)).length +
+        unlockedRacks.filter((r) => r.some((e) => e.instance.totalEnclosures > 0)).length;
+      return { locked, unlocked, ampCount, rakCount };
     })();
     lockedColumnContent = result.locked;
     unlockedColumnContent = result.unlocked;
+    layoutAmpCount = result.ampCount;
+    layoutRakCount = result.rakCount;
   } else {
     // Non-rack mode — split locked rack cards from regular entries
     const result = (() => {
@@ -3551,6 +3581,9 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
     unlockedColumnContent = result.unlocked;
   }
 
+  // Stash the totals computed above for the after-commit report (see layoutStatsRef effect).
+  layoutStatsRef.current = { ampCount: layoutAmpCount, rakCount: layoutRakCount };
+
   const showSplit = hasLockedRacks && lockedColumnContent;
 
   return (
@@ -3605,12 +3638,16 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
   );
 }
 
-export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputMap, hasErrors }: {
+export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputMap, hasErrors, displayedAmpCount, displayedRakCount }: {
   solution: SolverSolution;
   rackMode: boolean;
   lockedAmpIds?: Set<string>;
   perOutputMap?: Record<string, number>;
   hasErrors: boolean;
+  /** Actual amp/rack totals reported by the results panel — when present, the summary mirrors
+   * these exactly instead of re-deriving (so the two panels can never disagree). */
+  displayedAmpCount?: number;
+  displayedRakCount?: number;
 }) {
   const RACK_SIZE = 3;
   let effectiveAmpCount = solution.summary.totalAmplifiers;
@@ -3734,6 +3771,11 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
   const colorBase = hasErrors ? "text-amber-600 dark:text-amber-500" : "text-green-600 dark:text-green-500";
   const colorBold = hasErrors ? "text-amber-900 dark:text-amber-400" : "text-green-900 dark:text-green-400";
 
+  // Prefer the actual counts reported by the results panel; fall back to the local estimate only
+  // until the panel has reported (first frame). This is what keeps the two panels in lock-step.
+  const shownAmpCount = displayedAmpCount ?? effectiveAmpCount;
+  const shownRakCount = displayedRakCount ?? totalRaks;
+
   return (
     <div className={`rounded-lg border px-3 py-2 ${
       hasErrors
@@ -3745,13 +3787,13 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
           {hasErrors ? "Configuration (with errors)" : "Recommended Configuration"}
         </h3>
         <div className="flex items-center gap-4">
-          {rackMode && totalRaks > 0 && (
+          {rackMode && shownRakCount > 0 && (
             <span className={colorBase}>
-              <span className={`font-bold text-base ${colorBold}`}>{totalRaks}</span> RAK{totalRaks !== 1 ? "s" : ""}
+              <span className={`font-bold text-base ${colorBold}`}>{shownRakCount}</span> RAK{shownRakCount !== 1 ? "s" : ""}
             </span>
           )}
           <span className={colorBase}>
-            <span className={`font-bold text-base ${colorBold}`}>{effectiveAmpCount}</span> amp{effectiveAmpCount !== 1 ? "s" : ""}
+            <span className={`font-bold text-base ${colorBold}`}>{shownAmpCount}</span> amp{shownAmpCount !== 1 ? "s" : ""}
           </span>
           <span className={colorBase}>
             <span className={`font-bold text-base ${colorBold}`}>{solution.summary.totalEnclosuresAllocated}</span> encl.
@@ -3773,7 +3815,7 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, onLayoutStats }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
@@ -3827,6 +3869,7 @@ export default function SolverResults({ zoneSolutions, activeZoneId, salesMode =
           onRackNameChange={externalOnRackNameChange}
           perOutputMap={perOutputMap}
           hintsEnabled={hintsEnabled}
+          onLayoutStats={onLayoutStats}
         />
       </div>
     </EnclosureDragDropProvider>

@@ -283,6 +283,54 @@
       "specs": "SB118/specs.json",
       "source_manual": "SB118 Owner's Manual / User Manual (EN), version 2.0",
       "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB118/documents.zip"
+    },
+    "V-DOSC": {
+      "folder": "V_DOSC",
+      "specs": "V_DOSC/specs.json",
+      "source_manual": "V-DOSC Operator Manual (EN) v4, June 2005 (158 pp); V-DOSC datasheet (\"Specs V-DOSC 0903\"); official ARCHIVES bundle V-DOSC_certification_EN.pdf (EC Declaration of Conformity, signed 1 January 2010)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/V-DOSC/documents.zip"
+    },
+    "dV-DOSC": {
+      "folder": "dV_DOSC",
+      "specs": "dV_DOSC/specs.json",
+      "source_manual": "dV-DOSC / dV-SUB User Manual (EN) Version 3.0, June 2005 (dV_UM_EN_3-0.pdf, 150 pp); cross-checked against L-Acoustics Preset Guide v8.1 (2016) for preset names and the 65 Hz - 20 kHz usable bandwidth",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
+    },
+    "Kudo": {
+      "folder": "Kudo",
+      "specs": "Kudo/specs.json",
+      "source_manual": "KUDO User Manual (EN/FR) version 2.1, ref KUDO_UM_ML_2-1; KUDO Rigging Procedures Manual (EN/FR) version 2.0, ref KUDO_RM_ML_2-0; EC Declaration of Conformity (KUDO_certification_EN). Specifications are contained inside the User Manual (no standalone datasheet in the archive bundle).",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip"
+    },
+    "Kara": {
+      "folder": "Kara",
+      "specs": "Kara/specs.json",
+      "source_manual": "Kara Owner's Manual (EN) version 2.1 (2022 revision; Kara_OM_EN.pdf, includes rigging manual + specifications appendix); KARA System User Manual (EN) v2.1 (legacy 2017, cabling/preset focused); KARA Product Information v8.0 (ML)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip"
+    },
+    "ARCS II": {
+      "folder": "ARCS_II",
+      "specs": "ARCS_II/specs.json",
+      "source_manual": "ARCS II User Manual (EN), ref ARCSII_UM_EN_4.0, dated Dec 15, 2021 (Appendix C Specifications); ARCS II Rigging Manual (EN), ref ARCSII_RM_EN_2.0, dated Dec 15, 2021; ARCS II spec sheet ARCS II_SP_EN_4.0; LA8 Amplified Controller User Manual ref LA8_UM_EN_11.0 (Table 3).",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip"
+    },
+    "SB28": {
+      "folder": "SB28",
+      "specs": "SB28/specs.json",
+      "source_manual": "SB28 User Manual (EN) version 3.0 (SB28_UM_EN_3.0, 2017-03-30); SB28 Rigging Manual (EN) version 2.0 (SB28_RM_EN_2.0, 2021-12-14); Product Information v6.0 (SB28_PI_ML)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip"
+    },
+    "SB218": {
+      "folder": "SB218",
+      "specs": "SB218/specs.json",
+      "source_manual": "SB218 official datasheet PDF (specs SB218 1202); V-DOSC Operator's Manual (SB218 specifications and BUMPSUB rigging sections); SB218 EC Declaration of Conformity (SB218_certification_EN.pdf, 2010)",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB218/documents.zip"
+    },
+    "dV-SUB": {
+      "folder": "dV_SUB",
+      "specs": "dV_SUB/specs.json",
+      "source_manual": "dV-DOSC dV-SUB User Manual (EN) V3.0, June 2005 (dV_UM_EN_3-0.pdf, 150 pp); dV-SUB datasheet rev. dVS_SP_EN_1.0/02-09 (Feb 2009); L-Acoustics Amplified Controllers Preset Guide v5.5.1",
+      "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
     }
   }
 }

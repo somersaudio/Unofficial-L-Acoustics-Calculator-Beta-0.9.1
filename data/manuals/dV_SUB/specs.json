@@ -1,0 +1,82 @@
+{
+  "enclosure": "dV-SUB",
+  "product": "dV-SUB",
+  "type": "subwoofer",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "35 - 200",
+    "max_spl_db": 143,
+    "max_spl_note": "143 dB peak at 1 m, half-space, pink noise crest factor 10 dB, [dV-S_X] preset (datasheet rev. dVS_SP_EN_1.0/02-09). User Manual p.142 freefield figures by element count: 1 enclosure 133 dB cont / 139 dB peak; 2 enclosures 139 / 145; 4 enclosures 145 / 151. Sensitivity 104.5 dB SPL (2.83 Vrms at 1 m, 40-200 Hz, no EQ).",
+    "nominal_impedance_ohms": 2.7,
+    "directivity": "Omni-directional as a single element; in a line source the dV-SUB column becomes front-polarized (dipole effect) with directivity scaling by element count. Frequency response 40-200 Hz (+/-3 dB); usable bandwidth 35-200 Hz (35 Hz low limit at -10 dB).",
+    "components": "Single-section subwoofer: 3 x 15\" weather-resistant LF transducers (3\" edgewound copper-ribbon voice coil, die-cast aluminium basket) loaded in a dual-chamber vented bandpass enclosure (two side-firing 15\" wired in polarity opposition pressurising the central chamber). No MF, no HF. RMS power handling 1200 W (4800 W peak)."
+  },
+  "amplification": {
+    "amp_channels_required": 1,
+    "operating_modes": [
+      "single-section passive subwoofer (one SB amplifier output drives the 2.7 ohm load; classified as an SB channel)",
+      "hybrid combined dV-DOSC + dV-SUB drive from one controller (one SB channel for the sub, remaining outputs for the dV-DOSC LF/HF)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 4
+    },
+    "per_amplifier_note": "LA8 manual Table 3 (Enclosure drive capacity per LA8): dV-SUB = 1 connection per output / 4 enclosures per controller (i.e. 1 per output, 4 total per LA8). The 2.7 ohm load sits at the amplifier minimum-impedance floor, so one sub already loads a channel pair and the maximum is 4 per LA8. The 2009 datasheet specifies the LA8 as the dedicated controller; the current Preset Guide v5.5.1 also publishes dV-SUB presets for LA4, LA4X, LA8 and LA12X. Legacy 2005-era drive was the LA48 amplifier with the COMB/DOSUB connector system.",
+    "preset_names": [
+      "dV-S_60_100",
+      "dV-S_100",
+      "dV-S_60_X",
+      "dV-S_X",
+      "dV_dV-S_LO",
+      "dV_dV-S_HI",
+      "dV_dV-S_LO60",
+      "dV_dV-S_HI60"
+    ],
+    "preset_note": "[dV-S_X] (LPF 200 Hz) is the reference preset and the one the datasheet's 143 dB / 1200 W figures reference; [dV-S_60_X] adds a 60 Hz HPF, both optimised to pair with the V-DOSC/dV-DOSC [_X] presets. [dV-S_100] / [dV-S_60_100] cross over at 100 Hz for compact tops. The hybrid [dV_dV-S_LO/HI/LO60/HI60] presets cross dV-DOSC + dV-SUB at 100 Hz from a single controller. Legacy 2005 LA48-era names were dV 3W 120/200/80 dVS LO/HI."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4), wired 1+/1-. A single socket is provided deliberately to prevent daisy-chaining multiple subs (paralleling would drop the load below the 2.7 ohm floor); there is no link/through connector and each dV-SUB is fed individually.",
+    "breakouts": "Legacy cabling shared with SB218: sub cable DOSUB (8-pin CA-COM to 4x speakON), optionally with sub extension DO10P, to connect dV-SUB to the legacy amplifier racks. With modern LA8/LA4X/LA12X a standard NL4 speakON cable is used."
+  },
+  "physical": {
+    "weight_kg": 93,
+    "weight_note": "93 kg / 205 lb net; shipping weight 107 kg / 235.9 lb including the dV-SUBPLA pallet/cover.",
+    "dimensions_mm": "695 x 708 x 695 (W x H x D) mm; 27.4 x 27.9 x 27.4 in. Shipping 795 x 790 x 890 mm (31.3 x 31.1 x 35 in).",
+    "protection_rating": "N/A - no IP ingress-protection rating is published for this enclosure; transducers are described only as weather-resistant / corrosion-treated.",
+    "cabinet": "24 mm Baltic birch plywood (sealed, screwed, rabbeted angles, internally braced); Maroon-gray finish (datasheet rev 1.0 also cites RAL 8019 grayish-brown). Black epoxy-coated perforated steel grille with acoustically transparent foam. Integral polyester-coated steel flying hardware and integrated handles."
+  },
+  "deployment": {
+    "modes": [
+      "flown on top of a dV-DOSC array (dV-SUB is always flown above, never below)",
+      "flown dV-SUB-only column (up to 6 deep)",
+      "ground-stacked on integral runners with dV-ANGLESS sub-to-sub bars"
+    ],
+    "max_per_flown_array": "Steel certification (datasheet): 12 dV-DOSC + 4 dV-SUB on a single pick point (no extension bar), or 9 dV-DOSC + 3 dV-SUB on a dual pick point with extension bar. dV-SUB-only arrays rated up to 6 deep (6-deep total 552 kg / 1217 lb).",
+    "inter_element_angles": "0 deg between dV-SUB elements (a sub column is a coupled block); splay angles (0/-2/-3.75/-5.5/-7.5 deg) apply to the dV-DOSC elements below via dV-ANGLEP1/P2, not between the subs.",
+    "rigging_accessories": [
+      "dV-ANGLESS (sub-to-sub angle bar)",
+      "dV-ANGLESD (dV-SUB-to-dV-DOSC / dV-BUMP front angle bar)",
+      "dV-ANGLESDP (rear-point angle bar for dV-DOSC under dV-SUB)",
+      "dV-PIN25 (25 mm locking quick-release coupling pin)",
+      "dV-PIN81 (81 mm locking pin for dV-DOWN)",
+      "dV-BUMP / dV-BUMP2 (flying frames)",
+      "dV-DOWN (downfill bracket)",
+      "dV-SUBPLA (pallet/cover)"
+    ]
+  },
+  "usage": [
+    "Discontinued LF-extension subwoofer for the dV-DOSC compact line source, extending the system down to 35 Hz (-10 dB) using three 15\" transducers in a dual-chamber bandpass enclosure.",
+    "Each cabinet is a single 2.7 ohm passive load needing one SB amplifier channel; because 2.7 ohms sits at the amplifier minimum-impedance floor, an LA8 drives at most 4 dV-SUB (1 per output, 4 total per the LA8 drive-capacity table). LA4, LA4X and LA12X are also supported.",
+    "Choose the crossover by preset: [dV-S_X] / [dV-S_60_X] (200 Hz LPF) to pair with V-DOSC/dV-DOSC [_X] tops, or [dV-S_100] / [dV-S_60_100] (100 Hz) for compact use; the [dV_dV-S_xx] hybrids drive the sub and dV-DOSC together from one controller.",
+    "A single speakON socket is fitted on purpose - never daisy-chain dV-SUBs, as paralleling would pull the load below the 2.7 ohm floor; feed each sub on its own cable.",
+    "When flown, the dV-SUB always hangs on top of the dV-DOSC, never below: up to 12 dV-DOSC + 4 dV-SUB on a single pick point, or a dV-SUB-only column up to 6 deep ground-stacked or flown on its integral steel rigging with dV-ANGLESS / dV-ANGLESD bars and dV-PIN25 pins.",
+    "Always model the array in SOUNDVISION before rigging; the box has no published IP rating (weather-resistant transducers only) and no pole-mount or dedicated ground-stack pole accessory - it ground-stacks via integral runners."
+  ],
+  "source_manual": "dV-DOSC dV-SUB User Manual (EN) V3.0, June 2005 (dV_UM_EN_3-0.pdf, 150 pp); dV-SUB datasheet rev. dVS_SP_EN_1.0/02-09 (Feb 2009); L-Acoustics Amplified Controllers Preset Guide v5.5.1",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
+}

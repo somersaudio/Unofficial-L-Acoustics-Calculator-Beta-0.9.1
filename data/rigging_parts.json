@@ -4009,6 +4009,616 @@
       ],
       "deployments": [],
       "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB118/documents.zip"
+    },
+    "V-DOSC": {
+      "weight_kg": 108,
+      "recommended_rigging": "BUMP2",
+      "rigging_parts": [
+        {
+          "code": "BUMP2",
+          "name": "V-DOSC flying frame (bumper)",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flies a V-DOSC array up to 16 enclosures deep (or 15 V-DOSC + 3 dV-DOSC, or 14 V-DOSC + 6 dV-DOSC). Inverts to serve as a ground-stack base. Hung from two points 1.05 m / 43.25 in apart (front + rear); array site angle set by differential front/rear motor action. Top box captured by rotating legs + U-PINS (MC_DOAXE).",
+          "weight_kg": null,
+          "wll": "Flies up to 16 V-DOSC at >5:1 safety factor. Recommended chain-motor rating per point: 0.5 T (4 boxes), 1.0 T (5-10 boxes), 2.0 T (11-16 boxes); bridle (4 steel slings, 8 shackles, 2 pear rings) for 11-16-box arrays. Verify loads in ARRAY/SOUNDVISION.",
+          "verified": true
+        },
+        {
+          "code": "BUMPDELTA",
+          "name": "Pan adjuster delta plate",
+          "category": "bracket_yoke",
+          "function": "delta plate attaching two motors to BUMP2 for horizontal pan of a flown array.",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "MC_DOAXE",
+          "name": "U-PINS top-box capture pins",
+          "category": "accessory",
+          "function": "captive U-pins on BUMP2's rotating legs that capture the top enclosure of the array.",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "BUMP24 / BUMP251 / BUMP25 / BUMP26 / BUMP27 / BUMP23",
+          "name": "BUMP inter-element angle straps",
+          "category": "coupling_bar",
+          "function": "box-to-box; set inter-element angle: BUMP24 = 0.75/5.5 deg, BUMP251 = 1.3 deg, BUMP25 = 2 deg, BUMP26 = 3 deg, BUMP27 = 4 deg; BUMP23 = top-box (BUMPER) strap.",
+          "weight_kg": null,
+          "wll": "Inter-element angle range 0 to 5.5 deg at 0.75 deg resolution",
+          "verified": true
+        },
+        {
+          "code": "SPAC251 / SPAC25 / SPAC26 / SPAC27 / SPAC28",
+          "name": "SPAC spacer blocks",
+          "category": "coupling_bar",
+          "function": "box-to-box spacer blocks setting fixed inter-element angles: SPAC251 = 1.3 deg, SPAC25 = 2 deg, SPAC26 = 3 deg, SPAC27 = 4 deg, SPAC28 = 5.5 deg.",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "CHARIOT",
+          "name": "V-DOSC rigging transport dolly",
+          "category": "accessory",
+          "function": "transport chariot for 2x BUMP2 + 2x BUMPSUB plus straps, ratchets, screwjacks and shackles (transport accessory).",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-BUMP / dV-DOWN",
+          "name": "dV-DOSC down-fill adapters",
+          "category": "downfill",
+          "function": "box-to-box; hang/down-fill dV-DOSC enclosures beneath a V-DOSC array.",
+          "weight_kg": null,
+          "wll": "14 V-DOSC + 6 dV-DOSC (or 15 V-DOSC + 3 dV-DOSC) per BUMP2 array",
+          "verified": true
+        },
+        {
+          "code": "BUMPSUB",
+          "name": "SB218 companion flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flies the companion SB218 subwoofers (not a V-DOSC-enclosure part).",
+          "weight_kg": null,
+          "wll": "Flies up to 8 SB218 at >5:1 safety factor",
+          "verified": true
+        }
+      ],
+      "deployments": [
+        {
+          "mode": "flown",
+          "label": "Flown (truss / motor)",
+          "default_rigging": "BUMP2",
+          "safe": 16,
+          "max": 16
+        },
+        {
+          "mode": "ground_stack",
+          "label": "Ground-stacked (BUMP2 inverted)",
+          "default_rigging": "BUMP2",
+          "safe": null,
+          "max": null
+        }
+      ],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/V-DOSC/documents.zip"
+    },
+    "dV-DOSC": {
+      "weight_kg": 31.8,
+      "recommended_rigging": "dV-BUMP",
+      "rigging_parts": [
+        {
+          "code": "dV-BUMP",
+          "name": "dV-BUMP flying bumper",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flies a vertical dV-DOSC array. 8 pick-point holes (1-8) on the central spreader bar; supports single-point and 2-point hangs (front = trim, rear = site angle)",
+          "weight_kg": 22.5,
+          "wll": "Net 22.5 kg without extension bar; config limit max 24 dV-DOSC (single or 2-point hang from central spreader, no extension bar)",
+          "verified": true
+        },
+        {
+          "code": "dV-BUMP2",
+          "name": "dV-BUMP2 flying bumper",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; second-generation dV-DOSC flying bumper, same array-flying function as dV-BUMP",
+          "weight_kg": null,
+          "wll": "config limit max 24 dV-DOSC without extension bar; max 12 with extension bar",
+          "verified": true
+        },
+        {
+          "code": "dV-BUMP extension bar",
+          "name": "dV-BUMP extension bar",
+          "category": "rigging_bar",
+          "function": "adds 8 more pick-point holes (9-16) to the bumper for single-point rear hangs or 2-point hangs",
+          "weight_kg": 9.5,
+          "wll": "dV-BUMP with extension bar net 32.0 kg / 70.5 lb; config limit max 12 dV-DOSC (single-point rear or 2-point hang)",
+          "verified": true
+        },
+        {
+          "code": "dV-ANGLE P1",
+          "name": "dV-ANGLE P1 inter-element angle bar",
+          "category": "coupling_bar",
+          "function": "box-to-box; sets convex inter-element splay between dV-DOSC enclosures, flat (0 deg) up to 7.5 deg in ~1 deg increments",
+          "weight_kg": null,
+          "wll": "config-dependent (model in ARRAY2004/SOUNDVISION); 7.5 deg WST max for 80% acoustic fill",
+          "verified": true
+        },
+        {
+          "code": "dV-ANGLE P2",
+          "name": "dV-ANGLE P2 inter-element angle bar",
+          "category": "coupling_bar",
+          "function": "box-to-box; companion angle bar to dV-ANGLE P1 for setting 0 to 7.5 deg inter-element angles",
+          "weight_kg": null,
+          "wll": "config-dependent (model in ARRAY2004/SOUNDVISION); 7.5 deg WST max",
+          "verified": true
+        },
+        {
+          "code": "dV-PIN81",
+          "name": "dV-PIN81 coupling/link pins",
+          "category": "coupling_bar",
+          "function": "box-to-box link pins (used in fours), e.g. to attach the dV-DOWN downfill adapter",
+          "weight_kg": null,
+          "wll": "not stated (config-dependent)",
+          "verified": true
+        },
+        {
+          "code": "dV-DOWN",
+          "name": "dV-DOWN downfill adapter",
+          "category": "downfill",
+          "function": "box-to-array; flies up to 6 dV-DOSC as downfill beneath a V-DOSC array (3 dV-DOSC = weight of 1 V-DOSC)",
+          "weight_kg": null,
+          "wll": "max 6 dV-DOSC below V-DOSC (e.g. 15 V-DOSC + 3 dV-DOSC, or 14 V-DOSC + 6 dV-DOSC)",
+          "verified": true
+        }
+      ],
+      "deployments": [
+        {
+          "mode": "flown",
+          "label": "Flown (truss / motor)",
+          "default_rigging": "dV-BUMP",
+          "safe": 24,
+          "max": 24
+        },
+        {
+          "mode": "flown",
+          "label": "Flown with extension bar (single/2-point rear hang)",
+          "default_rigging": "dV-BUMP + extension bar",
+          "safe": 12,
+          "max": 12
+        },
+        {
+          "mode": "downfill",
+          "label": "Downfill below V-DOSC (dV-DOWN)",
+          "default_rigging": "dV-DOWN",
+          "safe": 6,
+          "max": 6
+        }
+      ],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
+    },
+    "Kudo": {
+      "weight_kg": 87,
+      "recommended_rigging": "KBUMP",
+      "rigging_parts": [
+        {
+          "code": "KBUMP",
+          "name": "KUDO flying/stacking rigging structure (bumper)",
+          "category": "flying_frame",
+          "function": "Primary structure for flying vertical KUDO line arrays from motor(s) and for ground-stacking with KJACKx2; box-to-truss/motor. Package = 1 main frame + 4 ball-locking pins (BLP) + 2 shackles with 22 mm/0.9in screw pin. Polyester-coated high-grade steel.",
+          "weight_kg": 44,
+          "wll": "Certified for up to 21 KUDO flown vertical (6 KUDO max ground-stacked). Single-point central-bar hang (holes 1-12) ultimate strength safety factor 4:1; dual-point side-bar (823 mm spacing) or central-bar holes 0 & 13 (900 mm spacing) hangs 6:1. Per-point WLL delegated to SOUNDVISION. Dimensions 866 x 100 x 1000 mm.",
+          "verified": true
+        },
+        {
+          "code": "KJACKx2",
+          "name": "Ground-stack jack pair for KBUMP",
+          "category": "accessory",
+          "function": "Pair of jack accessories that attach to KBUMP to form a tilted ground-stack platform (2 threaded rods + 2 U-brackets on support bases).",
+          "weight_kg": null,
+          "wll": "KBUMP + KJACKx2 ground-stack: up to 6 KUDO; tilt range -10 to +10 deg (capacity 3-6 boxes depending on tilt).",
+          "verified": true
+        },
+        {
+          "code": "KLIFT",
+          "name": "KUDO horizontal-array flying accessory",
+          "category": "rigging_bar",
+          "function": "Rigging accessory to fly a horizontal KUDO array; includes 1 shackle with 18 mm/0.7in screw pin.",
+          "weight_kg": 2,
+          "wll": "Up to 7 KUDO per KLIFT (min 2 per KLIFT); fixed 10 deg inter-element angle. Dimensions 508 x 130 x 34 mm.",
+          "verified": true
+        },
+        {
+          "code": "KPLA-2",
+          "name": "Removable front dolly board",
+          "category": "accessory",
+          "function": "Front dolly board for transport (optional).",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "KCOV",
+          "name": "Protective cover",
+          "category": "accessory",
+          "function": "Protective transport cover (optional).",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ],
+      "deployments": [
+        {
+          "mode": "flown",
+          "label": "Flown vertical array (truss / motor)",
+          "default_rigging": "KBUMP",
+          "safe": null,
+          "max": 21
+        },
+        {
+          "mode": "flown_horizontal",
+          "label": "Flown horizontal array",
+          "default_rigging": "KLIFT",
+          "safe": null,
+          "max": 7
+        },
+        {
+          "mode": "ground_stack",
+          "label": "Ground-stacked",
+          "default_rigging": "KBUMP",
+          "safe": null,
+          "max": 6
+        }
+      ],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip"
+    },
+    "Kara": {
+      "weight_kg": 26,
+      "recommended_rigging": "M-BUMP",
+      "rigging_parts": [
+        {
+          "code": "M-BUMP",
+          "name": "Bumper for flying or stacking KARA/SB18",
+          "category": "flying_frame",
+          "function": "Primary bumper: flies or ground-stacks KARA (and SB18) arrays from truss/motor; box-to-truss and array top frame",
+          "weight_kg": 25,
+          "wll": "2 x O19 mm shackles WLL 3.25 t; flies up to 24 KARA (with optional M-BAR); array count decreases with curvature; M-BUMP + KARA-PULLBACK = 16 KARA; mixed 12 KARA + 4 SB18",
+          "verified": true
+        },
+        {
+          "code": "M-BAR",
+          "name": "Extension bar for rigging frame",
+          "category": "rigging_bar",
+          "function": "Optional extension bar for M-BUMP; extends rigging points and forms part of the M-JACK stacking platform",
+          "weight_kg": 5,
+          "wll": "2 x O19 mm shackles WLL 3.25 t",
+          "verified": true
+        },
+        {
+          "code": "M-JACK",
+          "name": "4 tilt-adjustment screw jacks with 2 angle-bar extensions for stacked M-BUMP",
+          "category": "accessory",
+          "function": "Ground-stack platform feet: four tilt-adjustment screw jacks used with M-BUMP + M-BAR + KARA-ANGARMEX to form a stacking platform (up to 4 KARA platform-stacked, 9 KARA mixed with SB18)",
+          "weight_kg": 1.3,
+          "wll": "4 axis with safety pin; not a load-rated lifting element (ground-stack tilt jacks)",
+          "verified": true
+        },
+        {
+          "code": "KARA-ANGARMEX",
+          "name": "2 angle-bar extension for KARA bumper",
+          "category": "accessory",
+          "function": "Two angle-bar extensions adding extra downward site angle for the bottom KARA; attaches to M-BUMP or KARA-MINIBU",
+          "weight_kg": 0.6,
+          "wll": "rivets + M4 bolts (no separate WLL stated)",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBU",
+          "name": "Mini bumper for flying 6 KARA",
+          "category": "flying_frame",
+          "function": "Smaller flying/stacking bumper for arrays up to 6 KARA (or attached to an SB18 array); box-to-truss",
+          "weight_kg": 7.6,
+          "wll": "2 x O12 mm shackles WLL 1 t; flies up to 6 KARA",
+          "verified": true
+        },
+        {
+          "code": "KARA-MINIBUEX",
+          "name": "Extension bars for flying/stacking SB18/KARA",
+          "category": "rigging_bar",
+          "function": "Set of two complementary rigging plates for KARA-MINIBU to adapt to SB18 or pullback configs; box-to-box (KARA-MINIBU + KARA-MINIBUEX flies 6 KARA or up to 4 SB18)",
+          "weight_kg": 2.2,
+          "wll": "M8 screws/nuts (no separate WLL; relies on KARA-MINIBU shackles WLL 1 t)",
+          "verified": true
+        },
+        {
+          "code": "KARA-PULLBACK",
+          "name": "Pullback plate for KARA",
+          "category": "accessory",
+          "function": "Pullback plate connecting to the bottom of a KARA array to set a pullback (negative site angle) configuration; M-BUMP + KARA-PULLBACK flies up to 16 KARA",
+          "weight_kg": 6,
+          "wll": "1 x O19 mm shackle WLL 3.25 t",
+          "verified": true
+        }
+      ],
+      "deployments": [
+        {
+          "mode": "flown",
+          "label": "Flown (truss / motor)",
+          "default_rigging": "M-BUMP",
+          "safe": null,
+          "max": 24
+        },
+        {
+          "mode": "ground_stack",
+          "label": "Ground-stacked",
+          "default_rigging": "M-BUMP",
+          "safe": null,
+          "max": 9
+        }
+      ],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kara/documents.zip"
+    },
+    "ARCS II": {
+      "weight_kg": 50,
+      "recommended_rigging": "ARCBUMP",
+      "rigging_parts": [
+        {
+          "code": "ARCOUPL",
+          "name": "ARCOUPL captive coupling bars",
+          "category": "coupling_bar",
+          "function": "box-to-box; slides into the rigging rails to couple adjacent ARCS II enclosures at the fixed constant-curvature angle. 2 bars + 4 D-shackles Ø12 mm supplied per enclosure.",
+          "weight_kg": null,
+          "wll": "D-shackle Ø12 mm WLL 630 kg (6:1, BGV-C1 2012); per-array system WLL not published (model in SOUNDVISION).",
+          "verified": true
+        },
+        {
+          "code": "ARCBUMP",
+          "name": "ARCBUMP vertical flying frame",
+          "category": "flying_frame",
+          "function": "box-to-truss/motor; flies a vertical array of up to 4 ARCS II. Supplied with 2 ARCOUPL bars, 4x Ø12 mm + 2x Ø18 mm D-shackles, 6 safety slings 425 mm, 6 safety slings 155 mm; 18-hole tilt-angle bar (holes 1-18) selected via SOUNDVISION.",
+          "weight_kg": null,
+          "wll": "Up to 3 ARCS II on a single pick-up point, up to 4 on two pick-up points (BGV-C1 2012 / EN ISO 12100-1). Ø18 mm shackle WLL 1250 kg. Per-array WLL not published; model in SOUNDVISION.",
+          "verified": true
+        },
+        {
+          "code": "BUMP3",
+          "name": "BUMP3 horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies a horizontal array of 2 or 4 ARCS II (2x BUMP3 used for 1/3/5/6-box arrays with LIFTBAR). Supplied with 1x D-shackle Ø18 mm, 2 pierced bolts, 2 nuts, 2 pins.",
+          "weight_kg": null,
+          "wll": "1x BUMP3 flies 2 or 4 ARCS II. Ø18 mm shackle WLL 1250 kg (6:1). Per-array WLL not published; model in SOUNDVISION.",
+          "verified": true
+        },
+        {
+          "code": "LIFTBAR",
+          "name": "LIFTBAR horizontal flying bar",
+          "category": "rigging_bar",
+          "function": "box-to-truss/motor; flies a horizontal array of 1, 3, 5 or 6 ARCS II, used together with 2x BUMP3. Supplied with 2x Ø18 mm + 2x Ø22 mm D-shackles.",
+          "weight_kg": null,
+          "wll": "Flies 1/3/5/6 ARCS II with 2x BUMP3. Ø18 mm WLL 1250 kg, Ø22 mm WLL 2000 kg. Per-array WLL not published; model in SOUNDVISION.",
+          "verified": true
+        },
+        {
+          "code": "ARCSPLA",
+          "name": "ARCSPLA removable front dolly board",
+          "category": "accessory",
+          "function": "ground-stack base / front-grille protection / moving dolly (PI sheet ARCPLA_PI_ML). Used when ground-stacking directly or on top of an SB28 array.",
+          "weight_kg": null,
+          "wll": "Ground-stack support; capacity per SOUNDVISION stacking limits.",
+          "verified": true
+        },
+        {
+          "code": "ARCSCOV",
+          "name": "ARCSCOV protective cover",
+          "category": "accessory",
+          "function": "transport/storage cover (optional).",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ],
+      "deployments": [
+        {
+          "mode": "flown",
+          "label": "Flown horizontal (BUMP3 / LIFTBAR)",
+          "default_rigging": "BUMP3",
+          "safe": 6,
+          "max": 6
+        },
+        {
+          "mode": "flown_vertical",
+          "label": "Flown vertical (ARCBUMP)",
+          "default_rigging": "ARCBUMP",
+          "safe": 4,
+          "max": 4
+        },
+        {
+          "mode": "ground_stack",
+          "label": "Ground-stacked (ARCSPLA / on SB28)",
+          "default_rigging": "ARCSPLA",
+          "safe": null,
+          "max": null
+        }
+      ],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip#documents/ARCSII_RM_EN.pdf"
+    },
+    "SB28": {
+      "weight_kg": 93,
+      "recommended_rigging": "BUMPSUB-2",
+      "rigging_parts": [
+        {
+          "code": "BUMPSUB-2",
+          "name": "BUMPSUB-2 lifting beam for SB28",
+          "category": "flying_frame",
+          "function": "lifting/flying beam for vertical SB28 arrays; two pickup points plus safety points; lifts up to 16 SB28",
+          "weight_kg": null,
+          "wll": "Provided with 2 bow shackles, WLL 3.25 t each; flies up to 16 SB28 (safety factor 4:1)",
+          "verified": true
+        },
+        {
+          "code": "SB28CHAIN",
+          "name": "SB28CHAIN lifting chains (sold as a pair)",
+          "category": "coupling_bar",
+          "function": "couples flown SB28 enclosures to BUMPSUB-2; one pair per group of four enclosures, integrating end link, stabilizer and safety fitting; extendable by up to 3 additional pairs to reach 16 flown",
+          "weight_kg": null,
+          "wll": "One pair per group of four SB28; up to 16 SB28 flown",
+          "verified": true
+        },
+        {
+          "code": "SB28PLA",
+          "name": "Removable front dolly for one SB28",
+          "category": "accessory",
+          "function": "transport dolly attaching to the front of the cabinet (optional)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "Integrated stacking runners + handles",
+          "name": "Integrated rigging system (runners/tracks + pins) and handles",
+          "category": "accessory",
+          "function": "box-to-box ground-stack interlock for vertical/horizontal blocks (built into cabinet, not a separate purchasable part)",
+          "weight_kg": null,
+          "wll": "Ground-stack up to 4 SB28 (up to 8 when supporting a flown array)",
+          "verified": true
+        }
+      ],
+      "deployments": [],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB28/documents.zip"
+    },
+    "SB218": {
+      "weight_kg": 106,
+      "recommended_rigging": "BUMPSUB",
+      "rigging_parts": [
+        {
+          "code": "BUMPSUB",
+          "name": "BUMPSUB flying bar for SB218 vertical column",
+          "category": "flying_frame",
+          "function": "flying bar rigging up to 8 SB218 enclosures in a vertical column; includes 4 shackles and 2 flying chains with integral Aeroquip double-stud fittings that engage the cabinet flytrack",
+          "weight_kg": null,
+          "wll": "Rated for up to 8 SB218 at a 5:1 safety factor; explicit numeric WLL not published. Uses 22 mm shackles",
+          "verified": true
+        },
+        {
+          "code": "Flytrack sections",
+          "name": "Integrated recessed flytrack attachment points",
+          "category": "rigging_bar",
+          "function": "two recessed flytrack sections per side (4 attachment points per enclosure) that accept the Aeroquip double-stud fittings of the BUMPSUB and inter-box chains (built into cabinet)",
+          "weight_kg": null,
+          "wll": "Chain spacing per V-DOSC manual: fittings every 13 chain links (11 open links between shackles)",
+          "verified": true
+        },
+        {
+          "code": "SUBPLA",
+          "name": "Removable front dolly board for one SB218",
+          "category": "accessory",
+          "function": "transport dolly protecting the front baffle; attaches via two locking pins into two front-baffle dolly-locator studs (optional; ~9.5 kg)",
+          "weight_kg": 9.5,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "SUBCOV",
+          "name": "Protective cover for one SB218",
+          "category": "accessory",
+          "function": "protective transport cover (optional)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ],
+      "deployments": [],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/SB218/documents.zip"
+    },
+    "dV-SUB": {
+      "weight_kg": 93,
+      "recommended_rigging": "",
+      "rigging_parts": [
+        {
+          "code": "dV-ANGLESS",
+          "name": "dV-SUB sub-to-sub angle bar",
+          "category": "coupling_bar",
+          "function": "couples one dV-SUB to another in a sub column or ground-stack (4 bars per 2 dV-SUB, plus 8x dV-PIN25)",
+          "weight_kg": null,
+          "wll": "Certified by L-Acoustics for dV-SUB columns up to 6 deep",
+          "verified": true
+        },
+        {
+          "code": "dV-ANGLESD",
+          "name": "dV-SUB-to-dV-DOSC / dV-BUMP front angle bar",
+          "category": "coupling_bar",
+          "function": "front coupling of dV-SUB to a dV-DOSC element or to the dV-BUMP frame (4 per dV-BUMP attach, plus 8x dV-PIN25)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-ANGLESDP",
+          "name": "dV-SUB rear-point angle bar",
+          "category": "coupling_bar",
+          "function": "rear-point bar for stacking or flying dV-DOSC beneath dV-SUB (2x SD front + 2x SDP rear + 8x dV-PIN25)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-PIN25",
+          "name": "Locking quick-release pin, 25 mm grip",
+          "category": "accessory",
+          "function": "standard coupling pin for dV-ANGLESS/SD/SDP angle bars",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-PIN81",
+          "name": "Locking quick-release pin, 81 mm grip",
+          "category": "accessory",
+          "function": "long coupling pin for the dV-DOWN downfill connection",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-BUMP",
+          "name": "dV flying frame / bumper",
+          "category": "flying_frame",
+          "function": "primary flying frame for dV-DOSC + dV-SUB arrays; dV-SUB rigging is compatible with dV-BUMP and dV-BUMP2",
+          "weight_kg": null,
+          "wll": "Single pick: 12 dV-DOSC + 4 dV-SUB; dual pick with extension bar: 9 dV-DOSC + 3 dV-SUB",
+          "verified": true
+        },
+        {
+          "code": "dV-BUMP2",
+          "name": "dV flying frame / bumper (v2)",
+          "category": "flying_frame",
+          "function": "alternate flying frame compatible with dV-SUB rigging",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-DOWN",
+          "name": "dV-DOSC downfill bracket",
+          "category": "downfill",
+          "function": "rigs dV-DOSC as a downfill under V-DOSC (uses dV-PIN81)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        },
+        {
+          "code": "dV-SUBPLA",
+          "name": "dV-SUB pallet / protective cover",
+          "category": "accessory",
+          "function": "transport pallet and cover for one dV-SUB (optional)",
+          "weight_kg": null,
+          "wll": "",
+          "verified": true
+        }
+      ],
+      "deployments": [],
+      "rigging_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/dV-DOSC/documents.zip"
     }
   }
 }

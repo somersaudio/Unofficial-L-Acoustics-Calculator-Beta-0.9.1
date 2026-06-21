@@ -1,0 +1,85 @@
+{
+  "enclosure": "V-DOSC",
+  "product": "V-DOSC",
+  "type": "line source",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "40 - 20000 (-10 dB usable bandwidth; 50 Hz - 18 kHz +/- 3 dB, [3WX/3WX HI] preset)",
+    "max_spl_db": 134,
+    "max_spl_note": "Continuous max SPL at 1 m, free field, for a flat array: 1 box 134 dB, 2 boxes 140 dB, 4 boxes 146 dB. Max-curvature arrays: 2 boxes 139 dB (5 deg vertical coverage), 4 boxes 143 dB (15 deg vertical coverage). Per-section RMS power: LF 2 x 375 Wrms, MF 600 Wrms, HF 200 Wrms (pink noise, 6 dB crest factor).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Variable-curvature WST line source. Horizontal: 90 deg (-6 dB points), symmetrical, with -3 dB points at 70 deg. Vertical: defined by the array (element count and inter-element curvature). Sensitivity: LF 100 dB (40-200 Hz), MF 105 dB (200 Hz-1.3 kHz), HF 108 dB (1.3-18 kHz).",
+    "components": "3-way active: LF 2 x 15\" weather-resistant cone (3\" voice coil, bass-reflex); MF 4 x 7\" weather-resistant Kevlar cone (bass-reflex, V-shaped arrangement); HF 2 x 1.4\"-exit titanium-diaphragm compression drivers on 2 patented DOSC waveguides. Crossover 200 Hz (LF/MF) and 1.3 kHz (MF/HF), 24 dB/oct Linkwitz-Riley. RMS power handling: LF 2 x 375 W, MF 600 W, HF 200 W."
+  },
+  "amplification": {
+    "amp_channels_required": 4,
+    "operating_modes": [
+      "3-way active, quad-amplified (4 channels per enclosure: 2x LF, 1x MF, 1x HF; the two 15\" LF components are wired separately internally and each take their own channel)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 2
+    },
+    "per_amplifier_note": "App value from the LA8 manual Table 3: 2 V-DOSC per LA8 output / 2 V-DOSC total per LA8. Each V-DOSC needs a full set of 4 amplified channels (2x LF, 1x MF, 1x HF), so an 8-channel-equivalent LA8 in 3-way active mode drives a complete enclosure across its outputs; per-channel nominal loads are HF 16 ohm, MF 8 ohm, LF 2 x 8 ohm. Historically driven by the L-Acoustics LA48a controller (RK124a/RK122a turnkey racks), with the modern V-DOSC preset library carried in the LA8.",
+    "preset_names": [
+      "3WX",
+      "3WX LO",
+      "3WX HI",
+      "3W",
+      "3W INFRA",
+      "4W",
+      "INFRA",
+      "X",
+      "X AUX",
+      "5W INFRA",
+      "5W X",
+      "LO",
+      "HI"
+    ],
+    "preset_note": "3WX is the reference 3-way stereo preset (3WX LO / 3WX HI; 30 Hz HPF + LF shelving, standalone or AUX-sub). 2-way operation uses LO / HI; further 3-way (3W, 3W INFRA), 4-way (4W, INFRA, X, X AUX with subwoofer presets DELAY ARC / LCR) and 5-way (5W INFRA, 5W X) presets extend the system. Stereo channel-table names appear as e.g. 'V-DOSC 3WX LO' / 'V-DOSC 3WX HI' (mem. loc. 12/13)."
+  },
+  "connection": {
+    "input_connector": "2x parallel 8-pin CA-COM (L-Acoustics multipole) IN/LINK on the enclosure itself - NOT speakON on the box. The two parallel connectors allow daisy-chain/link of adjacent cabinets. CA-COM pinout carries the 4 sections (2x LF, MF, HF).",
+    "breakouts": "DO.7 V-CABLE (0.7 m, 8-conductor 4 mm2, CA-COM male/female) parallels adjacent enclosures; DO7 (7 m) / DO25 (25 m) link enclosures to PADO2a/PADO4a amp panels; DO10P (10 m) extension. Breakouts: DOFILL (CA-COM to 2x NL4 speakON, 2-way fill), DO3WFILL (CA-COM to 3x NL4 speakON), DOSUB (CA-COM to 4x NL4 speakON for 4 SB218 subs). Signal: LINK-BREAKOUT DOMM (to 6x male XLR) / DOMF (to 6x female XLR), DOM2/DOM30 6-pair 19-pin signal cables, LINK-EXTEND adapter. speakON (NL4) appears only on the fill/sub breakouts and amp-panel fanouts, never on the V-DOSC box."
+  },
+  "physical": {
+    "weight_kg": 108,
+    "weight_note": "108 kg / 238.1 lb net; shipping weight 122 kg / 269 lb.",
+    "dimensions_mm": "1300 (W) x 434 (H) x 565 (D) mm; 51.2 x 17.1 x 22.2 in (rectangular cabinet). Shipping 1340 x 480 x 600 mm.",
+    "protection_rating": "Not published (estimated). Drivers are described as weather-resistant but L-Acoustics states no IP code for V-DOSC in any official document.",
+    "cabinet": "15 mm + 30 mm Baltic birch plywood with internal steel bracing and sealed/screwed/rabbeted joints. Grille: black epoxy-coated 1.5 mm perforated steel + 10 mm acoustically transparent open-cell foam. Finish: maroon-gray high-resilient paint."
+  },
+  "deployment": {
+    "modes": [
+      "flown vertical array (BUMP2 flying frame)",
+      "ground-stacked (BUMP2 inverted as a base)"
+    ],
+    "max_per_flown_array": "BUMP2: up to 16 V-DOSC deep (or 15 V-DOSC + 3 dV-DOSC, or 14 V-DOSC + 6 dV-DOSC), at >5:1 safety factor. Hung from two points spaced 1.05 m / 43.25 in (one front, one rear); site angle set by differential front/rear motor action. Recommended chain-motor rating per point: 0.5 T (4 boxes), 1.0 T (5-10 boxes), 2.0 T (11-16 boxes); bridling recommended for 11-16-box arrays.",
+    "inter_element_angles": "0 deg to 5.5 deg between adjacent enclosures at 0.75 deg resolution, set with BUMP angle straps (BUMP24 0.75/5.5 deg, BUMP251 1.3 deg, BUMP25 2 deg, BUMP26 3 deg, BUMP27 4 deg; top-box strap BUMP23) and SPAC spacer blocks (SPAC251 1.3, SPAC25 2, SPAC26 3, SPAC27 4, SPAC28 5.5 deg). No pole-mount accessory exists (108 kg flagship; flown or ground-stacked only).",
+    "rigging_accessories": [
+      "BUMP2 (flying frame / bumper, up to 16 V-DOSC)",
+      "BUMPDELTA (pan adjuster delta plate)",
+      "U-PINS (MC_DOAXE, top-box capture)",
+      "BUMP24 / BUMP251 / BUMP25 / BUMP26 / BUMP27 / BUMP23 (angle straps)",
+      "SPAC251 / SPAC25 / SPAC26 / SPAC27 / SPAC28 (spacer blocks)",
+      "CHARIOT (transport dolly for 2x BUMP2)",
+      "dV-BUMP / dV-DOWN (dV-DOSC down-fill adapters)",
+      "BUMPSUB (companion SB218 sub frame)"
+    ]
+  },
+  "usage": [
+    "Variable-curvature WST line source - the original (1992) L-Acoustics flagship - for long-throw, full-range work in large-scale touring, festivals and arenas; the box that defined the modern line array.",
+    "Each enclosure is 3-way active and quad-amplified (4 channels: 2x LF, 1x MF, 1x HF, since the two 15\" components are wired separately), so plan a full set of 4 amplified channels per box: the app models 2 V-DOSC per LA8 (LA8 manual Table 3, 2 per output / 2 total).",
+    "Mind the per-section loads when sizing amplifiers: HF 16 ohm, MF 8 ohm, and 2 x 8 ohm across the two LF channels - the committed 8 ohm nominal maps to the MF section and each LF channel, but the HF channel is 16 ohm.",
+    "Pair with SB218 subwoofers (flown on BUMPSUB, up to 8 deep) for sub-bass extension below the V-DOSC range; the DOSUB breakout fans one CA-COM out to four SB218.",
+    "Fly with the BUMP2 frame (up to 16 V-DOSC, >5:1 safety factor) hung from two points 1.05 m apart, setting inter-element angles from 0 to 5.5 deg in 0.75 deg steps with BUMP straps and SPAC spacers; invert BUMP2 to ground-stack.",
+    "Connect with 2x parallel 8-pin CA-COM (IN/LINK) on the box itself - not speakON - and always model the array and mechanical safety factors in SOUNDVISION/ARRAY before rigging."
+  ],
+  "source_manual": "V-DOSC Operator Manual (EN) v4, June 2005 (158 pp); V-DOSC datasheet (\"Specs V-DOSC 0903\"); official ARCHIVES bundle V-DOSC_certification_EN.pdf (EC Declaration of Conformity, signed 1 January 2010)",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/V-DOSC/documents.zip"
+}

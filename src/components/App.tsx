@@ -721,6 +721,14 @@ export default function App() {
     return map;
   }, [activeZone.requests]);
 
+  // Actual amp/rack totals reported by the results panel, so the "Recommended Configuration"
+  // summary mirrors exactly what the panel shows (instead of re-deriving and drifting). The
+  // guarded setter ignores no-op reports to avoid redundant renders.
+  const [displayedStats, setDisplayedStats] = useState<{ amps: number; raks: number } | null>(null);
+  const handleLayoutStats = useCallback((amps: number, raks: number) => {
+    setDisplayedStats((prev) => (prev && prev.amps === amps && prev.raks === raks ? prev : { amps, raks }));
+  }, []);
+
 
   // Clear pending-unlock rack name when speaker configuration changes
   const requestsKey = useMemo(() =>
@@ -873,6 +881,8 @@ export default function App() {
                 lockedAmpIds={new Set(activeZone.lockedAmpInstances.map(a => a.id))}
                 perOutputMap={perOutputMap}
                 hasErrors={getImpedanceErrors(activeZoneSolution.solution).length > 0}
+                displayedAmpCount={displayedStats?.amps}
+                displayedRakCount={displayedStats?.raks}
               />
             </div>
           )}
@@ -931,6 +941,7 @@ export default function App() {
             onRackNameChange={(rackKey, name) => setRackNameMap(prev => ({ ...prev, [rackKey]: name }))}
             perOutputMap={perOutputMap}
             hintsEnabled={hintsEnabled}
+            onLayoutStats={handleLayoutStats}
             onMoveEnclosure={(move: EnclosureMoveResult) => {
               // Find the active zone's current solution to get amp instances
               const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);

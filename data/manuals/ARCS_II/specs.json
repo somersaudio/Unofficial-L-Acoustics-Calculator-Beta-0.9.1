@@ -1,0 +1,75 @@
+{
+  "enclosure": "ARCS II",
+  "product": "ARCS II",
+  "type": "line source",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "50 - 20000 ([ARCS II] preset, -10 dB)",
+    "max_spl_db": 142,
+    "max_spl_note": "Peak SPL at 1 m, free field, pink noise crest factor 4, [ARCS II] preset (SP v4.0 / UM v4.0). The 2011 launch press release and some third-party catalogs cite 140 dB; the current official documents state 142 dB. Extends to 25 Hz as a system when paired with an SB28 subwoofer.",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Constant-curvature WST line source: 22.5 deg symmetric (H) x 60 deg asymmetric (V, -20 deg/+40 deg) per enclosure standing vertically. Array coverage in the arraying plane = N x 22.5 deg; the orthogonal plane is the asymmetric 60 deg. Orientation sets whether the 40 deg lobe points up/down (horizontal array) or left/right (vertical array).",
+    "components": "2-way active: LF 1 x 15\" neodymium weather-resistant bass-reflex (K1-grade transducer); HF 1 x 3\" neodymium diaphragm compression driver on a DOSC waveguide. RMS power handling LF 600 W / HF 100 W."
+  },
+  "amplification": {
+    "amp_channels_required": 2,
+    "operating_modes": [
+      "2-way active: one amp channel drives LF, one drives HF (bi-amplified)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 4
+    },
+    "per_amplifier_note": "LA8 capacity per the LA8 user manual (LA8_UM_EN_11.0) Table 3 for the ARCS II: 2 connections per output / 4 enclosures per controller. As an active 2-way it uses 2 amp channels (LF + HF) per box; an LA4X drives up to 2 ARCS II (8 ohm), an LA8 up to 4 (8 ohm single / 4 ohm paralleled pair), and LA12X is listed as a compatible controller. System touring rack = LA-RAK (3x LA8).",
+    "preset_names": [
+      "[ARCS II]",
+      "[SB28_60]",
+      "[SB28_60_C]",
+      "[SB28_100]"
+    ],
+    "preset_note": "[ARCS II] is the single reference preset for the enclosure (medium-throw frequency response); preset routing IN A -> LF, IN B -> HF, with amp mapping OUT1=LF / OUT2=HF / OUT3=LF / OUT4=HF, default gain 0 dB, delay 0 ms, polarity +. [SB28_60] / [SB28_60_C] (cardioid) and [SB28_100] are companion subwoofer presets for SB28 LF extension, not the ARCS II itself (pre-alignment [ARCS II]+[SB28_60] -> ARCS II 0, SB28 2.6)."
+  },
+  "connection": {
+    "input_connector": "1x 4-point speakON (NL4) labeled IN + 1x 4-point speakON (NL4) labeled LINK (parallel pass-through for daisy-chaining additional ARCS II). Internal 2-way active pinout: 1+/1- = LF+/LF-, 2+/2- = HF+/HF-.",
+    "breakouts": "DOFILL-LA8 (8-point PA-COM to 2x 4-point speakON, feeds two 2-way active enclosures); DO3WFILL (PA-COM to 1x 4-point + 2x 2-point speakON, one active 2-way + two passive, custom preset); DOSUB-LA8 (PA-COM to 4x 2-point speakON for four subs); SP-Y1 (4-point speakON to 2x 2-point speakON, ships with CC4FP adapter) for two passive subs. Direct cables: SP.7/SP5/SP10/SP25 (4-point speakON, 4 mm2) and DO.7/DO10/DO25 (8-point PA-COM, 4 mm2)."
+  },
+  "physical": {
+    "weight_kg": 50,
+    "weight_note": "Net weight 50 kg / 110 lb.",
+    "dimensions_mm": "820 (H) x 439 (W) x 652 (D) mm; 32.3 x 17.3 x 25.7 in (spec sheet labels them W 439 x H 820 x D 652 mm).",
+    "protection_rating": "IP55",
+    "cabinet": "First-grade Baltic birch plywood; steel front grille with anti-corrosion coating and Airnet acoustically neutral fabric. Finish Dark Grey Brown (Pantone 426C), optional Pure White (RAL 9010). Rigging hardware in steel with anti-corrosion coating."
+  },
+  "deployment": {
+    "modes": [
+      "flown horizontal array (BUMP3 / LIFTBAR)",
+      "flown vertical array (ARCBUMP frame)",
+      "ground-stacked (directly or on top of an SB28 array, on ARCSPLA dolly board)"
+    ],
+    "max_per_flown_array": "Horizontal: 2 or 4 ARCS II on 1x BUMP3; 1/3/5/6 ARCS II on 2x BUMP3 + 1x LIFTBAR. Vertical: up to 3 ARCS II on ARCBUMP with a single pick-up point (1-3 authorized single-point), up to 4 with two pick-up points. Beyond these, model in SOUNDVISION.",
+    "inter_element_angles": "Constant curvature: fixed 22.5 deg inter-element splay in the arraying plane (not a variable-angle line array); array coverage = N x 22.5 deg. Whole-array site angle is set via BUMP3/ARCBUMP hole selection (ARCBUMP has an 18-hole tilt bar, holes 1-18) per SOUNDVISION.",
+    "rigging_accessories": [
+      "ARCOUPL (captive coupling bars, 2 + 4x Ø12 mm D-shackles supplied per enclosure)",
+      "BUMP3 (horizontal flying bar, 2 or 4 boxes)",
+      "LIFTBAR (horizontal flying bar for 1/3/5/6 boxes, used with 2x BUMP3)",
+      "ARCBUMP (vertical flying frame, up to 4 boxes)",
+      "ARCSPLA (removable front dolly board)",
+      "ARCSCOV (protective transport cover)"
+    ]
+  },
+  "usage": [
+    "Constant-curvature WST line source (active 2-way) for medium-throw work: FOH L/R, central clusters, side-fills and distributed delays in touring and install; horizontal/array coverage builds as N x 22.5 deg.",
+    "Each ARCS II is a bi-amplified box needing 2 amp channels (one LF, one HF); budget up to 2 boxes per LA4X and up to 4 per LA8 (per LA8 manual Table 3: 2 connections per output / 4 per controller), with LA12X also compatible.",
+    "Load the single [ARCS II] reference preset for the enclosure; route IN A to LF and IN B to HF (preset maps OUT1/2 = LF/HF for one box).",
+    "Extend the low end with SB28 subwoofers (system down to 25 Hz) using the [SB28_60] preset, or [SB28_60_C] for cardioid LF; observe the published pre-alignment values.",
+    "Fly horizontally on BUMP3 (2 or 4) or BUMP3 + LIFTBAR (1/3/5/6), or vertically on ARCBUMP (up to 3 single-point, 4 two-point), or ground-stack on ARCSPLA and on top of an SB28 array; couple adjacent boxes with the supplied ARCOUPL bars.",
+    "Always model the array in SOUNDVISION before rigging to confirm per-link working loads and safety factors and to select tilt-hole settings, since no single per-array maximum working load is published."
+  ],
+  "source_manual": "ARCS II User Manual (EN), ref ARCSII_UM_EN_4.0, dated Dec 15, 2021 (Appendix C Specifications); ARCS II Rigging Manual (EN), ref ARCSII_RM_EN_2.0, dated Dec 15, 2021; ARCS II spec sheet ARCS II_SP_EN_4.0; LA8 Amplified Controller User Manual ref LA8_UM_EN_11.0 (Table 3).",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/ARCSII/documents.zip"
+}

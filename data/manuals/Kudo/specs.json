@@ -1,0 +1,79 @@
+{
+  "enclosure": "Kudo",
+  "product": "KUDO (Multi-Mode WST enclosure)",
+  "type": "line source",
+  "status": "discontinued (legacy/archive)",
+  "electroacoustic": {
+    "frequency_range_hz": "35 Hz - 20 kHz (-10 dB usable bandwidth, [KUDO50_25] preset)",
+    "max_spl_db": 140,
+    "max_spl_note": "Peak level at 1 m, free field, 10 dB crest-factor pink noise, [KUDO50_40] preset (spec table carries a -6 dB annotation on the SPL row).",
+    "nominal_impedance_ohms": 8,
+    "directivity": "Multi-Mode WST variable-curvature line source with K-LOUVER directivity control. Horizontal (vertical array): 50 or 110 deg symmetric, or 25/55 / 55/25 deg asymmetric per deflector position. Vertical: 10 deg x number of enclosures, inter-element angles 0-10 deg at 1 deg resolution.",
+    "components": "LF: 2 x 12in weather-resistant direct-radiating bass-reflex; MF: 4 x 5in weather-resistant high-efficiency V-shape mounted; HF: 2 x 1.75in diaphragm compression drivers on DOSC waveguides. Active 3-way quad-amplified. Long-term RMS power handling: LF 2 x 450 W, MF 312 W, HF 75 W ([KUDO50_40] preset)."
+  },
+  "amplification": {
+    "amp_channels_required": 4,
+    "operating_modes": [
+      "Active 3-way, quad-amplified (4 channels per enclosure: 2x LF, 1x MF, 1x HF)"
+    ],
+    "recommended_amplifiers": [
+      "LA4",
+      "LA4X",
+      "LA8",
+      "LA12X"
+    ],
+    "per_amplifier": {
+      "LA8": 3
+    },
+    "per_amplifier_note": "App value: 3 per LA8 (LA8 manual Table 3: 3 / 3 - up to 3 KUDO per CA-COM output and 3 total per LA8 at 2.7 ohm parallel loading). Loading rules: 8 ohm = one KUDO per channel-set; 4 ohm = two KUDO in parallel (LA8 only); 2.7 ohm = three KUDO in parallel (LA8 only). Max 1 KUDO per LA4X. The period-correct controllers were LA4X and LA8 (touring rack: LA-RAK with 3x LA8); LA4/LA12X listed for app-key compatibility.",
+    "preset_names": [
+      "KUDO50_25",
+      "KUDO50_40",
+      "KUDO50_60",
+      "KUDO80_25",
+      "KUDO80_40",
+      "KUDO80_60",
+      "KUDO110_25",
+      "KUDO110_40",
+      "KUDO110_60"
+    ],
+    "preset_note": "Nine factory presets in a 3x3 matrix of K-LOUVER horizontal coverage (50/80/110 deg) x high-pass corner (25/40/60 Hz), named [KUDOxx_yy]. [KUDO50_25] is the reference for the -10 dB frequency response; [KUDO50_40] is the reference for max SPL and RMS power. Stored on both LA8 (factory memory) and LA4X onboard libraries."
+  },
+  "connection": {
+    "input_connector": "2 x 8-point PA-COM (1 male, 1 female, wired in parallel). PA-COM pinout: A/B = left-mounted LF (+/-), C/D = right-mounted LF (+/-), E/F = MF section (+/-), G/H = HF section (+/-).",
+    "breakouts": "DO.7 cable from the amplified controller to the enclosure; DO10 or DO25 cable for enclosure-to-enclosure link via the female PA-COM. Cable gauge per UM Table 1 for damping factor >20 (e.g. one DO25 4 mm2 25 m cable drives two parallel KUDO at 4 ohm with DF >20)."
+  },
+  "physical": {
+    "weight_kg": 87,
+    "weight_note": "87 kg / 191.8 lb net (UM v2.1 Specifications).",
+    "dimensions_mm": "876 (W) x 356/276 (H) x 689 (D) mm; 34.5 x 14/10.9 x 27.1 in (dual H figure reflects the trapezoidal cabinet, rear shorter than front).",
+    "protection_rating": "N/A (no formal IP code published; transducers/cabinet described as weather-resistant, bass drivers treated against humidity).",
+    "cabinet": "15, 18 and 30 mm Baltic birch plywood; polyester-coated steel grill with acoustically transparent Airnet fabric; polyester-coated high-grade steel rigging; handles integrated into the cabinet. Finish Grey Brown RAL 8019 or Pure White RAL 9010 (polyester paint)."
+  },
+  "deployment": {
+    "modes": [
+      "flown vertical array (KBUMP)",
+      "flown horizontal array (KLIFT)",
+      "ground-stacked (KBUMP + KJACKx2)"
+    ],
+    "max_per_flown_array": "KBUMP: up to 21 KUDO vertical flown; KLIFT: up to 7 KUDO horizontal flown (min 2 per KLIFT); ground-stacked: up to 6 KUDO (KBUMP + KJACKx2, or KBUMP alone at 0 deg tilt).",
+    "inter_element_angles": "0-10 deg in 1 deg steps. Ground-stack tilt vs. capacity (KBUMP/KJACKx2): -10 deg -> 3 boxes, -9 to -7 deg -> 4, -7 to -6 deg -> 5, -6 to +2 deg -> 6, +2 to +9 deg -> 5, +9 to +10 deg -> 4. KLIFT horizontal flying is at a fixed 10 deg inter-element angle.",
+    "rigging_accessories": [
+      "KBUMP (vertical flying/stacking frame)",
+      "KJACKx2 (ground-stack jack pair for KBUMP)",
+      "KLIFT (horizontal flying accessory)",
+      "KPLA-2 (front dolly board)",
+      "KCOV (protective cover)"
+    ]
+  },
+  "usage": [
+    "Multi-Mode WST variable-curvature line source from the dV-DOSC / mid-2000s era; active 3-way and quad-amplified, with K-LOUVER deflectors that set horizontal coverage (50, 80 or 110 deg) per box for medium-to-long-throw touring and install work, delivering up to 140 dB.",
+    "Each enclosure needs 4 amp channels (2x LF, 1x MF, 1x HF), so plan amp inventory in full sets: the period-correct controllers are the LA8 (up to 3 KUDO per CA-COM output / 3 per LA8 at 2.7 ohm parallel) and the LA4X (1 KUDO each); the touring reference rack is the LA-RAK with 3x LA8.",
+    "Pick the preset to match the K-LOUVER deflector setting and the desired high-pass corner: [KUDOxx_25/40/60] where xx is 50/80/110 deg coverage and yy is the 25/40/60 Hz HPF; [KUDO50_25] gives the full 35 Hz extension and [KUDO50_40] is the max-SPL reference.",
+    "Pair with companion subwoofers - SB118 or SB28 (and per the preset guide also KS28, SB18, SB218) - to extend the low end below the 35 Hz enclosure limit.",
+    "Fly vertical arrays on the KBUMP (up to 21 KUDO, 0-10 deg inter-element in 1 deg steps), fly horizontal arrays on the KLIFT (up to 7 KUDO), or ground-stack on KBUMP + KJACKx2 (up to 6 KUDO); connect with 2x 8-point PA-COM (male/female parallel) carrying all four sections, daisy-chaining via DO10/DO25.",
+    "This is a discontinued/archived product: docs live only as a single L-Acoustics ARCHIVES bundle, no IP rating is published, and per-suspension-point WLL is delegated to SOUNDVISION - always validate any array mechanically in SOUNDVISION before rigging."
+  ],
+  "source_manual": "KUDO User Manual (EN/FR) version 2.1, ref KUDO_UM_ML_2-1; KUDO Rigging Procedures Manual (EN/FR) version 2.0, ref KUDO_RM_ML_2-0; EC Declaration of Conformity (KUDO_certification_EN). Specifications are contained inside the User Manual (no standalone datasheet in the archive bundle).",
+  "official_pdf": "https://prdstglaxxwe001.blob.core.windows.net/webapp-lacoustics/documentation/ARCHIVES/Kudo/documents.zip"
+}
