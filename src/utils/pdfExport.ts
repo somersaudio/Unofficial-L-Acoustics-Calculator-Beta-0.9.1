@@ -38,7 +38,7 @@ async function loadImageWithDimensions(src: string): Promise<{ base64: string; w
 }
 
 export async function generatePDFReport(options: PDFExportOptions): Promise<void> {
-  const { zoneSolutions } = options;
+  const { zoneSolutions, rackMode } = options;
   const isMultiZone = zoneSolutions.length > 1;
 
   const doc = new jsPDF({
