@@ -1,7 +1,7 @@
 {
   "name": "unofficial-l-acoustics-calculator",
   "productName": "Unofficial L-Acoustics Calculator",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Unofficial amplifier calculator for L-Acoustics speaker configurations",
   "main": ".vite/build/main.js",
   "repository": {
