@@ -2443,7 +2443,7 @@ function LaRakCard({ rackIndex, instances, cableGaugeMm2, useFeet, onAdjustEnclo
   );
 }
 
-function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, ampIndex, cableLengths, onCableLengthChange, hidePackToggle = false, isInRack = false, rackPosition, perOutputMap }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked: () => void; onToggleSpread: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; ampIndex?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void; hidePackToggle?: boolean; isInRack?: boolean; rackPosition?: number; perOutputMap?: Record<string, number> }) {
+function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useFeet, onAdjustEnclosure, packed, spread, onTogglePacked, onToggleSpread, isLocked = false, onLock, onUnlock, ampNumber, ampIndex, cableLengths, onCableLengthChange, hidePackToggle = false, isInRack = false, rackPosition, perOutputMap }: { instance: AmpInstance; salesMode?: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; packed: boolean; spread: boolean; onTogglePacked?: () => void; onToggleSpread?: () => void; isLocked?: boolean; onLock?: () => void; onUnlock?: () => void; ampNumber?: number; ampIndex?: number; cableLengths?: Record<string, number>; onCableLengthChange?: (outputIndex: number, lengthMeters: number) => void; hidePackToggle?: boolean; isInRack?: boolean; rackPosition?: number; perOutputMap?: Record<string, number> }) {
   // Compute the repacked/spread instance based on mode
   const instance = useMemo(() => {
     if (packed && spread) {
@@ -2876,6 +2876,55 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   );
 }
 
+/**
+ * Multi-amp "Prioritize Channels" spread for a group of same-type amps (e.g. all LA8s), mirroring
+ * what LA-RAK racks already do for LA12X. If honoring the ×N-per-ch target (perOutputMap) needs MORE
+ * amps than the solver allocated, pad virtual amps and redistribute across them. Returns the spread
+ * instances ONLY when extra amps are needed; returns null when the existing amps already suffice, so
+ * the caller keeps the normal per-amp render (which already spreads within a single amp).
+ */
+function spreadAcrossAmps(
+  instances: AmpInstance[],
+  perOutputMap?: Record<string, number>
+): AmpInstance[] | null {
+  if (instances.length === 0) return null;
+  const ampConfig = instances[0].ampConfig;
+  let totalGroupsNeeded = 0;
+  let firstEnclosure: Enclosure | undefined;
+  for (const inst of instances) {
+    for (const output of inst.outputs) {
+      for (const enc of output.enclosures) {
+        if (enc.count <= 0) continue;
+        if (!firstEnclosure) firstEnclosure = enc.enclosure;
+        const cpu = getChannelsPerUnit(enc.enclosure, ampConfig.key);
+        const perOut = perOutputMap?.[enc.enclosure.enclosure] ?? 1;
+        if (cpu > 1) {
+          if (output.outputIndex % cpu === 0) totalGroupsNeeded += Math.ceil(enc.count / perOut);
+        } else {
+          totalGroupsNeeded += Math.ceil(enc.count / perOut);
+        }
+      }
+    }
+  }
+  const cpu = firstEnclosure ? getChannelsPerUnit(firstEnclosure, ampConfig.key) : 1;
+  const groupsPerAmp = Math.max(1, Math.floor(ampConfig.outputs / Math.max(1, cpu)));
+  const ampsNeeded = Math.max(instances.length, Math.ceil(totalGroupsNeeded / groupsPerAmp));
+  if (ampsNeeded <= instances.length) return null; // existing amps already hold the spread
+  const padded: AmpInstance[] = [...instances];
+  for (let i = instances.length; i < ampsNeeded; i++) {
+    padded.push({
+      id: `spread-virtual-${ampConfig.key}-${i}`,
+      ampConfig,
+      outputs: Array.from({ length: ampConfig.outputs }, (_, oi) => ({
+        outputIndex: oi, enclosures: [], totalEnclosures: 0, impedanceOhms: Infinity,
+      })),
+      totalEnclosures: 0,
+      loadPercent: 0,
+    });
+  }
+  return spreadRackInstances(repackRackInstances(padded), perOutputMap).filter((inst) => inst.totalEnclosures > 0);
+}
+
 /** Renders a single zone's solver results */
 function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, useFeet, onAdjustEnclosure, lockedAmpIds, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, onLayoutStats }: { solution: SolverSolution; salesMode: boolean; rackMode: boolean; cableGaugeMm2: number; useFeet: boolean; onAdjustEnclosure?: (enclosureName: string, delta: number) => void; lockedAmpIds?: Set<string>; onLockAmpInstance?: (ampInstance: AmpInstance) => void; onLockRack?: (ampInstances: AmpInstance[]) => void; onUnlockAmpInstance?: (ampInstanceId: string) => void; onCombineLockedRacks?: (ampIds: string[]) => void; rackNameMap?: Record<string, string>; onRackNameChange?: (rackKey: string, name: string) => void; perOutputMap?: Record<string, number>; hintsEnabled?: boolean; onLayoutStats?: (ampCount: number, rakCount: number) => void }) {
   // Track packed/spread state per amp index (independent per amp)
@@ -3253,6 +3302,31 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
       const otherAmpNumbers = new Map<number, number>();
       otherEntries.forEach((e, idx) => otherAmpNumbers.set(e.globalIndex, idx + 1));
 
+      // Multi-amp ×N-per-ch spread for non-LA12X amps (LA8, LA4X, …) so the per-channel control
+      // changes the amp count the same way it does inside LA-RAK racks. Group the unlocked "other"
+      // amps by type; if a group needs more amps to honor the per-ch target, render the expanded
+      // (pre-spread) amps as fixed cards. Otherwise keep the normal per-amp render (which already
+      // spreads within one amp). The lock action on an expanded card pins the RAW group instances.
+      type OtherRender =
+        | { spread: false; instance: AmpInstance; globalIndex: number }
+        | { spread: true; instance: AmpInstance; rawInstances: AmpInstance[] };
+      const unlockedOtherByType = new Map<string, { instance: AmpInstance; globalIndex: number }[]>();
+      for (const e of unlockedOtherEntries) {
+        const k = e.instance.ampConfig.key;
+        if (!unlockedOtherByType.has(k)) unlockedOtherByType.set(k, []);
+        unlockedOtherByType.get(k)!.push(e);
+      }
+      const unlockedOtherRender: OtherRender[] = [];
+      for (const group of unlockedOtherByType.values()) {
+        const expanded = spreadAcrossAmps(group.map((g) => g.instance), perOutputMap);
+        if (expanded) {
+          const rawInstances = group.map((g) => g.instance);
+          for (const inst of expanded) unlockedOtherRender.push({ spread: true, instance: inst, rawInstances });
+        } else {
+          for (const g of group) unlockedOtherRender.push({ spread: false, instance: g.instance, globalIndex: g.globalIndex });
+        }
+      }
+
       // Compute non-conflicting rack names
       const lockedRackDisplayNames: string[] = [];
       const takenNumbers = new Set<number>();
@@ -3415,26 +3489,46 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
               />
             );
           })}
-          {unlockedOtherEntries.map(({ instance, globalIndex }) => (
+          {unlockedOtherRender.map((item, i) => item.spread ? (
+            // Expanded ×N-per-ch spread amp (possibly virtual). No per-amp pack toggle; the
+            // already-spread instance is shown as-is, and locking pins the RAW group instances.
             <AmpCard
-              key={instance.id}
-              instance={instance}
+              key={item.instance.id}
+              instance={item.instance}
               salesMode={false}
               cableGaugeMm2={cableGaugeMm2}
               useFeet={useFeet}
               onAdjustEnclosure={onAdjustEnclosure}
-              packed={packedMap[globalIndex] ?? false}
-              spread={spreadMap[globalIndex] ?? false}
-              onTogglePacked={() => handleTogglePacked(globalIndex)}
-              onToggleSpread={() => handleToggleSpread(globalIndex)}
+              packed={false}
+              spread={false}
+              hidePackToggle={true}
               perOutputMap={perOutputMap}
               isLocked={false}
-              onLock={() => handleLockWithCableMigration?.(instance, globalIndex)}
-              onUnlock={() => onUnlockAmpInstance?.(instance.id)}
-              ampNumber={otherAmpNumbers.get(globalIndex) ?? 1}
-              ampIndex={globalIndex}
+              onLock={onLockRack ? () => onLockRack(item.rawInstances) : undefined}
+              onUnlock={() => onUnlockAmpInstance?.(item.instance.id)}
+              ampNumber={i + 1}
               cableLengths={cableLengths}
-              onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(globalIndex, outputIndex, meters)}
+            />
+          ) : (
+            <AmpCard
+              key={item.instance.id}
+              instance={item.instance}
+              salesMode={false}
+              cableGaugeMm2={cableGaugeMm2}
+              useFeet={useFeet}
+              onAdjustEnclosure={onAdjustEnclosure}
+              packed={packedMap[item.globalIndex] ?? false}
+              spread={spreadMap[item.globalIndex] ?? false}
+              onTogglePacked={() => handleTogglePacked(item.globalIndex)}
+              onToggleSpread={() => handleToggleSpread(item.globalIndex)}
+              perOutputMap={perOutputMap}
+              isLocked={false}
+              onLock={() => handleLockWithCableMigration?.(item.instance, item.globalIndex)}
+              onUnlock={() => onUnlockAmpInstance?.(item.instance.id)}
+              ampNumber={otherAmpNumbers.get(item.globalIndex) ?? 1}
+              ampIndex={item.globalIndex}
+              cableLengths={cableLengths}
+              onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(item.globalIndex, outputIndex, meters)}
             />
           ))}
         </>
@@ -3445,7 +3539,7 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
         lockedRacks.reduce((s, r) => s + r.filter((e) => e.instance.totalEnclosures > 0).length, 0) +
         unlockedRacks.reduce((s, r) => s + r.filter((e) => e.instance.totalEnclosures > 0).length, 0) +
         lockedOtherEntries.filter((e) => e.instance.totalEnclosures > 0).length +
-        unlockedOtherEntries.filter((e) => e.instance.totalEnclosures > 0).length;
+        unlockedOtherRender.filter((it) => it.instance.totalEnclosures > 0).length;
       const rakCount =
         lockedRacks.filter((r) => r.some((e) => e.instance.totalEnclosures > 0)).length +
         unlockedRacks.filter((r) => r.some((e) => e.instance.totalEnclosures > 0)).length;
@@ -3476,6 +3570,29 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
       const regularEntries = unlocked.sort((a, b) => a.index - b.index);
       const regularAmpNumbers = new Map<number, number>();
       regularEntries.forEach((e, idx) => regularAmpNumbers.set(e.index, idx + 1));
+
+      // Multi-amp ×N-per-ch spread (same mechanism as the rack-mode branch): group unlocked amps
+      // by type and expand a group across more amps when the per-channel target needs it, so the
+      // ×N-per-ch control changes the amp count for any amp type (LA8 included), not just LA-RAK.
+      type RegRender =
+        | { spread: false; instance: AmpInstance; index: number }
+        | { spread: true; instance: AmpInstance; rawInstances: AmpInstance[] };
+      const regularByType = new Map<string, { instance: AmpInstance; index: number }[]>();
+      for (const e of regularEntries) {
+        const k = e.instance.ampConfig.key;
+        if (!regularByType.has(k)) regularByType.set(k, []);
+        regularByType.get(k)!.push(e);
+      }
+      const regularRender: RegRender[] = [];
+      for (const group of regularByType.values()) {
+        const expanded = spreadAcrossAmps(group.map((g) => g.instance), perOutputMap);
+        if (expanded) {
+          const rawInstances = group.map((g) => g.instance);
+          for (const inst of expanded) regularRender.push({ spread: true, instance: inst, rawInstances });
+        } else {
+          for (const g of group) regularRender.push({ spread: false, instance: g.instance, index: g.index });
+        }
+      }
 
       const lockedNonRackAmpNumbers = new Map<number, number>();
       lockedNonRack.forEach((e, idx) => lockedNonRackAmpNumbers.set(e.index, idx + 1));
@@ -3550,35 +3667,61 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
 
       const unlockedContent = (
         <>
-          {regularEntries.map(({ instance, index }) => (
+          {regularRender.map((item, i) => item.spread ? (
+            // Expanded ×N-per-ch spread amp (possibly virtual). No per-amp pack toggle; locking
+            // pins the RAW group instances.
             <AmpCard
-              key={instance.id}
-              instance={instance}
+              key={item.instance.id}
+              instance={item.instance}
               salesMode={salesMode}
               cableGaugeMm2={cableGaugeMm2}
               useFeet={useFeet}
               onAdjustEnclosure={onAdjustEnclosure}
-              packed={packedMap[index] ?? false}
-              spread={spreadMap[index] ?? false}
-              onTogglePacked={() => handleTogglePacked(index)}
-              onToggleSpread={() => handleToggleSpread(index)}
+              packed={false}
+              spread={false}
+              hidePackToggle={true}
               perOutputMap={perOutputMap}
               isLocked={false}
-              onLock={() => handleLockWithCableMigration?.(instance, index)}
-              onUnlock={() => onUnlockAmpInstance?.(instance.id)}
-              ampNumber={regularAmpNumbers.get(index) ?? 1}
-              ampIndex={index}
+              onLock={onLockRack ? () => onLockRack(item.rawInstances) : undefined}
+              onUnlock={() => onUnlockAmpInstance?.(item.instance.id)}
+              ampNumber={i + 1}
               cableLengths={cableLengths}
-              onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(index, outputIndex, meters)}
+            />
+          ) : (
+            <AmpCard
+              key={item.instance.id}
+              instance={item.instance}
+              salesMode={salesMode}
+              cableGaugeMm2={cableGaugeMm2}
+              useFeet={useFeet}
+              onAdjustEnclosure={onAdjustEnclosure}
+              packed={packedMap[item.index] ?? false}
+              spread={spreadMap[item.index] ?? false}
+              onTogglePacked={() => handleTogglePacked(item.index)}
+              onToggleSpread={() => handleToggleSpread(item.index)}
+              perOutputMap={perOutputMap}
+              isLocked={false}
+              onLock={() => handleLockWithCableMigration?.(item.instance, item.index)}
+              onUnlock={() => onUnlockAmpInstance?.(item.instance.id)}
+              ampNumber={regularAmpNumbers.get(item.index) ?? 1}
+              ampIndex={item.index}
+              cableLengths={cableLengths}
+              onCableLengthChange={(outputIndex, meters) => handleCableLengthChange(item.index, outputIndex, meters)}
             />
           ))}
         </>
       );
 
-      return { locked: lockedContent, unlocked: unlockedContent };
+      // Mirror the actual displayed amp count (post-spread) for the summary.
+      const ampCount =
+        lockedRacks.reduce((s, r) => s + r.filter((e) => e.instance.totalEnclosures > 0).length, 0) +
+        lockedNonRack.filter((e) => e.instance.totalEnclosures > 0).length +
+        regularRender.filter((it) => it.instance.totalEnclosures > 0).length;
+      return { locked: lockedContent, unlocked: unlockedContent, ampCount };
     })();
     lockedColumnContent = result.locked;
     unlockedColumnContent = result.unlocked;
+    layoutAmpCount = result.ampCount;
   }
 
   // Stash the totals computed above for the after-commit report (see layoutStatsRef effect).
