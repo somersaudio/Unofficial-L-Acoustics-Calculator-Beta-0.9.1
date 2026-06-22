@@ -63,9 +63,12 @@ gh release upload "${TAG}" "${X64_ZIP}" -R "${REPO}" --clobber
 echo "==> [4/5] Publishing release ${TAG}…"
 gh release edit "${TAG}" -R "${REPO}" --draft=false
 
-# 5/5 — trigger the Windows build in CI (uploads Setup.exe + RELEASES + .nupkg to ${TAG})
+# 5/5 — trigger the Windows build in CI (uploads Setup.exe + RELEASES + .nupkg to ${TAG}).
+# Dispatch against the just-created ${TAG} (not the default branch) so the Actions run is
+# labeled with the version, not "main". The publish steps above already created the tag, and
+# release.yml has no push-tag trigger, so this is still a SINGLE run (no double-run race).
 echo "==> [5/5] Triggering Windows CI…"
-gh workflow run release.yml -R "${REPO}"
+gh workflow run release.yml -R "${REPO}" --ref "${TAG}"
 
 echo ""
 echo "✅ ${TAG}: macOS arm64 + x64 published. Windows is building in CI."
