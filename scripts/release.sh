@@ -59,6 +59,28 @@ if [ -z "${X64_ZIP}" ] || [ ! -f "${X64_ZIP}" ]; then
 fi
 gh release upload "${TAG}" "${X64_ZIP}" -R "${REPO}" --clobber
 
+# 3b — stable, version-less download aliases for somersaudio.com.
+# The website links to these fixed names via /releases/latest/download/<name>, so its
+# download buttons always serve the NEWEST release with no per-release website edit
+# (same pattern as TalkBoard_mac_arm.dmg / SomerSVC-arm64.dmg on the other two apps).
+# They are byte-identical copies of the versioned zips above. update.electronjs.org is
+# first-wins on asset matching and the versioned originals are uploaded first, so the
+# macOS auto-updater keeps using those, not these aliases.
+echo "==> [3b] Uploading stable download aliases (mac)…"
+ARM64_ZIP="$(ls out/make/zip/darwin/arm64/*arm64-${VERSION}.zip | head -1)"
+if [ -z "${ARM64_ZIP}" ] || [ ! -f "${ARM64_ZIP}" ]; then
+  echo "ERROR: no arm64 zip for ${VERSION} in out/make/zip/darwin/arm64/" >&2
+  exit 1
+fi
+ALIAS_DIR="$(mktemp -d)"
+cp "${ARM64_ZIP}" "${ALIAS_DIR}/L-Acoustic.Amp.Calc-darwin-arm64.zip"
+cp "${X64_ZIP}"   "${ALIAS_DIR}/L-Acoustic.Amp.Calc-darwin-x64.zip"
+gh release upload "${TAG}" \
+  "${ALIAS_DIR}/L-Acoustic.Amp.Calc-darwin-arm64.zip" \
+  "${ALIAS_DIR}/L-Acoustic.Amp.Calc-darwin-x64.zip" \
+  -R "${REPO}" --clobber
+rm -rf "${ALIAS_DIR}"
+
 # 4/5 — make the release live (so update.electronjs.org serves it)
 echo "==> [4/5] Publishing release ${TAG}…"
 gh release edit "${TAG}" -R "${REPO}" --draft=false

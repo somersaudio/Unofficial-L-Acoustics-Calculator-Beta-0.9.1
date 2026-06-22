@@ -40,3 +40,21 @@ jobs:
         env:
           # Provided automatically by Actions; used by @electron-forge/publisher-github
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Stable, version-less Windows installer alias for somersaudio.com. The site links to
+      # this fixed name via /releases/latest/download/L-Acoustic.Amp.Calc-Setup.exe, so its
+      # Windows button always serves the newest build with no per-release website edit. It is
+      # a byte-identical copy of the versioned Setup.exe published above. Squirrel auto-update
+      # uses RELEASES + .nupkg (never the Setup.exe), so this alias cannot affect updates.
+      - name: Upload stable Windows download alias
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          exe="$(find out/make -iname '*Setup.exe' | head -1)"
+          if [ -z "$exe" ]; then echo "ERROR: no Setup.exe found under out/make" >&2; exit 1; fi
+          cp "$exe" "L-Acoustic.Amp.Calc-Setup.exe"
+          tag="v$(node -p "require('./package.json').version")"
+          gh release upload "$tag" "L-Acoustic.Amp.Calc-Setup.exe" --clobber \
+            -R somersaudio/Unofficial-L-Acoustics-Calculator-Beta-0.9.1
