@@ -801,7 +801,7 @@ export default function App() {
         />
         <div className="flex items-center gap-2">
           <button
-            onClick={() => generatePDFReport({ zoneSolutions, rackMode })}
+            onClick={() => generatePDFReport({ zoneSolutions, rackMode, riggingParts: data.riggingParts, cableGaugeMm2, useFeet, weightInLbs })}
             disabled={!zoneSolutions.some((zs) => zs.solution !== null)}
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium bg-gray-600 text-gray-200 hover:bg-gray-400 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 transition-colors"
             title="Export PDF report"

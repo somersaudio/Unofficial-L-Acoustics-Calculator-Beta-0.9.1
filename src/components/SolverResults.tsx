@@ -2474,8 +2474,10 @@ function AmpCard({ instance: rawInstance, salesMode = false, cableGaugeMm2, useF
   // Only show toggle when there are enclosures to redistribute
   const showPackToggle = rawInstance.totalEnclosures > 1 && !salesMode && !hidePackToggle && !isInRack;
 
-  // NL8 is now always shown in CableChain for LA12X, no separate amp-level display needed
-  const showAmpNL8 = false;
+  // In an LA-RAK, the per-channel cable chains in the output cards would duplicate the combined
+  // "Service Amp" NL8 routing shown below the card — so suppress the per-channel chains when racked
+  // and let the service-amp routing be the single source of cabling for the rack.
+  const showAmpNL8 = isInRack;
   const connectorClickBack: (() => void) | undefined = undefined;
 
   // Group channels into physical outputs when needed (e.g., LA12X: 4 channels -> 2 NL4 connectors)
