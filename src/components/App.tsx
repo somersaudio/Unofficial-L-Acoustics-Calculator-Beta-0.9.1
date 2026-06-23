@@ -338,7 +338,7 @@ export default function App() {
   });
   const [cableGaugeMm2, setCableGaugeMm2] = useState<number>(() => {
     const saved = localStorage.getItem("cableGaugeMm2");
-    return saved ? JSON.parse(saved) : 2.5;
+    return saved ? JSON.parse(saved) : 4;
   });
   const [useFeet, setUseFeet] = useState<boolean>(() => {
     const saved = localStorage.getItem("useFeet");

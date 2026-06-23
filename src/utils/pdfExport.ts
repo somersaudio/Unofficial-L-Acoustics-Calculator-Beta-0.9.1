@@ -83,7 +83,7 @@ export async function generatePDFReport(options: PDFExportOptions): Promise<void
     zoneSolutions,
     rackMode = false,
     riggingParts,
-    cableGaugeMm2 = 2.5,
+    cableGaugeMm2 = 4,
     useFeet = true,
     weightInLbs = false,
   } = options;

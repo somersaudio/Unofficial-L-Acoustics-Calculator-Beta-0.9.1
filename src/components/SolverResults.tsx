@@ -3923,7 +3923,7 @@ export function RecommendedConfig({ solution, rackMode, lockedAmpIds, perOutputM
   );
 }
 
-export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 2.5, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, onLayoutStats }: SolverResultsProps) {
+export default function SolverResults({ zoneSolutions, activeZoneId, salesMode = false, rackMode = false, cableGaugeMm2 = 4, useFeet = true, onAdjustEnclosure, onLockAmpInstance, onLockRack, onUnlockAmpInstance, onCombineLockedRacks, onMoveEnclosure, rackNameMap: externalRackNameMap, onRackNameChange: externalOnRackNameChange, perOutputMap, hintsEnabled = false, onLayoutStats }: SolverResultsProps) {
   // Find the active zone's solution
   const activeZoneSolution = zoneSolutions.find((zs) => zs.zone.id === activeZoneId);
   const activeSolution = activeZoneSolution?.solution ?? null;
