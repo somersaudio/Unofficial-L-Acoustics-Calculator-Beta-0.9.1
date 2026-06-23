@@ -2026,9 +2026,12 @@ export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Re
         ? Math.min(groupsNeededForThisType, Math.max(1, groups.length - groupsToReserveForSingleChannel))
         : groups.length;
 
-      // Phase 1: Allocate perOut (or minimum) per group to each empty group (up to maxGroupsToUse)
+      // Phase 1: Allocate up to perOut per group to each empty group (up to maxGroupsToUse).
+      // Use `remaining > 0` (not `remaining >= perOutMulti`): when the leftover is smaller than
+      // the ×N target it must still PACK into a group here, not fall through to Phase 2 which
+      // would spread it across every group and evict other enclosures sharing the amp.
       let groupsUsed = 0;
-      for (let gi = 0; gi < groups.length && remaining >= perOutMulti && groupsUsed < maxGroupsToUse; gi++) {
+      for (let gi = 0; gi < groups.length && remaining > 0 && groupsUsed < maxGroupsToUse; gi++) {
         const group = groups[gi];
         // Check if group is empty
         if (outputs[group[0]].totalEnclosures > 0) continue;
@@ -2099,8 +2102,10 @@ export function spreadAmpInstance(instance: AmpInstance, perOutputOverrides?: Re
       // ×N per ch override (from EnclosureSelector) raises the per-channel count when spreading
       const perOut = Math.max(minPerOutput, perOutputOverrides?.[enclosure.enclosure] ?? minPerOutput);
 
-      // Phase 1: Allocate perOut (or minimum) per output to each empty channel
-      for (let idx = 0; idx < order.length && remaining >= perOut; idx++) {
+      // Phase 1: Allocate up to perOut per output to each empty channel. `remaining > 0` (not
+      // `>= perOut`) so a leftover smaller than the ×N target still packs into a channel here
+      // rather than spreading across the amp in Phase 2 and evicting other enclosure types.
+      for (let idx = 0; idx < order.length && remaining > 0; idx++) {
         const oi = order[idx];
         if (outputs[oi].totalEnclosures === 0) {
           const toPlace = Math.min(remaining, perOut, limits.per_output);
