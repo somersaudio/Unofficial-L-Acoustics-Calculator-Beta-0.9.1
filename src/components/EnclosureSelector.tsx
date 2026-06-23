@@ -647,16 +647,29 @@ export default function EnclosureSelector({
                 className={`relative flex items-center gap-2 rounded-lg border py-1 px-3 bg-gray-100 dark:bg-neutral-800 ${isLocked ? "" : "border-gray-300 dark:border-neutral-700"}`}
                 style={isLocked ? { borderColor: lockGold } : undefined}
               >
-                {/* Enclosure Image — consistent size across all rows that have a second control line */}
-                {imageUrl && (
-                  <div className={`w-[88px] flex-shrink-0 overflow-hidden rounded ${hasBottomRow ? "h-[72px]" : "h-[50px]"}`}>
+                {/* Enclosure image — the slot is ALWAYS rendered (image or a same-size
+                    placeholder) so rows stay aligned when an enclosure has no picture. */}
+                <div className={`w-[88px] flex-shrink-0 overflow-hidden rounded ${hasBottomRow ? "h-[72px]" : "h-[50px]"}`}>
+                  {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={request.enclosure.enclosure}
                       className="h-full w-full object-contain"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div
+                      className="flex h-full w-full items-center justify-center rounded border border-dashed border-gray-300 text-gray-300 dark:border-neutral-700 dark:text-neutral-700"
+                      aria-hidden="true"
+                      title="No image available"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                        <circle cx="8.5" cy="10" r="1.5" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 16l-5-5-7 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 {/* Right column: stacked control lines. min-w-0 keeps it bounded to its
                     flex share so the inner deployment/rigging selects shrink instead of
                     overflowing the card on enclosures with very long rigging options. */}
