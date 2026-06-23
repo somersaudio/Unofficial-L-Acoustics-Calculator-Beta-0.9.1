@@ -340,6 +340,45 @@ function getChannelsPerUnit(enclosure: Enclosure, ampConfigKey?: string): number
   return enclosure.signal_channels.length;
 }
 
+/**
+ * How many same-model amps are needed to honor the ×N-per-ch ("Prioritize Channels") spread.
+ *
+ * Aggregates each enclosure ARRAY's own physical-box total and uses that array's OWN channels-per-
+ * unit — never one shared cpu for the whole group. A mixed amp (e.g. a 2-channel Kara + a 1-channel
+ * Kiva on the same LA8) therefore gets a correct, MONOTONIC amp count as ×N rises. The old per-group
+ * math measured every array with the first enclosure's cpu and counted per output, which over-
+ * allocated amps at some ×N values (e.g. ×3 with 2 boxes) and reshuffled the other array onto a
+ * second amp. Mirrors the (already-correct) RecommendedConfig calculation so display == recommended.
+ */
+export function ampsNeededForSpread(
+  instances: AmpInstance[],
+  perOutputOverrides?: Record<string, number>
+): number {
+  if (instances.length === 0) return 0;
+  const ampConfig = instances[0].ampConfig;
+  // Total physical boxes per enclosure type (count boxes once, on the primary channel of a group).
+  const totalByEnc = new Map<string, { enclosure: Enclosure; total: number }>();
+  for (const inst of instances) {
+    for (const output of inst.outputs) {
+      for (const enc of output.enclosures) {
+        if (enc.count <= 0) continue;
+        const cpu = getChannelsPerUnit(enc.enclosure, ampConfig.key);
+        if (cpu > 1 && output.outputIndex % cpu !== 0) continue; // skip secondary (HF/MF) channels
+        const key = enc.enclosure.enclosure;
+        const ex = totalByEnc.get(key);
+        totalByEnc.set(key, { enclosure: enc.enclosure, total: (ex?.total ?? 0) + enc.count });
+      }
+    }
+  }
+  let totalOutputsNeeded = 0;
+  for (const [, { enclosure, total }] of totalByEnc) {
+    const perOut = Math.max(1, perOutputOverrides?.[enclosure.enclosure] ?? 1);
+    const cpu = getChannelsPerUnit(enclosure, ampConfig.key);
+    totalOutputsNeeded += Math.ceil(total / perOut) * Math.max(1, cpu);
+  }
+  return Math.max(instances.length, Math.ceil(totalOutputsNeeded / ampConfig.outputs));
+}
+
 /** Get impedance for a specific channel within a multi-channel enclosure unit */
 function getSectionImpedance(enclosure: Enclosure, channelIndexInUnit: number): number {
   const signalType = enclosure.signal_channels[channelIndexInUnit];

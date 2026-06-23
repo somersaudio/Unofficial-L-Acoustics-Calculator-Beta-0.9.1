@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react"; // eslint-disable-line
 import type { AmpInstance, OutputAllocation, ZoneWithSolution, SolverSolution, Enclosure } from "../types";
 import { HARD_FLOOR_IMPEDANCE, MIN_IMPEDANCE_OHMS, getMaxCableLength, calculateCableLoss } from "../types";
-import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance, repackRackInstances, spreadRackInstances } from "../solver/ampSolver";
+import { getImpedanceErrors, repackAmpInstance, spreadAmpInstance, repackRackInstances, spreadRackInstances, ampsNeededForSpread } from "../solver/ampSolver";
 import { getEnclosureImage } from "../utils/enclosureImages";
 import CableLossChart from "./CableLossChart";
 import {
@@ -2891,26 +2891,8 @@ function spreadAcrossAmps(
 ): AmpInstance[] | null {
   if (instances.length === 0) return null;
   const ampConfig = instances[0].ampConfig;
-  let totalGroupsNeeded = 0;
-  let firstEnclosure: Enclosure | undefined;
-  for (const inst of instances) {
-    for (const output of inst.outputs) {
-      for (const enc of output.enclosures) {
-        if (enc.count <= 0) continue;
-        if (!firstEnclosure) firstEnclosure = enc.enclosure;
-        const cpu = getChannelsPerUnit(enc.enclosure, ampConfig.key);
-        const perOut = perOutputMap?.[enc.enclosure.enclosure] ?? 1;
-        if (cpu > 1) {
-          if (output.outputIndex % cpu === 0) totalGroupsNeeded += Math.ceil(enc.count / perOut);
-        } else {
-          totalGroupsNeeded += Math.ceil(enc.count / perOut);
-        }
-      }
-    }
-  }
-  const cpu = firstEnclosure ? getChannelsPerUnit(firstEnclosure, ampConfig.key) : 1;
-  const groupsPerAmp = Math.max(1, Math.floor(ampConfig.outputs / Math.max(1, cpu)));
-  const ampsNeeded = Math.max(instances.length, Math.ceil(totalGroupsNeeded / groupsPerAmp));
+  // Aggregate per enclosure array (each with its own channels-per-unit) — see ampsNeededForSpread.
+  const ampsNeeded = ampsNeededForSpread(instances, perOutputMap);
   if (ampsNeeded <= instances.length) return null; // existing amps already hold the spread
   const padded: AmpInstance[] = [...instances];
   for (let i = instances.length; i < ampsNeeded; i++) {
@@ -3240,27 +3222,8 @@ function ZoneSolutionSection({ solution, salesMode, rackMode, cableGaugeMm2, use
           Object.values(rackModeMap).every(m => m === "spread");
         if (allSpread && unlockedLa12x.length > 0) {
           const ampConfig = unlockedLa12x[0].instance.ampConfig;
-          let totalGroupsNeeded = 0;
-          let firstEnclosure: Enclosure | undefined;
-          for (const entry of unlockedLa12x) {
-            for (const output of entry.instance.outputs) {
-              for (const enc of output.enclosures) {
-                if (enc.count > 0) {
-                  if (!firstEnclosure) firstEnclosure = enc.enclosure;
-                  const cpu = getChannelsPerUnit(enc.enclosure, ampConfig.key);
-                  const perOut = perOutputMap?.[enc.enclosure.enclosure] ?? 1;
-                  if (cpu > 1) {
-                    if (output.outputIndex % cpu === 0) totalGroupsNeeded += Math.ceil(enc.count / perOut);
-                  } else {
-                    totalGroupsNeeded += Math.ceil(enc.count / perOut);
-                  }
-                }
-              }
-            }
-          }
-          const cpu = firstEnclosure ? getChannelsPerUnit(firstEnclosure, ampConfig.key) : 1;
-          const groupsPerAmp = Math.max(1, Math.floor(ampConfig.outputs / Math.max(1, cpu)));
-          const ampsNeeded = Math.max(unlockedLa12x.length, Math.ceil(totalGroupsNeeded / groupsPerAmp));
+          // Aggregate per enclosure array (each with its own channels-per-unit) — see ampsNeededForSpread.
+          const ampsNeeded = ampsNeededForSpread(unlockedLa12x.map((e) => e.instance), perOutputMap);
           if (ampsNeeded > unlockedLa12x.length) {
             preSpread = true;
             const padded: { instance: AmpInstance; globalIndex: number }[] = [...unlockedLa12x];
