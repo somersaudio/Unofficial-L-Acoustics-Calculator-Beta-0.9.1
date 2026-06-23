@@ -89,7 +89,7 @@ const createWindow = () => {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    title: "Unofficial L-Acoustics Calculator Beta 0.9.8",
+    title: "Unofficial L-Acoustics Calculator Beta 0.9.9",
   });
 
   // Load the index.html of the app.
