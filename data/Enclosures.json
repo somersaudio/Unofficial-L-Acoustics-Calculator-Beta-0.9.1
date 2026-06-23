@@ -70,7 +70,8 @@
       "signal_channels": [
         "PA"
       ],
-      "parallelAllowed": true
+      "parallelAllowed": true,
+      "preferredPerOutput": 2
     },
     {
       "enclosure": "A10 Wide/Focus",
@@ -850,7 +851,8 @@
       "signal_channels": [
         "PA"
       ],
-      "parallelAllowed": true
+      "parallelAllowed": true,
+      "preferredPerOutput": 2
     },
     {
       "enclosure": "X6i",
@@ -1179,7 +1181,8 @@
       "signal_channels": [
         "PA"
       ],
-      "parallelAllowed": true
+      "parallelAllowed": true,
+      "preferredPerOutput": 2
     },
     {
       "enclosure": "Kilo",
@@ -1197,7 +1200,8 @@
       "signal_channels": [
         "SB"
       ],
-      "parallelAllowed": true
+      "parallelAllowed": true,
+      "preferredPerOutput": 2
     },
     {
       "enclosure": "SB118",
