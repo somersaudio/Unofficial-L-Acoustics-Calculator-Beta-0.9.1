@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { watch } from "node:fs";
 import started from "electron-squirrel-startup";
 import { updateElectronApp } from "update-electron-app";
 import { loadDataFromFiles } from "./data/dataLoader";
@@ -164,6 +165,30 @@ function setupIpcHandlers(): void {
   });
 }
 
+// Dev only: live-reload data edits. Renderer code hot-reloads via Vite HMR and main.ts edits
+// auto-restart the main process, but data/*.json is read once at startup — so watch it and, on
+// change, re-read the data and reload open windows so the dev app always reflects the latest
+// data without a manual restart. Guarded by isPackaged so it never runs in a shipped build.
+function watchDataInDev(): void {
+  if (app.isPackaged) return;
+  const dataPath = getDataPath();
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  try {
+    watch(dataPath, (_event, filename) => {
+      if (filename && !filename.endsWith(".json")) return; // ignore manuals/, images, etc.
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        console.log(`[dev] data change (${filename ?? "?"}) — reloading data + windows`);
+        appData = await loadAndValidateData();
+        for (const win of BrowserWindow.getAllWindows()) win.webContents.reload();
+      }, 250); // debounce: editors fire several events per save
+    });
+    console.log("[dev] watching data/ for live reload");
+  } catch (err) {
+    console.error("[dev] could not watch data dir:", err);
+  }
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on("ready", async () => {
@@ -182,6 +207,9 @@ app.on("ready", async () => {
 
   // Create the main window
   createWindow();
+
+  // Dev only: live-reload on data/*.json edits (no-op in packaged builds)
+  watchDataInDev();
 
   // Build native application menu
   const isMac = process.platform === "darwin";
